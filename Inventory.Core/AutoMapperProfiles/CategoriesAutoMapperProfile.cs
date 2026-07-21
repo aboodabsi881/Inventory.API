@@ -9,7 +9,8 @@ namespace Inventory.Core.AutoMapperProfiles
 {
     public class CategoriesAutoMapperProfile : Profile
     {
-        CategoriesAutoMapperProfile()
+        // 💡 أضفنا كلمة public هنا
+        public CategoriesAutoMapperProfile()
         {
             CreateMap<CategoryRequestDto, Category>();
 

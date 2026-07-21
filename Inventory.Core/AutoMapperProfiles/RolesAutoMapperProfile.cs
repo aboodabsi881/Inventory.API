@@ -9,7 +9,7 @@ namespace Inventory.Core.AutoMapperProfiles
 {
     public class RolesAutoMapperProfile : Profile
     {
-        RolesAutoMapperProfile()
+        public RolesAutoMapperProfile()
         {
             CreateMap<RoleRequestDto, ApplicationRole>();
 

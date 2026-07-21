@@ -10,7 +10,7 @@ namespace Inventory.Core.AutoMapperProfiles
 {
     public class AccountsAutoMapperProfile : Profile
     {
-        AccountsAutoMapperProfile()
+        public AccountsAutoMapperProfile()
         {
             CreateMap<RegisterRequestDto, ApplicationUser>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());

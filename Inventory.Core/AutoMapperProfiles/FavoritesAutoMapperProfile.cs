@@ -9,7 +9,7 @@ namespace Inventory.Core.AutoMapperProfiles
 {
     public class FavoritesAutoMapperProfile : Profile
     {
-        FavoritesAutoMapperProfile()
+        public FavoritesAutoMapperProfile()
         {
             CreateMap<FavoriteRequestDto, Favorite>();
 

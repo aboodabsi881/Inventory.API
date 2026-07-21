@@ -9,6 +9,7 @@
         public string NameEn { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty; // Maps your culture-aware display logic
         public string? PhoneNumber { get; set; }
+        public string? RoleName { get; set; }
         public string? Img { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace Inventory.Core.AutoMapperProfiles
 {
     public class CartsAutoMapperProfile : Profile
     {
-        CartsAutoMapperProfile() 
+        public CartsAutoMapperProfile() 
         {
             CreateMap<CartRequestDto, Cart>();
 

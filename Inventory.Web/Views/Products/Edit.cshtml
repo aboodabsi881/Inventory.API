@@ -1,0 +1,112 @@
+﻿@using Inventory.ViewModel.Products
+@model CreateUpdateProductVM
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Product</h4>
+            </div>
+            <div class="card-body p-4">
+                <form id="editProductForm" asp-action="Edit" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Hidden fields to preserve ID and existing image path -->
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Img" />
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Price" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PowerType" class="form-label fw-semibold"></label>
+                        <select asp-for="PowerType"
+                                asp-items="Html.GetEnumSelectList<Inventory.Core.Utilities.Enums.PowerType>()"
+                                class="form-select">
+                            <option value="">-- Select Power Type --</option>
+                        </select>
+                        <span asp-validation-for="PowerType" class="text-danger"></span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Img))
+                    {
+                        <div class="mb-3 text-center p-3 bg-light rounded border">
+                            <label class="form-label d-block small text-muted mb-2">Current Product Image</label>
+                            <img src="@Model.Img" alt="@Model.Name" class="img-thumbnail object-fit-cover" style="max-height: 140px;" />
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <label asp-for="ImgFile" class="form-label fw-semibold">Change Image (Optional)</label>
+                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
+                        <span asp-validation-for="ImgFile" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Back to List
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-lg me-1"></i> Update Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#editProductForm').on('submit', function (e) {
+            e.preventDefault();
+            if (!$(this).valid()) return;
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/Products/Edit/' + $('#Id').val(),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.redirectUrl) {
+                        window.location.href = res.redirectUrl;
+                    }
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON;
+                    alert(err?.message || "An error occurred while updating.");
+                }
+            });
+        });
+    </script>
+}

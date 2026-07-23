@@ -12,7 +12,7 @@ namespace Inventory.Core.DTOs
         public PowerType? PowerType { get; set; }
 
         [Required(ErrorMessage = "Product image path is required.")]
-        public string Img { get; set; } = string.Empty;
+        public string? Img { get; set; }
 
         [Range(0.01, 1000000, ErrorMessage = "Price must be greater than 0.")]
         public decimal Price { get; set; }

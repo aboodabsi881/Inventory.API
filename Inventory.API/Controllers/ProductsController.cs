@@ -43,25 +43,25 @@ namespace Inventory.API.Controllers
 
         // POST: api/products
         [HttpPost]
-        public async Task<ActionResult<ProductResponseDto>> CreateProduct([FromForm] ProductRequestDto model, IFormFile? imgFile)
+        public async Task<ActionResult<ProductResponseDto>> CreateProduct([FromForm] ProductRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdProduct = await _productService.CreateProductAsync(model, imgFile);
+            var createdProduct = await _productService.CreateProductAsync(model);
             return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
         }
 
         // PUT: api/products/5
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<ProductResponseDto>> UpdateProduct(int id, [FromForm] ProductRequestDto model, IFormFile? imgFile)
+        public async Task<ActionResult<ProductResponseDto>> UpdateProduct(int id, [FromForm] ProductRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var updatedProduct = await _productService.UpdateProductAsync(id, model, imgFile);
+                var updatedProduct = await _productService.UpdateProductAsync(id, model);
                 return Ok(updatedProduct);
             }
             catch (KeyNotFoundException ex)

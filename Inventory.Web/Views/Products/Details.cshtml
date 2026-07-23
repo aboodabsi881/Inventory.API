@@ -1,0 +1,58 @@
+﻿@using Inventory.ViewModel.Products
+@model ProductDetailsVM
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow border-0 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-3 border-end">
+                    <img src="@(string.IsNullOrEmpty(Model.Img) ? "/images/placeholder.png" : Model.Img)"
+                         alt="@Model.Name"
+                         class="img-fluid rounded object-fit-cover"
+                         style="max-height: 280px;" />
+                </div>
+                <div class="col-md-7">
+                    <div class="card-body p-4 d-flex flex-column h-100">
+                        <div class="mb-3">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-2">
+                                @(string.IsNullOrEmpty(Model.CategoryName) ? "Uncategorized" : Model.CategoryName)
+                            </span>
+                            <h3 class="card-title fw-bold text-dark mb-1">@Model.Name</h3>
+                            <h4 class="text-success fw-bold mb-0">$@Model.Price.ToString("F2")</h4>
+                        </div>
+
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted"><i class="bi bi-hash me-1"></i>Product ID</span>
+                                <span class="fw-semibold">#@Model.Id</span>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted"><i class="bi bi-tag me-1"></i>Category</span>
+                                <span class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(Model.CategoryName) ? "Uncategorized" : Model.CategoryName)
+                                </span>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted"><i class="bi bi-lightning-charge me-1"></i>Power Type</span>
+                                <span class="fw-semibold">@(Model.PowerType.HasValue ? Model.PowerType.Value.ToString() : "N/A")</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto d-flex gap-2 border-top pt-3">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning flex-fill">
+                                <i class="bi bi-pencil me-1"></i> Edit
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                                <i class="bi bi-arrow-left me-1"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Inventory.Core.DTOs
 {
@@ -8,7 +9,6 @@ namespace Inventory.Core.DTOs
         [StringLength(100, ErrorMessage = "Category name cannot exceed 100 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Category image path is required.")]
-        public string Img { get; set; } = string.Empty;
+        public string? Img { get; set; }
     }
 }

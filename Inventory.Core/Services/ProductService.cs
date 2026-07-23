@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Inventory.Core.DTOs;
 using Inventory.Core.Entities.Products;
 using Inventory.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Core.Services
 {
@@ -30,27 +31,23 @@ namespace Inventory.Core.Services
             return _mapper.Map<IReadOnlyList<ProductResponseDto>>(products);
         }
 
-        public async Task<ProductResponseDto> GetProductByIdAsync(int id)
+        public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
+            var product = await _unitOfWork.Repository<Product>()
+                .GetFirstOrDefaultAsync(
+                    predicate: p => p.Id == id,
+                    include: q => q.Include(p => p.Category) 
+                );
+
             if (product == null)
-                throw new KeyNotFoundException($"Product with ID {id} was not found.");
+                return null;
 
             return _mapper.Map<ProductResponseDto>(product);
         }
 
-        public async Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model, IFormFile? imgFile = null)
+        public async Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model)
         {
             var product = _mapper.Map<Product>(model);
-
-            if (imgFile != null && imgFile.Length > 0)
-            {
-                product.Img = await SaveImageAsync(imgFile);
-            }
-            else
-            {
-                product.Img = "/products/default.png"; // Default fallback image
-            }
 
             await _unitOfWork.Repository<Product>().AddAsync(product);
             await _unitOfWork.CompleteAsync();
@@ -58,7 +55,7 @@ namespace Inventory.Core.Services
             return _mapper.Map<ProductResponseDto>(product);
         }
 
-        public async Task<ProductResponseDto> UpdateProductAsync(int id, ProductRequestDto model, IFormFile? imgFile = null)
+        public async Task<ProductResponseDto> UpdateProductAsync(int id, ProductRequestDto model)
         {
             var existingProduct = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
             if (existingProduct == null)
@@ -67,10 +64,6 @@ namespace Inventory.Core.Services
             // Overwrite updated values onto tracked DB entity state
             _mapper.Map(model, existingProduct);
 
-            if (imgFile != null && imgFile.Length > 0)
-            {
-                existingProduct.Img = await SaveImageAsync(imgFile);
-            }
 
             _unitOfWork.Repository<Product>().Update(existingProduct);
             await _unitOfWork.CompleteAsync();
@@ -88,25 +81,6 @@ namespace Inventory.Core.Services
             var result = await _unitOfWork.CompleteAsync();
 
             return result > 0;
-        }
-
-        private async Task<string> SaveImageAsync(IFormFile imgFile)
-        {
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imgFile.FileName)}";
-            var directoryPath = Path.Combine(_env.WebRootPath, "products");
-
-            // Ensure physical directory exists in wwwroot/products
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            var fullPath = Path.Combine(directoryPath, fileName);
-
-            await using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await imgFile.CopyToAsync(stream);
-            }
-
-            return "/products/" + fileName;
         }
     }
 }

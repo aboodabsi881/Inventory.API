@@ -1,67 +1,69 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Inventory.Core.DTOs;
-using Inventory.Core.Interfaces;
+﻿    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Inventory.Core.DTOs;
+    using Inventory.Core.Interfaces;
 
-namespace Inventory.API.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CategoriesController : ControllerBase
+    namespace Inventory.API.Controllers
     {
-        private readonly ICategoryService _categoryService;
-
-        public CategoriesController(ICategoryService categoryService)
+        [ApiController]
+        [Route("api/[controller]")]
+        public class CategoriesController : ControllerBase
         {
-            _categoryService = categoryService;
-        }
+            private readonly ICategoryService _categoryService;
 
-        // GET: api/categories
-        [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<CategoryResponseDto>>> GetAllCategories()
-        {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-            return Ok(categories);
-        }
-
-        // GET: api/categories/5
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<CategoryResponseDto>> GetCategoryById(int id)
-        {
-            try
+            public CategoriesController(ICategoryService categoryService)
             {
-                var category = await _categoryService.GetCategoryByIdAsync(id);
-                return Ok(category);
+                _categoryService = categoryService;
             }
-            catch (KeyNotFoundException ex)
+
+            // GET: api/categories
+            [HttpGet]
+            public async Task<ActionResult<IReadOnlyList<CategoryResponseDto>>> GetAllCategories()
             {
-                return NotFound(new { message = ex.Message });
+                var categories = await _categoryService.GetAllCategoriesAsync();
+                return Ok(categories);
             }
-        }
+
+            // GET: api/categories/5
+            [HttpGet("{id:int}")]
+            public async Task<ActionResult<CategoryResponseDto>> GetCategoryById(int id)
+            {
+                try
+                {
+                    var category = await _categoryService.GetCategoryByIdAsync(id);
+                    return Ok(category);
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+            }
 
         // POST: api/categories
         [HttpPost]
-        public async Task<ActionResult<CategoryResponseDto>> CreateCategory([FromForm] CategoryRequestDto model, IFormFile? imgFile)
+        public async Task<ActionResult<CategoryResponseDto>> CreateCategory([FromForm] CategoryRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdCategory = await _categoryService.CreateCategoryAsync(model, imgFile);
+            var createdCategory = await _categoryService.CreateCategoryAsync(model);
             return CreatedAtAction(nameof(GetCategoryById), new { id = createdCategory.Id }, createdCategory);
         }
 
         // PUT: api/categories/5
+        // PUT: api/categories/5
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<CategoryResponseDto>> UpdateCategory(int id, [FromForm] CategoryRequestDto model, IFormFile? imgFile)
+        public async Task<ActionResult<CategoryResponseDto>> UpdateCategory(int id, [FromForm] CategoryRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var updatedCategory = await _categoryService.UpdateCategoryAsync(id, model, imgFile);
+                // إرسال الـ model مباشرة بدون ملفات منفصلة
+                var updatedCategory = await _categoryService.UpdateCategoryAsync(id, model);
                 return Ok(updatedCategory);
             }
             catch (KeyNotFoundException ex)
@@ -72,20 +74,20 @@ namespace Inventory.API.Controllers
 
         // DELETE: api/categories/5
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteCategory(int id)
-        {
-            try
+            public async Task<IActionResult> DeleteCategory(int id)
             {
-                var success = await _categoryService.DeleteCategoryAsync(id);
-                if (!success)
-                    return BadRequest(new { message = "Failed to delete category." });
+                try
+                {
+                    var success = await _categoryService.DeleteCategoryAsync(id);
+                    if (!success)
+                        return BadRequest(new { message = "Failed to delete category." });
 
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
+                    return NoContent();
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
             }
         }
     }
-}

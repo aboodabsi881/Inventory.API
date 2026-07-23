@@ -1,0 +1,57 @@
+﻿@model Inventory.ViewModel.Categories.CategoryDetailsVM
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<div class="container py-3">
+    <div class="card shadow border-0 mb-4">
+        <div class="card-body d-flex align-items-center">
+            <img src="@(string.IsNullOrEmpty(Model.Img) ? "/images/placeholder.png" : Model.Img)"
+                 class="rounded me-4 object-fit-cover"
+                 style="width: 120px; height: 120px;"
+                 alt="@Model.Name" />
+            <div>
+                <h2 class="fw-bold mb-1">@Model.Name</h2>
+                <p class="text-muted mb-0">Total Products: @(Model.ProductsVM?.Count ?? 0)</p>
+            </div>
+            <div class="ms-auto">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Products in this Category</h4>
+
+    @if (Model.ProductsVM == null || !Model.ProductsVM.Any())
+    {
+        <div class="alert alert-secondary text-center">
+            No products in this category yet.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-4 g-3">
+            @foreach (var product in Model.ProductsVM)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(product.Img) ? "/images/placeholder.png" : product.Img)"
+                             class="card-img-top object-fit-cover"
+                             style="height: 150px;"
+                             alt="@product.Name" />
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-1">@product.Name</h6>
+                            <p class="text-success fw-bold mb-0">$@product.Price</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

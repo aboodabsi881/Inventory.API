@@ -14,8 +14,7 @@ namespace Inventory.Core.AutoMapperProfiles
         {
             CreateMap<CategoryRequestDto, Category>();
 
-            CreateMap<Category, CategoryResponseDto>()
-                .ForMember(dest => dest.ProductsCount, opt => opt.MapFrom(src => src.Products != null ? src.Products.Count : 0));
+            CreateMap<Category, CategoryResponseDto>();
         }
     }
 }

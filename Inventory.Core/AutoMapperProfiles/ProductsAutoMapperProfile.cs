@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Inventory.Core.DTOs;
 using Inventory.Core.Entities.Products;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inventory.Core.AutoMapperProfiles
 {

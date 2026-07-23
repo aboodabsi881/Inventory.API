@@ -9,8 +9,8 @@ namespace Inventory.Core.Interfaces
     {
         Task<IReadOnlyList<ProductResponseDto>> GetAllProductsAsync();
         Task<ProductResponseDto> GetProductByIdAsync(int id);
-        Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model, IFormFile? imgFile = null);
-        Task<ProductResponseDto> UpdateProductAsync(int id, ProductRequestDto model, IFormFile? imgFile = null);
+        Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model);
+        Task<ProductResponseDto> UpdateProductAsync(int id, ProductRequestDto model);
         Task<bool> DeleteProductAsync(int id);
     }
 }

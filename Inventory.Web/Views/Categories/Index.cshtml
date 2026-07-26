@@ -1,9 +1,14 @@
-﻿@model IEnumerable<Inventory.ViewModel.Categories.CategoryVM>
+﻿@using Inventory.ViewModel.Categories
+@model IEnumerable<CategoryVM>
 
 @{
     ViewData["Title"] = "Categories";
 }
-@Html.AntiForgeryToken()
+
+<form id="antiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-tags me-2"></i>Categories</h2>
     <a asp-action="Create" class="btn btn-primary">
@@ -24,10 +29,15 @@ else
         {
             <div class="col" id="category-card-@category.Id">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="@(string.IsNullOrEmpty(category.Img) ? "/images/placeholder.png" : category.Img)"
-                         class="card-img-top object-fit-cover"
-                         alt="@category.Name"
-                         style="height: 180px;">
+                    <!-- 💡 Full image display with click-to-enlarge modal -->
+                    <a href="javascript:void(0)"
+                       onclick="showFullImage('@(string.IsNullOrEmpty(category.Img) ? "/images/placeholder.png" : category.Img)', '@category.Name')">
+                        <img src="@(string.IsNullOrEmpty(category.Img) ? "/images/placeholder.png" : category.Img)"
+                             class="card-img-top object-fit-contain p-2 bg-light border-bottom"
+                             alt="@category.Name"
+                             style="height: 200px; cursor: pointer;"
+                             title="Click to view full image">
+                    </a>
 
                     <div class="card-body">
                         <h5 class="card-title fw-bold">@category.Name</h5>
@@ -55,15 +65,30 @@ else
     </div>
 }
 
-
-
-
 @section Scripts {
     <script>
+        // 🔍 Lightbox Preview for Full Image
+        function showFullImage(imgUrl, categoryName) {
+            Swal.fire({
+                title: categoryName || 'Category Image',
+                imageUrl: imgUrl,
+                imageAlt: categoryName,
+                imageWidth: 500,
+                imageHeight: 'auto',
+                showConfirmButton: false,
+                showCloseButton: true,
+                background: '#fff',
+                customClass: {
+                    image: 'img-fluid rounded shadow-sm'
+                }
+            });
+        }
+
+        // 🗑️ Delete Category Function
         function deleteCategory(id, name) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: `Do you really want to delete the product "${name}"?`,
+                text: `Do you really want to delete the category "${name}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -106,5 +131,3 @@ else
         }
     </script>
 }
-
-

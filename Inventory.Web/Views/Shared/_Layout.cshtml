@@ -11,77 +11,90 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <!-- SweetAlert2 CSS (for alerts) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.min.css" />
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Inventory.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <!-- Navbar -->
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-boxes me-2"></i>Inventory
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold text-primary fs-4 d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                    <span class="bg-primary text-white rounded p-2 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bi bi-box-seam-fill fs-6"></i>
+                    </span>
+                    <span>Inventory</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Mobile Toggler -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                        aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1 fw-semibold">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link text-secondary px-3 rounded-pill hover-bg" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-1"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Categories" asp-action="Index">
+                            <a class="nav-link text-secondary px-3 rounded-pill" asp-controller="Categories" asp-action="Index">
                                 <i class="bi bi-tags me-1"></i> Categories
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Products" asp-action="Index">
-                                <i class="bi bi-box-seam me-1"></i> Products
+                            <a class="nav-link text-secondary px-3 rounded-pill" asp-controller="Products" asp-action="Index">
+                                <i class="bi bi-boxes me-1"></i> Products
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">
+                            <a class="nav-link text-secondary px-3 rounded-pill" asp-controller="Roles" asp-action="Index">
                                 <i class="bi bi-shield-lock me-1"></i> Roles
                             </a>
                         </li>
                     </ul>
 
-                    <!-- Right side icons (Favorites & Cart) -->
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item me-2">
-                            <a class="nav-link text-danger" asp-controller="Favorite" asp-action="Index" title="Favorites">
-                                <i class="bi bi-heart-fill fs-5"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item me-2">
-                            <a class="nav-link text-primary position-relative" asp-controller="Cart" asp-action="Index" title="Carts">
-                                <i class="bi bi-cart3 fs-5"></i>
-                            </a>
-                        </li>
+                    <!-- Action Buttons (Favorites & Cart) -->
+                    <div class="d-flex align-items-center gap-2">
+                        <a class="btn btn-danger-subtle text-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center"
+                           style="width: 40px; height: 40px;"
+                           asp-controller="Favorite" asp-action="Index" title="Favorites">
+                            <i class="bi bi-heart-fill fs-5"></i>
+                        </a>
 
-                    </ul>
+                        <a class="btn btn-primary-subtle text-primary rounded-circle p-0 d-inline-flex align-items-center justify-content-center position-relative"
+                           style="width: 40px; height: 40px;"
+                           asp-controller="Cart" asp-action="Index" title="Cart">
+                            <i class="bi bi-bag-fill fs-5"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
+    <!-- Main Content Body -->
+    <div class="container my-4 flex-grow-1">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-light mt-auto py-3">
-        <div class="container text-center">
-            &copy; 2026 - Inventory Management System
+    <!-- Footer -->
+    <footer class="bg-white border-top text-muted py-3 mt-auto">
+        <div class="container text-center text-md-between d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+            <span class="small">&copy; 2026 <strong class="text-dark">Inventory Management System</strong></span>
+            <div class="d-flex gap-3 small">
+                <a class="text-secondary text-decoration-none" asp-controller="Home" asp-action="Index">Privacy</a>
+                <a class="text-secondary text-decoration-none" asp-controller="Home" asp-action="Index">Terms</a>
+            </div>
         </div>
     </footer>
 
@@ -90,6 +103,19 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Auto Active Link Highlighter -->
+    <script>
+        $(document).ready(function () {
+        const currentPath = window.location.pathname.toLowerCase();
+        $('.navbar-nav .nav-link').each(function () {
+        const href = $(this).attr('href').toLowerCase();
+        if (currentPath === href || (href !== '/' && currentPath.startsWith(href))) {
+        $(this).addClass('bg-primary-subtle text-primary fw-bold').removeClass('text-secondary');
+        }
+        });
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

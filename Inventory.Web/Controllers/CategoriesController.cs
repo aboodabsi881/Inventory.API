@@ -37,31 +37,37 @@ namespace Inventory.Web.Controllers
 
         // GET: Categories/Details/5
         // Retrieves category details along with associated products from the API.
-        // GET: Categories/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var client = _httpClientFactory.CreateClient("InventoryAPI");
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            // 1️⃣ جلب تفاصيل التصنيف مع منتجاته
+            // 1️⃣ Fetch category details with products
             var category = await client.GetFromJsonAsync<CategoryDetailsVM>($"Categories/{id}", options);
 
             if (category == null)
                 return NotFound();
 
-            // 2️⃣ جلب قائمة المفضلات الحالية من الـ API
+            // 2️⃣ Fetch favorites & cart items from API
             var favorites = await client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", options) ?? new List<FavoriteVM>();
-            var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
-
             var carts = await client.GetFromJsonAsync<List<CartVM>>("Carts", options) ?? new List<CartVM>();
-            var cartProductIds = carts.Select(f => f.ProductId).ToHashSet();
 
-            // 3️⃣ تحديث حالة IsFavorite لكل منتج داخل هذا التصنيف
+            // 3️⃣ Map favorites to HashSet & cart items to Dictionary (ProductId -> Quantity)
+            var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
+            var cartDictionary = carts.ToDictionary(c => c.ProductId, c => c.Quantity);
+
+            // 4️⃣ Update IsFavorite and QuantityInCart for each product in category
             if (category.ProductsVM != null)
             {
                 foreach (var product in category.ProductsVM)
                 {
                     product.IsFavorite = favoriteProductIds.Contains(product.Id);
+
+                    // 💡 Sets the cart quantity so the view renders the + / - pill button correctly on load
+                    if (cartDictionary.TryGetValue(product.Id, out int qty))
+                    {
+                        product.QuantityInCart = qty;
+                    }
                 }
             }
 

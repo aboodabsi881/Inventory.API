@@ -1,0 +1,114 @@
+﻿@using Inventory.Web.ViewModels.Favorites
+@model IEnumerable<FavoriteVM>
+
+@{
+    ViewData["Title"] = "My Favorites";
+}
+
+<form id="antiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-danger">
+        <i class="bi bi-heart-fill me-2"></i>My Favorites
+    </h2>
+    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Products
+    </a>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col" id="favorite-card-@item.Id">
+                <div class="card h-100 shadow-sm border-0 position-relative">
+                    <img src="@(string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg)"
+                         class="card-img-top object-fit-cover"
+                         alt="@item.ProductName"
+                         style="height: 180px;" />
+
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-semibold text-truncate mb-0">@(item.ProductName ?? "Unnamed Product")</h5>
+                            <span class="badge bg-primary rounded-pill">$@item.ProductPrice.ToString("F2")</span>
+                        </div>
+
+                        <div class="mt-auto d-flex justify-content-between gap-2 pt-3 border-top">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-info btn-sm flex-fill">
+                                <i class="bi bi-eye"></i> View Product
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeFavorite(@item.Id, '@item.ProductName')">
+                                <i class="bi bi-trash me-1"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-light text-center border shadow-sm p-5" role="alert">
+                <i class="bi bi-heartbreak text-muted display-4 d-block mb-3"></i>
+                <h4 class="fw-bold text-secondary">Your favorite list is empty</h4>
+                <p class="text-muted">Explore our catalog and save your preferred products here!</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-2">
+                    Browse Products
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function removeFavorite(favoriteId, name) {
+            Swal.fire({
+                title: 'Remove from Favorites?',
+                text: `Are you sure you want to remove "${name}" from your favorites?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = $('input[name="__RequestVerificationToken"]').val();
+
+                    $.ajax({
+                        url: `@Url.Action("DeleteConfirmed", "Favorite")/${favoriteId}`,
+                        type: 'POST',
+                        headers: {
+                            "RequestVerificationToken": token
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: response.icon || 'info',
+                                title: 'Removed!',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                $(`#favorite-card-${favoriteId}`).fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            });
+                        },
+                        error: function (xhr) {
+                            const err = xhr.responseJSON;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: err ? err.message : 'Failed to remove favorite.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

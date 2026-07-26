@@ -1,8 +1,11 @@
 ﻿using Inventory.ViewModel.Categories;
 using Inventory.Web.Resources;
+using Inventory.Web.ViewModels.Carts;
+using Inventory.Web.ViewModels.Favorites;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Inventory.Web.Controllers
 {
@@ -34,13 +37,33 @@ namespace Inventory.Web.Controllers
 
         // GET: Categories/Details/5
         // Retrieves category details along with associated products from the API.
+        // GET: Categories/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var category = await client.GetFromJsonAsync<CategoryDetailsVM>($"Categories/{id}");
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            // 1️⃣ جلب تفاصيل التصنيف مع منتجاته
+            var category = await client.GetFromJsonAsync<CategoryDetailsVM>($"Categories/{id}", options);
 
             if (category == null)
                 return NotFound();
+
+            // 2️⃣ جلب قائمة المفضلات الحالية من الـ API
+            var favorites = await client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", options) ?? new List<FavoriteVM>();
+            var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
+
+            var carts = await client.GetFromJsonAsync<List<CartVM>>("Carts", options) ?? new List<CartVM>();
+            var cartProductIds = carts.Select(f => f.ProductId).ToHashSet();
+
+            // 3️⃣ تحديث حالة IsFavorite لكل منتج داخل هذا التصنيف
+            if (category.ProductsVM != null)
+            {
+                foreach (var product in category.ProductsVM)
+                {
+                    product.IsFavorite = favoriteProductIds.Contains(product.Id);
+                }
+            }
 
             return View(category);
         }

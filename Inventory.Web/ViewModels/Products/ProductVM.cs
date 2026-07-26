@@ -15,6 +15,7 @@ namespace Inventory.ViewModel.Products
         public IFormFile? ImgFile { get; set; }
         public decimal Price { get; set; }
         public bool IsFavorite { get; set; }
+        public int QuantityInCart { get; set; }
         public CategoryDetailsVM? Category { get; set; }
     }
 }

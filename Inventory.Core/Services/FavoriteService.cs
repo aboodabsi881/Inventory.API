@@ -22,16 +22,19 @@ namespace Inventory.Core.Services
 
         public async Task<IReadOnlyList<FavoriteResponseDto>> GetAllFavoritesAsync()
         {
-            var favorites = await _unitOfWork.Repository<Favorite>().GetAllAsync();
+            var allFavorites = await _unitOfWork.Repository<Favorite>().GetAllAsync();
+
+            // 💡 تصفية العناصر المفضلة فقط
+            var activeFavorites = allFavorites.Where(f => f.IsFavorite).ToList();
+
             var products = await _unitOfWork.Repository<Product>().GetAllAsync();
 
-            // Link products so AutoMapper can map Product Name/Image if needed by the DTO
-            foreach (var fav in favorites)
+            foreach (var fav in activeFavorites)
             {
                 fav.Product = products.FirstOrDefault(p => p.Id == fav.ProductId);
             }
 
-            return _mapper.Map<IReadOnlyList<FavoriteResponseDto>>(favorites);
+            return _mapper.Map<IReadOnlyList<FavoriteResponseDto>>(activeFavorites);
         }
 
         public async Task<FavoriteResponseDto?> ToggleFavoriteAsync(int productId)

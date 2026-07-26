@@ -1,11 +1,14 @@
 ﻿using Inventory.ViewModel.Categories;
 using Inventory.ViewModel.Products;
 using Inventory.Web.Resources;
+using Inventory.Web.ViewModels.Carts;
+using Inventory.Web.ViewModels.Favorites;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Inventory.Web.Controllers
 {
@@ -30,9 +33,28 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var products = await client.GetFromJsonAsync<List<ProductVM>>("Products");
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            return View(products ?? new List<ProductVM>());
+            var products = await client.GetFromJsonAsync<List<ProductVM>>("Products", options) ?? new List<ProductVM>();
+            var favorites = await client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", options) ?? new List<FavoriteVM>();
+            var cartItems = await client.GetFromJsonAsync<List<CartVM>>("Carts", options) ?? new List<CartVM>();
+
+            var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
+            // 💡 عمل Dictionary لمعرفة كمية كل منتج داخل السلة
+            var cartDictionary = cartItems.ToDictionary(c => c.ProductId, c => c.Quantity);
+
+            foreach (var product in products)
+            {
+                product.IsFavorite = favoriteProductIds.Contains(product.Id);
+
+                // تعيين الكمية إذا كان المنتج موجوداً في السلة
+                if (cartDictionary.TryGetValue(product.Id, out int qty))
+                {
+                    product.QuantityInCart = qty;
+                }
+            }
+
+            return View(products);
         }
 
         // GET: Products/Details/5

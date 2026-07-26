@@ -40,31 +40,67 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         $('#createCategoryForm').on('submit', function (e) {
             e.preventDefault();
+
+            // 1️⃣ التحقق من صحة المدخلات بجهة العميل
             if (!$(this).valid()) return;
 
-            var formData = new FormData(this);
+            // 2️⃣ تعريف المتغيرات بشكل صحيح لمنع خطأ Uncaught ReferenceError
+            const $form = $(this);
+            const formData = new FormData(this); // 💡 FormData يحزم النصوص والملفات معاُ
 
             $.ajax({
-                url: '/Categories/Create',
+                url: $form.attr('action') || '/Categories/Create',
                 type: 'POST',
                 data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    if (res.redirectUrl) {
-                        window.location.href = res.redirectUrl;
-                    }
+                processData: false, // 👈 ضروري لرفع الملفات والصور
+                contentType: false, // 👈 يمنع jQuery من إفساد نوع المحتوى
+                success: function (response) {
+                    Swal.fire({
+                        icon: response.icon || 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = response.redirectUrl || '/Categories';
+                    });
                 },
                 error: function (xhr) {
                     const err = xhr.responseJSON;
-                    alert(err?.message || "An error occurred during creation.");
+                    let errorMessage = 'Validation failed or server error.';
+
+                    if (err && err.errors) {
+                        errorMessage = Object.values(err.errors).flat().join('<br/>');
+                    } else if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Creation Failed',
+                        html: errorMessage
+                    });
                 }
             });
         });
     </script>
 }
+
+
+
+
+
+

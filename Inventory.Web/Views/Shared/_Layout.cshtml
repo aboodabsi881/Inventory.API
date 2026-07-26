@@ -47,20 +47,26 @@
                                 <i class="bi bi-box-seam me-1"></i> Products
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">
+                                <i class="bi bi-shield-lock me-1"></i> Roles
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- Right side icons (Favorites & Cart) -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item me-2">
-                            <a class="nav-link text-danger" asp-controller="Favorites" asp-action="Index" title="Favorites">
+                            <a class="nav-link text-danger" asp-controller="Favorite" asp-action="Index" title="Favorites">
                                 <i class="bi bi-heart-fill fs-5"></i>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-primary position-relative" asp-controller="Cart" asp-action="Index" title="Cart">
+                        <li class="nav-item me-2">
+                            <a class="nav-link text-primary position-relative" asp-controller="Cart" asp-action="Index" title="Carts">
                                 <i class="bi bi-cart3 fs-5"></i>
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 ﻿using Inventory.Core.Entities.Users.ApplicationRoles;
-using Inventory.Core.Entities.Users.ApplicationUsers; // Points to your clean .NET 10 entity namespace
+using Inventory.Core.Entities.Users.ApplicationUsers;
 using Inventory.Data.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

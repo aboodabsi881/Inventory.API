@@ -35,7 +35,7 @@ namespace Inventory.Data.Services
             var category = await _unitOfWork.Repository<Category>()
                 .GetFirstOrDefaultAsync(
                     predicate: c => c.Id == id,
-                    include: q => q.Include(c => c.Products) // 👈 Loads products from DB
+                    include: q => q.Include(c => c.Products)
                 );
 
             if (category == null)
@@ -61,7 +61,6 @@ namespace Inventory.Data.Services
             if (existing == null)
                 throw new KeyNotFoundException($"Category with ID {id} was not found.");
 
-            // دمج القيم القادمة من Request DTO مع الكائن الموجود بحافظة قاعدة البيانات
             _mapper.Map(model, existing);
 
             _unitOfWork.Repository<Category>().Update(existing);

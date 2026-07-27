@@ -53,7 +53,6 @@
         }
 
         // PUT: api/categories/5
-        // PUT: api/categories/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<CategoryResponseDto>> UpdateCategory(int id, [FromForm] CategoryRequestDto model)
         {
@@ -62,7 +61,6 @@
 
             try
             {
-                // إرسال الـ model مباشرة بدون ملفات منفصلة
                 var updatedCategory = await _categoryService.UpdateCategoryAsync(id, model);
                 return Ok(updatedCategory);
             }

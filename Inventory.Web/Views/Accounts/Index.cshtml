@@ -1,0 +1,135 @@
+﻿@using Inventory.Web.ViewModels.Accounts
+@model IEnumerable<UsersVM>
+
+@{
+    ViewData["Title"] = "Users List";
+}
+
+<form id="antiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary"><i class="bi bi-people-fill me-2"></i>Users List</h2>
+    <a asp-action="Register" class="btn btn-primary rounded-pill px-4 shadow-sm">
+        <i class="bi bi-person-plus-fill me-1"></i> Add New User
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-primary-subtle text-primary fw-semibold">
+                <tr>
+                    <th class="ps-4" style="width: 70px;">Avatar</th>
+                    <th>User Info</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th class="text-end pe-4" style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var user in Model)
+                    {
+                        <tr id="user-row-@user.Id">
+                            <td class="ps-4">
+                                <a href="javascript:void(0)" onclick="showFullImage('@(string.IsNullOrEmpty(user.Img) ? "/images/placeholder-user.png" : user.Img)', '@user.UserName')">
+                                    <!-- 💡 Clean image binding from Database -->
+                                    <img src="@(string.IsNullOrEmpty(user.Img) ? "/images/Portrait_Placeholder.png" : user.Img)"
+                                         class="rounded-circle object-fit-cover border shadow-sm"
+                                         style="width: 44px; height: 44px; cursor: pointer;"
+                                         alt="@user.UserName" />
+                                </a>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">@user.UserName</div>
+                                <small class="text-muted">@user.NameEn / @user.NameAr</small>
+                            </td>
+                            <td class="text-secondary small">@user.Email</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fs-7 fw-semibold">
+                                    @user.RoleName
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <a asp-action="PersonalData" asp-route-id="@user.Id" class="btn btn-outline-info btn-sm rounded-circle p-2" title="Edit Profile">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-outline-warning btn-sm rounded-circle p-2" title="Change Password">
+                                        <i class="bi bi-key-fill"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-2" onclick="deleteUser('@user.Id', '@user.UserName')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-person-x display-6 d-block mb-2 text-secondary"></i>
+                            No users registered yet. Click <strong>Add New User</strong> to get started.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteUser(id, userName) {
+            Swal.fire({
+                title: 'Delete User?',
+                text: `Do you really want to delete user "${userName}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = $('input[name="__RequestVerificationToken"]').val();
+
+                    $.ajax({
+                        url: `@Url.Action("Delete", "Accounts")/${id}`,
+                        type: 'POST',
+                        headers: { "RequestVerificationToken": token },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.icon || 'success',
+                                title: 'Deleted!',
+                                text: response.message || 'User deleted successfully.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                $(`#user-row-${id}`).fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function showFullImage(imgUrl, userName) {
+            Swal.fire({
+                title: userName || 'User Avatar',
+                imageUrl: imgUrl,
+                imageWidth: 280,
+                imageHeight: 280,
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: { image: 'rounded-circle object-fit-cover shadow' }
+            });
+        }
+    </script>
+}

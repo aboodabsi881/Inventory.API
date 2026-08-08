@@ -53,6 +53,9 @@
                 overflow-x: hidden;
             }
 
+            .btn:focus {
+                box-shadow: none !important;
+            }
             /* Fixed Sidebar Styling */
             .sidebar {
                 width: var(--sidebar-width);
@@ -224,8 +227,8 @@
         <ul class="nav nav-pills flex-column gap-1 mb-auto">
             <li class="nav-item">
                 <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-house-door fs-5"></i>
-                    <span class="link-text">Home</span>
+                    <i class="bi bi-speedometer2 fs-5"></i>
+                    <span class="link-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">

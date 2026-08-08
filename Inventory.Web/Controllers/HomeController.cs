@@ -16,9 +16,9 @@ namespace Inventory.Web.Controllers
         {
             _client = httpClientFactory.CreateClient("InventoryAPI");
         }
+
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Admin , Super Admin")]
-
         public async Task<IActionResult> Index()
         {
             var vm = new DashboardVM();

@@ -27,10 +27,9 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="cartTable">
                             <thead class="table-light">
                                 <tr>
-                                    <!-- 💡 إعطاء عمود الصورة والمنتج مساحة 40% من عرض الجدول -->
                                     <th style="width: 40%;">Product</th>
                                     <th style="width: 15%;">Price</th>
                                     <th class="text-center" style="width: 20%;">Quantity</th>
@@ -41,13 +40,15 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
+                                    var imgUrl = string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg;
+                                    var calculatedTotal = item.TotalPrice > 0 ? item.TotalPrice : (item.Quantity * item.ProductPrice);
+
                                     <tr id="cart-row-@item.Id">
                                         <td style="width: 45%;">
                                             <div class="d-flex align-items-center">
-                                                <!-- 💡 زيادة حجم المعاينة إلى 85x85 وإضافة إمكانية الضغط للتكبير -->
                                                 <a href="javascript:void(0)"
-                                                   onclick="showFullImage('@(string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg)', '@item.ProductName')">
-                                                    <img src="@(string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg)"
+                                                   onclick="showFullImage(@Html.Raw(Json.Serialize(imgUrl)), @Html.Raw(Json.Serialize(item.ProductName)))">
+                                                    <img src="@imgUrl"
                                                          class="rounded me-3 object-fit-contain shadow-sm border bg-light"
                                                          style="width: 85px; height: 85px; min-width: 85px; cursor: pointer;"
                                                          alt="@item.ProductName"
@@ -61,7 +62,10 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="fw-semibold text-secondary">$@item.ProductPrice.ToString("F2")</td>
+                                        <!-- Added id and data-price attribute here -->
+                                        <td class="fw-semibold text-secondary" id="price-@item.ProductId" data-price="@item.ProductPrice">
+                                            $@item.ProductPrice.ToString("F2")
+                                        </td>
                                         <td>
                                             <div class="input-group input-group-sm justify-content-center">
                                                 <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(@item.ProductId, -1)">-</button>
@@ -69,9 +73,12 @@
                                                 <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(@item.ProductId, 1)">+</button>
                                             </div>
                                         </td>
-                                        <td class="fw-bold text-success" id="total-@item.ProductId">$@item.TotalPrice.ToString("F2")</td>
+                                        <!-- Initial render uses fallback calculation if TotalPrice is 0 -->
+                                        <td class="fw-bold text-success" id="total-@item.ProductId">
+                                            $@calculatedTotal.ToString("F2")
+                                        </td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(@item.Id, '@item.ProductName')">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(@item.Id, @Html.Raw(Json.Serialize(item.ProductName)))">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -129,6 +136,7 @@
             timer: 1500,
             timerProgressBar: true
         });
+
         function updateQuantity(productId, change) {
             const token = $('input[name="__RequestVerificationToken"]').val();
 
@@ -138,33 +146,45 @@
                 headers: {
                     "RequestVerificationToken": token
                 },
-                success: function (res) {
+                success: function(res) {
                     if (res.removed) {
                         location.reload();
-                    } else if (res.item) {
-                        $(`#qty-${productId}`).text(res.item.quantity);
-                        $(`#total-${productId}`).text('$' + res.item.totalPrice.toFixed(2));
-                        $('#summary-subtotal').text('$' + res.grandTotal.toFixed(2));
-                        $('#summary-grandtotal').text('$' + res.grandTotal.toFixed(2));
+                    } else if (res) {
+                        const itemObj = res.item || res.Item;
+                        const qty = itemObj ? (itemObj.quantity ?? itemObj.Quantity ?? 0) : 0;
+
+                        // Extract unit price from DOM
+                        const unitPrice = parseFloat($(`#price-${productId}`).attr('data-price')) || 0;
+
+                        // Calculate total on client side if API returns 0 or undefined
+                        let itemTotal = itemObj ? (itemObj.totalPrice ?? itemObj.TotalPrice ?? 0) : 0;
+                        if (!itemTotal || itemTotal === 0) {
+                            itemTotal = qty * unitPrice;
+                        }
+
+                        const grandTotal = res.grandTotal ?? res.GrandTotal ?? 0;
+
+                        // Update row values
+                        $(`#qty-${productId}`).text(qty);
+                        $(`#total-${productId}`).text('$' + Number(itemTotal).toFixed(2));
+
+                        $('#summary-subtotal').text('$' + Number(grandTotal).toFixed(2));
+                        $('#summary-grandtotal').text('$' + Number(grandTotal).toFixed(2));
 
                         Toast.fire({ icon: 'success', title: 'Cart updated' });
                     }
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     console.error("AJAX Error Details:", xhr);
-
                     let msg = 'Failed to update cart.';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         msg = xhr.responseJSON.message;
                     }
-
-                    Toast.fire({
-                        icon: 'error',
-                        title: msg
-                    });
+                    Toast.fire({ icon: 'error', title: msg });
                 }
             });
         }
+
         function showFullImage(imgUrl, productName) {
             Swal.fire({
                 title: productName || 'Product Image',
@@ -180,6 +200,7 @@
                 }
             });
         }
+
         function removeItem(cartId, name) {
             Swal.fire({
                 title: 'Remove Item?',
@@ -196,15 +217,20 @@
                         url: `@Url.Action("Remove", "Cart")/${cartId}`,
                         type: 'POST',
                         headers: { "RequestVerificationToken": token },
-                        success: function (res) {
+                        success: function(res) {
                             $(`#cart-row-${cartId}`).fadeOut(300, function() {
                                 $(this).remove();
-                                $('#summary-subtotal').text('$' + res.grandTotal.toFixed(2));
-                                $('#summary-grandtotal').text('$' + res.grandTotal.toFixed(2));
-                                if ($('tbody tr').length === 0) location.reload();
+
+                                const grandTotal = res ? (res.grandTotal ?? res.GrandTotal ?? 0) : 0;
+                                $('#summary-subtotal').text('$' + Number(grandTotal).toFixed(2));
+                                $('#summary-grandtotal').text('$' + Number(grandTotal).toFixed(2));
+
+                                if ($('#cartTable tbody tr').length === 0) {
+                                    location.reload();
+                                }
                             });
                         },
-                        error: function () {
+                        error: function() {
                             Toast.fire({ icon: 'error', title: 'Failed to remove item' });
                         }
                     });

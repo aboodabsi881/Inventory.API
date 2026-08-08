@@ -93,15 +93,14 @@ namespace Inventory.API.Controllers
         [HttpPut("personal-data/{id}")]
         public async Task<ActionResult<PersonalDataResponseDto>> UpdatePersonalData(
             string id,
-            [FromForm] PersonalDataRequestDto model,
-            IFormFile? imgFile)
+            [FromForm] PersonalDataRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var updatedUser = await _accountService.UpdateUserAsync(id, model, imgFile);
+                var updatedUser = await _accountService.UpdateUserAsync(id, model);
                 return Ok(updatedUser);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is InvalidOperationException)

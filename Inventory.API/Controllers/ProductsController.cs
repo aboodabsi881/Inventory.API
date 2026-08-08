@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Inventory.Core.DTOs;
+﻿using Inventory.Core.DTOs;
 using Inventory.Core.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.API.Controllers
 {
@@ -22,7 +19,8 @@ namespace Inventory.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<ProductResponseDto>>> GetAllProducts()
         {
-            var products = await _productService.GetAllProductsAsync();
+            // 💡 التعديل هنا: استخدام الاسم الجديد للميثود في السيرفيس
+            var products = await _productService.GetAllProductsDtoAsync();
             return Ok(products);
         }
 
@@ -30,15 +28,13 @@ namespace Inventory.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ProductResponseDto>> GetProductById(int id)
         {
-            try
-            {
-                var product = await _productService.GetProductByIdAsync(id);
-                return Ok(product);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            // 💡 التعديل هنا: استخدام الاسم الجديد للميثود في السيرفيس
+            var product = await _productService.GetProductDtoByIdAsync(id);
+
+            if (product == null)
+                return NotFound(new { message = $"Product with ID {id} was not found." });
+
+            return Ok(product);
         }
 
         // POST: api/products

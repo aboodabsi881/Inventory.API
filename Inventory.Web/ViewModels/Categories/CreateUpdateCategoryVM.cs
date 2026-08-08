@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Inventory.ViewModel.Categories
+namespace Inventory.Web.ViewModels.Categories
 {
     public class CreateUpdateCategoryVM
     {

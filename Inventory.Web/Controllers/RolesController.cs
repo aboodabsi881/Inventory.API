@@ -1,43 +1,35 @@
-﻿using Inventory.ViewModel.Roles;
-using Inventory.Web.Resources;
+﻿using Inventory.Web.Resources;
+using Inventory.Web.ViewModels.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Inventory.Web.Controllers
 {
+    [Authorize(Roles = "SuperAdmin, Super Admin")]
     public class RolesController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _client;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public RolesController(
             IHttpClientFactory httpClientFactory,
             IStringLocalizer<SharedResource> localizer)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = httpClientFactory.CreateClient("InventoryAPI");
             _localizer = localizer;
         }
 
-        // GET: ApplicationRoles
-        // Retrieves and displays all roles from the API.
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var roles = await client.GetFromJsonAsync<List<RoleVM>>("Roles");
-
-            return View(roles ?? new List<RoleVM>());
+            var roles = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
+            return View(roles);
         }
 
-        // GET: ApplicationRoles/Create
-        // Renders the form to create a new role.
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
-        // POST: ApplicationRoles/Create
-        // Posts role data to the API.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RoleVM roleVM)
@@ -45,9 +37,7 @@ namespace Inventory.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { icon = "warning", message = _localizer["ValidationFailed"].Value });
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.PostAsJsonAsync("Roles", new { Name = roleVM.Name });
-
+            var response = await _client.PostAsJsonAsync("Roles", new { Name = roleVM.Name });
             if (response.IsSuccessStatusCode)
             {
                 return Ok(new
@@ -62,21 +52,14 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        // GET: ApplicationRoles/Edit/5
-        // Retrieves existing role details to populate the edit form.
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var role = await client.GetFromJsonAsync<RoleVM>($"Roles/{id}");
-
-            if (role == null)
-                return NotFound();
+            var role = await _client.GetFromJsonAsync<RoleVM>($"Roles/{id}", JsonOptions);
+            if (role == null) return NotFound();
 
             return View(role);
         }
 
-        // POST: ApplicationRoles/Edit/5
-        // Updates role data via the API.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RoleVM roleVM)
@@ -87,9 +70,7 @@ namespace Inventory.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { icon = "warning", message = _localizer["ValidationFailed"].Value });
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.PutAsJsonAsync($"Roles/{id}", new { Id = roleVM.Id, Name = roleVM.Name });
-
+            var response = await _client.PutAsync($"Roles/{id}", JsonContent.Create(new { Id = roleVM.Id, Name = roleVM.Name }));
             if (response.IsSuccessStatusCode)
             {
                 return Ok(new
@@ -104,15 +85,17 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        // POST: ApplicationRoles/Delete/5
-        // Deletes role from API.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.DeleteAsync($"Roles/{id}");
+            var role = await _client.GetFromJsonAsync<RoleVM>($"Roles/{id}", JsonOptions);
+            if (role != null && (role.Name.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) || role.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest(new { icon = "error", message = "System Role 'SuperAdmin' cannot be deleted!" });
+            }
 
+            var response = await _client.DeleteAsync($"Roles/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return Ok(new

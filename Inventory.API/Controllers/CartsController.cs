@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Inventory.Core.DTOs;
+﻿using Inventory.Core.DTOs;
 using Inventory.Core.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.API.Controllers
 {

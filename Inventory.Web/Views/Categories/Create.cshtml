@@ -1,4 +1,5 @@
-﻿@model Inventory.ViewModel.Categories.CreateUpdateCategoryVM
+﻿@using Inventory.Web.ViewModels.Categories
+@model CreateUpdateCategoryVM
 
 @{
     ViewData["Title"] = "Create Category";
@@ -51,7 +52,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#createCategoryForm').on('submit', function (e) {
+        $('#createCategoryForm').on('submit', function(e) {
             e.preventDefault();
 
             // 1️⃣ التحقق من صحة المدخلات بجهة العميل
@@ -67,7 +68,7 @@
                 data: formData,
                 processData: false, // 👈 ضروري لرفع الملفات والصور
                 contentType: false, // 👈 يمنع jQuery من إفساد نوع المحتوى
-                success: function (response) {
+                success: function(response) {
                     Swal.fire({
                         icon: response.icon || 'success',
                         title: 'Success!',
@@ -78,7 +79,7 @@
                         window.location.href = response.redirectUrl || '/Categories';
                     });
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     const err = xhr.responseJSON;
                     let errorMessage = 'Validation failed or server error.';
 
@@ -98,7 +99,6 @@
         });
     </script>
 }
-
 
 
 

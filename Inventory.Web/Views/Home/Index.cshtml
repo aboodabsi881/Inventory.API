@@ -1,8 +1,163 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Inventory.Web.ViewModels.Home
+@model DashboardVM
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Welcome Banner -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-speedometer2 me-2 text-primary"></i>System Dashboard
+        </h2>
+        <p class="text-muted mb-0">Real-time overview of system inventory and accounts.</p>
+    </div>
+    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
+        <i class="bi bi-clock me-1"></i> Live Status
+    </span>
+</div>
+
+<!-- KPI Metric Cards Grid -->
+<div class="row g-3 mb-4">
+    <!-- Total Products -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-medium d-block mb-1">Total Products</span>
+                    <h3 class="fw-bold text-dark mb-0">@Model.TotalProducts</h3>
+                </div>
+                <div class="bg-primary-subtle text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="bi bi-boxes fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-medium d-block mb-1">Low Stock Items</span>
+                    <h3 class="fw-bold text-danger mb-0">@Model.LowStockCount</h3>
+                </div>
+                <div class="bg-danger-subtle text-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-medium d-block mb-1">Categories</span>
+                    <h3 class="fw-bold text-dark mb-0">@Model.TotalCategories</h3>
+                </div>
+                <div class="bg-info-subtle text-info rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="bi bi-grid-1x2-fill fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Users -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-medium d-block mb-1">System Users</span>
+                    <h3 class="fw-bold text-dark mb-0">@Model.TotalUsers</h3>
+                </div>
+                <div class="bg-success-subtle text-success rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="bi bi-people-fill fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shortcuts & Recent Activity Split -->
+<div class="row g-4">
+    <!-- Quick Actions Panel -->
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge me-2 text-warning"></i>Quick Actions</h5>
+            <div class="d-grid gap-2">
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("Super Admin"))
+                {
+                    <a asp-controller="Products" asp-action="Create" class="btn btn-outline-primary text-start rounded-3 p-3">
+                        <i class="bi bi-plus-circle me-2"></i> Add New Product
+                    </a>
+                    <a asp-controller="Categories" asp-action="Create" class="btn btn-outline-secondary text-start rounded-3 p-3">
+                        <i class="bi bi-folder-plus me-2"></i> Add Category
+                    </a>
+                }
+                @if (User.IsInRole("SuperAdmin") || User.IsInRole("Super Admin"))
+                {
+                    <a asp-controller="Accounts" asp-action="Register" class="btn btn-outline-info text-start rounded-3 p-3">
+                        <i class="bi bi-person-plus me-2"></i> Register System User
+                    </a>
+                    <a asp-controller="Roles" asp-action="Index" class="btn btn-outline-dark text-start rounded-3 p-3">
+                        <i class="bi bi-shield-lock me-2"></i> Access Control
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Inventory Items Table -->
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Products</h5>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-link text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary small fw-semibold">
+                        <tr>
+                            <th class="ps-4">Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentProducts != null && Model.RecentProducts.Any())
+                        {
+                            @foreach (var p in Model.RecentProducts)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-dark">@p.Name</td>
+                                    <td><span class="badge bg-light text-dark border">@p.CategoryName</span></td>
+                                    <td class="fw-bold">$@p.Price.ToString("F2")</td>
+                                    <td>
+                                        @if (p.StockQuantity <= 5)
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1">Low (@p.StockQuantity)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1">In Stock (@p.StockQuantity)</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No recent items available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

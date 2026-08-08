@@ -1,15 +1,15 @@
-﻿@using Inventory.ViewModel.Products
+﻿@using Inventory.Web.ViewModels.Products
 @model CreateUpdateProductVM
 
 @{
     ViewData["Title"] = "Create Product";
 }
 
-<div class="row justify-content-center">
+<div class="row justify-content-center my-4">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-square me-2"></i>Create New Product</h4>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white p-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-plus-square me-2"></i>Create New Product</h4>
             </div>
             <div class="card-body p-4">
                 <form id="createProductForm" asp-action="Create" method="post" enctype="multipart/form-data">
@@ -18,7 +18,7 @@
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label fw-semibold"></label>
                         <input asp-for="Name" class="form-control" placeholder="Enter product name" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
                     <div class="row g-3 mb-3">
@@ -28,7 +28,7 @@
                                 <span class="input-group-text">$</span>
                                 <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
                             </div>
-                            <span asp-validation-for="Price" class="text-danger"></span>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-6">
@@ -36,7 +36,7 @@
                             <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
                                 <option value="">-- Select Category --</option>
                             </select>
-                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
                         </div>
                     </div>
 
@@ -47,20 +47,26 @@
                                 class="form-select">
                             <option value="">-- Select Power Type --</option>
                         </select>
-                        <span asp-validation-for="PowerType" class="text-danger"></span>
+                        <span asp-validation-for="PowerType" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Image Preview Container -->
+                    <div class="mb-3 text-center p-3 bg-light rounded-3 border d-none" id="previewContainer">
+                        <label class="form-label d-block small text-muted mb-2">Selected Image Preview</label>
+                        <img id="imgPreview" src="#" alt="Selected Image" class="img-thumbnail object-fit-cover shadow-sm" style="max-height: 150px;" />
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="ImgFile" class="form-label fw-semibold"></label>
-                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
-                        <span asp-validation-for="ImgFile" class="text-danger"></span>
+                        <label asp-for="ImgFile" class="form-label fw-semibold">Product Image</label>
+                        <input asp-for="ImgFile" id="imgInput" type="file" class="form-control" accept="image/*" />
+                        <span asp-validation-for="ImgFile" class="text-danger small"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-2 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary">
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="bi bi-arrow-left me-1"></i> Back to List
                         </a>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold">
                             <i class="bi bi-check-lg me-1"></i> Save Product
                         </button>
                     </div>
@@ -73,18 +79,34 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // 💡 معاينة فورية للصورة المختارة قبل رفعها
+        $('#imgInput').on('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imgPreview').attr('src', e.target.result);
+                    $('#previewContainer').removeClass('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $('#previewContainer').addClass('d-none');
+            }
+        });
+
+        // 💡 إرسال البيانات عبر AJAX بنفس آلية التعديل
         $('#createProductForm').on('submit', function (e) {
             e.preventDefault();
 
             // 1️⃣ التحقق من صحة المدخلات بجهة العميل
             if (!$(this).valid()) return;
 
-            // 2️⃣ تعريف المتغيرات بشكل صحيح لمنع خطأ Uncaught ReferenceError
+            // 2️⃣ حزم البيانات مع الملف المرفوع
             const $form = $(this);
-            const formData = new FormData(this); // 💡 FormData يحزم النصوص والملفات معاُ
+            const formData = new FormData(this);
 
             $.ajax({
-                url: $form.attr('action') || '/Products/Create',
+                url: $form.attr('action') || '@Url.Action("Create", "Products")',
                 type: 'POST',
                 data: formData,
                 processData: false, // 👈 ضروري لرفع الملفات والصور
@@ -93,11 +115,11 @@
                     Swal.fire({
                         icon: response.icon || 'success',
                         title: 'Success!',
-                        text: response.message,
+                        text: response.message || 'Product created successfully.',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = response.redirectUrl || '/Products';
+                        window.location.href = response.redirectUrl || '@Url.Action("Index", "Products")';
                     });
                 },
                 error: function (xhr) {
@@ -119,4 +141,4 @@
             });
         });
     </script>
-}   
+}

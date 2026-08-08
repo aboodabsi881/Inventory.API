@@ -1,18 +1,18 @@
-﻿+@using Inventory.ViewModel.Products
+﻿@using Inventory.Web.ViewModels.Products
 @model CreateUpdateProductVM
 
 @{
     ViewData["Title"] = "Edit Product";
 }
 
-<div class="row justify-content-center">
+<div class="row justify-content-center my-4">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Product</h4>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-warning text-dark p-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Product</h4>
             </div>
             <div class="card-body p-4">
-                <form id="editProductForm" asp-action="Edit" method="post" enctype="multipart/form-data">
+                <form id="editProductForm" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <!-- Hidden fields to preserve ID and existing image path -->
@@ -22,7 +22,7 @@
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label fw-semibold"></label>
                         <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
                     <div class="row g-3 mb-3">
@@ -32,7 +32,7 @@
                                 <span class="input-group-text">$</span>
                                 <input asp-for="Price" type="number" step="0.01" class="form-control" />
                             </div>
-                            <span asp-validation-for="Price" class="text-danger"></span>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-6">
@@ -40,7 +40,7 @@
                             <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
                                 <option value="">-- Select Category --</option>
                             </select>
-                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
                         </div>
                     </div>
 
@@ -51,28 +51,28 @@
                                 class="form-select">
                             <option value="">-- Select Power Type --</option>
                         </select>
-                        <span asp-validation-for="PowerType" class="text-danger"></span>
+                        <span asp-validation-for="PowerType" class="text-danger small"></span>
                     </div>
 
                     @if (!string.IsNullOrEmpty(Model.Img))
                     {
                         <div class="mb-3 text-center p-3 bg-light rounded border">
                             <label class="form-label d-block small text-muted mb-2">Current Product Image</label>
-                            <img src="@Model.Img" alt="@Model.Name" class="img-thumbnail object-fit-cover" style="max-height: 140px;" />
+                            <img src="@Model.Img" alt="@Model.Name" class="img-thumbnail object-fit-cover" style="max-height: 140px;" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                         </div>
                     }
 
                     <div class="mb-4">
                         <label asp-for="ImgFile" class="form-label fw-semibold">Change Image (Optional)</label>
                         <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
-                        <span asp-validation-for="ImgFile" class="text-danger"></span>
+                        <span asp-validation-for="ImgFile" class="text-danger small"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-2 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary">
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="bi bi-arrow-left me-1"></i> Back to List
                         </a>
-                        <button type="submit" class="btn btn-warning">
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold">
                             <i class="bi bi-save me-1"></i> Update Product
                         </button>
                     </div>
@@ -82,36 +82,34 @@
     </div>
 </div>
 
-
-                    
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         $('#editProductForm').on('submit', function (e) {
             e.preventDefault();
 
-            // 1️⃣ التحقق من صحة المدخلات بجهة العميل
+            // 1️⃣ Client-side validation check
             if (!$(this).valid()) return;
 
-            // 2️⃣ تعريف المتغيرات بشكل صحيح لمنع خطأ Uncaught ReferenceError
+            // 2️⃣ Collect form data into FormData object for multipart/form-data upload
             const $form = $(this);
-            const formData = new FormData(this); // 💡 FormData يحزم النصوص والملفات معاُ
+            const formData = new FormData(this);
 
             $.ajax({
-                url: $form.attr('action') || '/Products/Edit',
+                url: $form.attr('action') || `@Url.Action("Edit", "Products")/${$('#Id').val()}`,
                 type: 'POST',
                 data: formData,
-                processData: false, // 👈 ضروري لرفع الملفات والصور
-                contentType: false, // 👈 يمنع jQuery من إفساد نوع المحتوى
+                processData: false, // 👈 Required for file uploads
+                contentType: false, // 👈 Prevents jQuery from setting incorrect header
                 success: function (response) {
                     Swal.fire({
                         icon: response.icon || 'success',
-                        title: 'Success!',
-                        text: response.message,
+                        title: 'Updated!',
+                        text: response.message || 'Product updated successfully.',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = response.redirectUrl || '/Products';
+                        window.location.href = response.redirectUrl || '@Url.Action("Index", "Products")';
                     });
                 },
                 error: function (xhr) {
@@ -126,7 +124,7 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Creation Failed',
+                        title: 'Update Failed',
                         html: errorMessage
                     });
                 }

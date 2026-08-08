@@ -25,4 +25,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Configuration\UserRoleConfiguration.cs" />
+  </ItemGroup>
+
 </Project>

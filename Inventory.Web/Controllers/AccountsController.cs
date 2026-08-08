@@ -1,116 +1,118 @@
-﻿using Inventory.ViewModel.Roles;
-using Inventory.Web.ViewModels.Accounts;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Inventory.Web.ViewModels.Accounts;
+using Inventory.Web.ViewModels.Roles;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     public class AccountsController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _client;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public AccountsController(IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = httpClientFactory.CreateClient("InventoryAPI");
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // ==========================================
-        // 1️⃣ GET: Accounts/Users (Users List Index)
-        // ==========================================
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-            var users = await client.GetFromJsonAsync<List<UsersVM>>("Accounts/users", options) ?? new List<UsersVM>();
-
-            return View(users);
-        }
-
-        // ==========================================
-        // 2️⃣ LOGIN
-        // ==========================================
-        [HttpGet]
-        public IActionResult Login()
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
         {
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin, Super Admin")]
+        public async Task<IActionResult> Index()
+        {
+            var users = await _client.GetFromJsonAsync<List<UsersVM>>("Accounts/users", JsonOptions) ?? new List<UsersVM>();
+            return View(users);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login()
+        {
+            if (User.Identity?.IsAuthenticated ?? false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVM model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return BadRequest(new { message = "Invalid input details." });
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.PostAsJsonAsync("Accounts/login", model);
-
-            if (response.IsSuccessStatusCode)
+            var response = await _client.PostAsJsonAsync("Accounts/login", model);
+            if (!response.IsSuccessStatusCode)
             {
-                var userObj = await response.Content.ReadFromJsonAsync<UsersVM>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (userObj != null)
-                {
-                    // 💡 Save user profile avatar & name into Cookies for global access in Layout
-                    SetUserCookies(userObj.Img, userObj.UserName);
-                }
-
-                return Json(new { icon = "success", message = "Login successful!", redirectUrl = Url.Action("Index", "Home") });
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return BadRequest(new { message = !string.IsNullOrWhiteSpace(errorContent) ? errorContent : "Invalid username or password." });
             }
 
-            return BadRequest(new { message = "Invalid username/email or password." });
+            var userObj = await response.Content.ReadFromJsonAsync<UsersVM>(JsonOptions);
+            if (userObj == null)
+                return BadRequest(new { message = "Invalid user response." });
+
+            var principal = CreateClaimsPrincipal(userObj);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = model.RememberMe,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            };
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+            return Ok(new
+            {
+                icon = "success",
+                message = "Login successful!",
+                redirectUrl = Url.Action("Index", "Accounts")
+            });
         }
 
-        // ==========================================
-        // 3️⃣ LOGOUT
-        // ==========================================
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            // Clear layout user cookies
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             Response.Cookies.Delete("UserAvatar");
             Response.Cookies.Delete("UserName");
+            Response.Cookies.Delete("UserRole");
 
             return RedirectToAction(nameof(Login));
         }
 
-        // ==========================================
-        // 4️⃣ REGISTER
-        // ==========================================
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVM model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            string? imagePath = null;
-
-            // Save uploaded image to wwwroot/images/users if provided
-            if (model.ImgFile != null && model.ImgFile.Length > 0)
-            {
-                imagePath = await SaveUserImageAsync(model.ImgFile);
-            }
+            string? imagePath = model.ImgFile is { Length: > 0 } ? await SaveUserImageAsync(model.ImgFile) : null;
 
             var registerPayload = new
             {
@@ -123,112 +125,79 @@ namespace Inventory.Web.Controllers
                 RoleName = string.IsNullOrEmpty(model.RoleName) ? "User" : model.RoleName
             };
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.PostAsJsonAsync("Accounts/register", registerPayload);
-
+            var response = await _client.PostAsJsonAsync("Accounts/register", registerPayload);
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { icon = "success", message = "User registered successfully!", redirectUrl = Url.Action("Index") });
+                return Ok(new { icon = "success", message = "User registered successfully!", redirectUrl = Url.Action("Login") });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
             return BadRequest(new { message = $"Registration failed: {errorContent}" });
         }
 
-        // ==========================================
-        // 5️⃣ PERSONAL DATA (USER PROFILE)
-        // ==========================================
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> PersonalData(int id)
         {
-            if (id <= 0)
-                return BadRequest("Invalid User ID.");
+            if (id <= 0) return BadRequest("Invalid User ID.");
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var response = await _client.GetAsync($"Accounts/personal-data/{id}");
+            if (!response.IsSuccessStatusCode) return NotFound();
 
-            var response = await client.GetAsync($"Accounts/personal-data/{id}");
-            if (!response.IsSuccessStatusCode)
-                return NotFound();
+            var vm = await response.Content.ReadFromJsonAsync<PersonalDataVM>(JsonOptions);
+            if (vm == null) return NotFound();
 
-            var vm = await response.Content.ReadFromJsonAsync<PersonalDataVM>(options);
-            if (vm == null)
-                return NotFound();
-
-            var rolesList = await client.GetFromJsonAsync<List<RoleVM>>("Roles", options) ?? new List<RoleVM>();
+            var rolesList = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
             vm.RoleLookup = new SelectList(rolesList.Select(r => r.Name), vm.RoleName);
-
-            // Refresh cookies with user data
-            SetUserCookies(vm.Img, vm.UserName);
 
             return View(vm);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PersonalData(PersonalDataVM model)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
             if (!ModelState.IsValid)
             {
-                var rolesList = await client.GetFromJsonAsync<List<RoleVM>>("Roles", options) ?? new List<RoleVM>();
+                var rolesList = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
                 model.RoleLookup = new SelectList(rolesList.Select(r => r.Name), model.RoleName);
                 return View(model);
             }
 
-            // 1️⃣ Save new uploaded image if provided
-            if (model.ImgFile != null && model.ImgFile.Length > 0)
+            if (model.ImgFile is { Length: > 0 })
             {
                 model.Img = await SaveUserImageAsync(model.ImgFile);
             }
-            // 2️⃣ Safeguard: Fallback to placeholder if image path remains empty
             else if (string.IsNullOrWhiteSpace(model.Img))
             {
                 model.Img = "/images/Portrait_Placeholder.png";
             }
 
-            // 3️⃣ Pack payload as MultipartFormDataContent because API expects [FromForm]
-            using var formData = new MultipartFormDataContent();
-            formData.Add(new StringContent(model.Id.ToString()), nameof(model.Id));
-            formData.Add(new StringContent(model.UserName ?? string.Empty), nameof(model.UserName));
-            formData.Add(new StringContent(model.Email ?? string.Empty), nameof(model.Email));
-            formData.Add(new StringContent(model.NameEn ?? string.Empty), nameof(model.NameEn));
-            formData.Add(new StringContent(model.NameAr ?? string.Empty), nameof(model.NameAr));
-
-            if (!string.IsNullOrEmpty(model.RoleName))
-                formData.Add(new StringContent(model.RoleName), nameof(model.RoleName));
-
-            formData.Add(new StringContent(model.Img), nameof(model.Img));
-
-            var response = await client.PutAsync($"Accounts/personal-data/{model.Id}", formData);
+            using var formData = BuildPersonalDataFormData(model);
+            var response = await _client.PutAsync($"Accounts/personal-data/{model.Id}", formData);
 
             if (response.IsSuccessStatusCode)
             {
-                // 💡 Immediately update cookies so new avatar displays across all pages
-                SetUserCookies(model.Img, model.UserName);
-
-                return Json(new { icon = "success", message = "Profile updated successfully!", redirectUrl = Url.Action("Index") });
+                return Ok(new { icon = "success", message = "Profile updated successfully!", redirectUrl = Url.Action("Index", "Accounts") });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
             return BadRequest(new { icon = "error", message = !string.IsNullOrEmpty(errorContent) ? errorContent : "Failed to update profile." });
         }
 
-        // ==========================================
-        // 6️⃣ CHANGE PASSWORD
-        // ==========================================
+        [Authorize]
         [HttpGet]
         public IActionResult ChangePassword(int id)
         {
             if (id <= 0)
+            {
                 return BadRequest("User ID is required.");
-
-            var model = new ChangePasswordVM { Id = id.ToString() };
-            return View(model);
+            }
+            return View(new ChangePasswordVM { Id = id.ToString() });
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
@@ -236,84 +205,116 @@ namespace Inventory.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            var payload = new
-            {
-                CurrentPassword = model.OldPassword,
-                NewPassword = model.NewPassword
-            };
-
-            var response = await client.PostAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
+            var payload = new { CurrentPassword = model.OldPassword, NewPassword = model.NewPassword };
+            var response = await _client.PostAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { icon = "success", message = "Password updated successfully!", redirectUrl = Url.Action("Index") });
+                return Ok(new { icon = "success", message = "Password updated successfully!", redirectUrl = Url.Action("Index", "Home") });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
             return BadRequest(new { message = $"Password update failed: {errorContent}" });
         }
 
-        // ==========================================
-        // 7️⃣ DELETE USER
-        // ==========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Super Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
                 return BadRequest(new { message = "Invalid User ID." });
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var response = await client.DeleteAsync($"Accounts/users/{id}");
-
+            var response = await _client.DeleteAsync($"Accounts/users/{id}");
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { icon = "success", message = "User deleted successfully." });
+                return Ok(new { icon = "success", message = "User deleted successfully." });
             }
 
             return BadRequest(new { icon = "error", message = "Failed to delete user." });
         }
 
-        // ==========================================
-        // 💡 HELPER METHODS
-        // ==========================================
+        private static ClaimsPrincipal CreateClaimsPrincipal(UsersVM userObj)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, userObj.Id.ToString()),
+                new(ClaimTypes.Name, !string.IsNullOrWhiteSpace(userObj.UserName) ? userObj.UserName : "User"),
+                new(ClaimTypes.Email, userObj.Email ?? ""),
+                new("Avatar", !string.IsNullOrWhiteSpace(userObj.Img) ? userObj.Img : "/images/Portrait_Placeholder.png")
+            };
+
+            var rolesList = new List<string>();
+
+            if (userObj.Roles != null && userObj.Roles.Any())
+            {
+                rolesList.AddRange(userObj.Roles);
+            }
+
+            if (!string.IsNullOrWhiteSpace(userObj.RoleName))
+            {
+                rolesList.Add(userObj.RoleName);
+            }
+
+            if (!rolesList.Any())
+            {
+                rolesList.Add("User");
+            }
+
+            foreach (var role in rolesList.Distinct())
+            {
+                var cleanRole = role.Trim();
+                var normalizedRole = cleanRole.Replace(" ", "");
+
+                if (normalizedRole.Equals("superadmin", StringComparison.OrdinalIgnoreCase))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "SuperAdmin"));
+                    claims.Add(new Claim(ClaimTypes.Role, "Super Admin"));
+                }
+                else if (normalizedRole.Equals("admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                }
+                else
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, cleanRole));
+                }
+            }
+
+            return new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+        }
+
+        private static MultipartFormDataContent BuildPersonalDataFormData(PersonalDataVM model)
+        {
+            var formData = new MultipartFormDataContent
+            {
+                { new StringContent(model.Id.ToString()), nameof(model.Id) },
+                { new StringContent(model.UserName ?? string.Empty), nameof(model.UserName) },
+                { new StringContent(model.Email ?? string.Empty), nameof(model.Email) },
+                { new StringContent(model.NameEn ?? string.Empty), nameof(model.NameEn) },
+                { new StringContent(model.NameAr ?? string.Empty), nameof(model.NameAr) },
+                { new StringContent(model.Img ?? string.Empty), nameof(model.Img) }
+            };
+
+            if (!string.IsNullOrEmpty(model.RoleName))
+                formData.Add(new StringContent(model.RoleName), nameof(model.RoleName));
+
+            return formData;
+        }
+
         private async Task<string> SaveUserImageAsync(IFormFile imgFile)
         {
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imgFile.FileName)}";
             var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "users");
 
             if (!Directory.Exists(uploadsFolder))
-            {
                 Directory.CreateDirectory(uploadsFolder);
-            }
 
             var fullPath = Path.Combine(uploadsFolder, fileName);
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await imgFile.CopyToAsync(stream);
-            }
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await imgFile.CopyToAsync(stream);
 
             return "/images/users/" + fileName;
         }
-
-        private void SetUserCookies(string? imgPath, string? userName)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.Now.AddDays(7),
-                HttpOnly = false, // Allows layout to read safely
-                IsEssential = true
-            };
-
-            var avatarUrl = !string.IsNullOrWhiteSpace(imgPath) ? imgPath : "/images/Portrait_Placeholder.png";
-            var name = !string.IsNullOrWhiteSpace(userName) ? userName : "User";
-
-            Response.Cookies.Append("UserAvatar", avatarUrl, cookieOptions);
-            Response.Cookies.Append("UserName", name, cookieOptions);
-        }
     }
-
-
 }

@@ -12,5 +12,6 @@ namespace Inventory.Core.DTOs
         public decimal Price { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public string? CreatedBy { get; set; }
     }
 }

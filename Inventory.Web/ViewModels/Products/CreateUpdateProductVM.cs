@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Inventory.ViewModel.Products
+namespace Inventory.Web.ViewModels.Products
 {
     public class CreateUpdateProductVM
     {

@@ -1,67 +1,48 @@
-﻿@using Inventory.ViewModel.Products
-@model CreateUpdateProductVM
+﻿@using Inventory.Web.ViewModels.Roles
+@model RoleVM
 
 @{
-    ViewData["Title"] = "Create Product";
+    ViewData["Title"] = "Create Role";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-square me-2"></i>Create New Product</h4>
+<div class="row justify-content-center my-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-shield-plus fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-0 fw-bold">Create New Role</h5>
+                        <small class="text-white-50">Define access control roles for system users</small>
+                    </div>
+                </div>
             </div>
+
             <div class="card-body p-4">
-                <form id="createProductForm" asp-action="Create" method="post" enctype="multipart/form-data">
+                <form id="createRoleForm" asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
 
-                    <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-semibold"></label>
-                        <input asp-for="Name" class="form-control" placeholder="Enter product name" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="Price" class="form-label fw-semibold"></label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
-                            </div>
-                            <span asp-validation-for="Price" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label asp-for="CategoryId" class="form-label fw-semibold"></label>
-                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
-                                <option value="">-- Select Category --</option>
-                            </select>
-                            <span asp-validation-for="CategoryId" class="text-danger"></span>
-                        </div>
-                    </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="mb-3">
-                        <label asp-for="PowerType" class="form-label fw-semibold"></label>
-                        <select asp-for="PowerType"
-                                asp-items="Html.GetEnumSelectList<Inventory.Core.Utilities.Enums.PowerType>()"
-                                class="form-select">
-                            <option value="">-- Select Power Type --</option>
-                        </select>
-                        <span asp-validation-for="PowerType" class="text-danger"></span>
+                        <label asp-for="Name" class="form-label fw-semibold text-secondary small">Role Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-shield-lock"></i>
+                            </span>
+                            <input asp-for="Name" class="form-control border-start-0" placeholder="e.g., Manager, Supervisor..." />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-4">
-                        <label asp-for="ImgFile" class="form-label fw-semibold"></label>
-                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
-                        <span asp-validation-for="ImgFile" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-flex justify-content-between pt-2 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary">
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="bi bi-arrow-left me-1"></i> Back to List
                         </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-lg me-1"></i> Save Product
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
+                            <i class="bi bi-plus-circle me-1"></i> Save Role
                         </button>
                     </div>
                 </form>
@@ -73,26 +54,43 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#createProductForm').on('submit', function (e) {
+        $('#createRoleForm').on('submit', function(e) {
             e.preventDefault();
+
+            // 1️⃣ Client-side validation check
             if (!$(this).valid()) return;
 
-            var formData = new FormData(this);
+            const form = $(this);
 
+            // 2️⃣ Submit role creation via AJAX
             $.ajax({
-                url: '/Products/Create',
+                url: form.attr('action') || '/Roles/Create',
                 type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    if (res.redirectUrl) {
-                        window.location.href = res.redirectUrl;
-                    }
+                data: form.serialize(),
+                success: function(response) {
+                    Swal.fire({
+                        icon: response.icon || 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = response.redirectUrl || '/Roles';
+                    });
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     const err = xhr.responseJSON;
-                    alert(err?.message || "An error occurred during creation.");
+                    let errorMessage = 'Failed to create role.';
+
+                    if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Creation Failed',
+                        html: errorMessage
+                    });
                 }
             });
         });

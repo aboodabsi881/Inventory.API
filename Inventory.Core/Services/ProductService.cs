@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Inventory.Core.DTOs;
+﻿using Inventory.Core.DTOs;
 using Inventory.Core.Entities.Products;
 using Inventory.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,73 +7,42 @@ namespace Inventory.Core.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _env;
-        private readonly IMapper _mapper;
+        private readonly IRepository<Product> _productRepo;
 
-        public ProductService(IUnitOfWork unitOfWork, IWebHostEnvironment env, IMapper mapper)
+        public ProductService(IRepository<Product> productRepo)
         {
-            _unitOfWork = unitOfWork;
-            _env = env;
-            _mapper = mapper;
+            _productRepo = productRepo;
         }
 
-        public async Task<IReadOnlyList<ProductResponseDto>> GetAllProductsAsync()
+        public async Task<IReadOnlyList<ProductResponseDto>> GetAllProductsDtoAsync()
         {
-            var products = await _unitOfWork.Repository<Product>().GetAllAsync();
-            return _mapper.Map<IReadOnlyList<ProductResponseDto>>(products);
+            return await _productRepo.GetAllDtoAsync<ProductResponseDto>(include: q => q.Include(p => p.Category));
         }
 
-        public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
+        public async Task<ProductResponseDto?> GetProductDtoByIdAsync(int id)
         {
-            var product = await _unitOfWork.Repository<Product>()
-                .GetFirstOrDefaultAsync(
-                    predicate: p => p.Id == id,
-                    include: q => q.Include(p => p.Category) 
-                );
+            var product = await _productRepo.GetFirstOrDefaultAsync(
+                predicate: p => p.Id == id,
+                include: q => q.Include(p => p.Category)
+            );
 
-            if (product == null)
-                return null;
-
-            return _mapper.Map<ProductResponseDto>(product);
+            if (product == null) return null;
+            return await _productRepo.GetDtoByIdAsync<ProductResponseDto>(id);
         }
 
         public async Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model)
         {
-            var product = _mapper.Map<Product>(model);
-
-            await _unitOfWork.Repository<Product>().AddAsync(product);
-            await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<ProductResponseDto>(product);
+            return await _productRepo.CreateFromDtoAsync<ProductRequestDto, ProductResponseDto>(model);
         }
 
         public async Task<ProductResponseDto> UpdateProductAsync(int id, ProductRequestDto model)
         {
-            var existingProduct = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
-            if (existingProduct == null)
-                throw new KeyNotFoundException($"Product with ID {id} was not found.");
-
-            // Overwrite updated values onto tracked DB entity state
-            _mapper.Map(model, existingProduct);
-
-
-            _unitOfWork.Repository<Product>().Update(existingProduct);
-            await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<ProductResponseDto>(existingProduct);
+            return await _productRepo.UpdateFromDtoAsync<ProductRequestDto, ProductResponseDto>(id, model);
         }
 
         public async Task<bool> DeleteProductAsync(int id)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
-            if (product == null)
-                throw new KeyNotFoundException($"Product with ID {id} was not found.");
-
-            _unitOfWork.Repository<Product>().Delete(product);
-            var result = await _unitOfWork.CompleteAsync();
-
-            return result > 0;
+            return await _productRepo.DeleteAndSaveAsync(id);
         }
     }
 }

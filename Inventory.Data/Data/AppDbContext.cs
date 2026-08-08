@@ -21,10 +21,10 @@ namespace Inventory.Data.Data
             public DbSet<Cart> Carts { get; set; }
             public DbSet<Favorite> Favorites { get; set; }
 
-            // Fluent API
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
+                modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
                 modelBuilder.ApplyConfiguration(new CategoryConfiguration());
                 modelBuilder.ApplyConfiguration(new ProductConfiguration());
                 modelBuilder.ApplyConfiguration(new CartConfiguration());

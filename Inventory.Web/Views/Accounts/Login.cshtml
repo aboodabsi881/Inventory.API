@@ -22,13 +22,13 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="UserName" class="form-control rounded-3" placeholder="name@example.com" />
+                        <input asp-for="UserName" class="form-control rounded-3" placeholder="UserName / Email" />
                         <label asp-for="UserName"></label>
                         <span asp-validation-for="UserName" class="text-danger small"></span>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="Password" class="form-control rounded-3" placeholder="Password" />
+                        <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="Password" />
                         <label asp-for="Password"></label>
                         <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
@@ -55,32 +55,30 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#loginForm').on('submit', function(e) {
+        $('#loginForm').on('submit', function (e) {
             e.preventDefault();
 
-            if (!$(this).valid()) return;
-
             const $form = $(this);
-            const formData = new FormData(this);
+            if (!$form.valid()) return;
 
+            // 💡 Use form.serialize() instead of FormData for clean ASP.NET Core Model Binding
             $.ajax({
                 url: $form.attr('action') || '/Accounts/Login',
                 type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
+                data: $form.serialize(),
+                success: function (response) {
                     Swal.fire({
                         icon: response.icon || 'success',
                         title: 'Welcome!',
                         text: response.message || 'Login successful!',
-                        timer: 1500,
+                        timer: 1200,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = response.redirectUrl || '/Home';
+                        // 💡 Full browser navigation to home page after setting authentication ticket
+                        window.location.href = response.redirectUrl || '/Home/Index';
                     });
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     const err = xhr.responseJSON;
                     let errorMessage = 'Invalid login credentials.';
 

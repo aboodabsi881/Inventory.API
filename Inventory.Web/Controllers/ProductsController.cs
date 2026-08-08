@@ -1,53 +1,57 @@
-﻿using Inventory.ViewModel.Categories;
-using Inventory.ViewModel.Products;
-using Inventory.Web.Resources;
+﻿using Inventory.Web.Resources;
 using Inventory.Web.ViewModels.Carts;
+using Inventory.Web.ViewModels.Categories;
 using Inventory.Web.ViewModels.Favorites;
+using Inventory.Web.ViewModels.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace Inventory.Web.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _client;
         private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public ProductsController(
             IHttpClientFactory httpClientFactory,
             IStringLocalizer<SharedResource> localizer,
             IWebHostEnvironment webHostEnvironment)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = httpClientFactory.CreateClient("InventoryAPI");
             _localizer = localizer;
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // GET: Products
-        // Retrieves and displays all products from the API.
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var products = await _client.GetFromJsonAsync<List<ProductVM>>("Products", JsonOptions) ?? new List<ProductVM>();
 
-            var products = await client.GetFromJsonAsync<List<ProductVM>>("Products", options) ?? new List<ProductVM>();
-            var favorites = await client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", options) ?? new List<FavoriteVM>();
-            var cartItems = await client.GetFromJsonAsync<List<CartVM>>("Carts", options) ?? new List<CartVM>();
+            List<FavoriteVM> favorites = new();
+            List<CartVM> cartItems = new();
+
+            try
+            {
+                favorites = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
+                cartItems = await _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions) ?? new List<CartVM>();
+            }
+            catch
+            {
+            }
 
             var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
-            // 💡 عمل Dictionary لمعرفة كمية كل منتج داخل السلة
             var cartDictionary = cartItems.ToDictionary(c => c.ProductId, c => c.Quantity);
 
             foreach (var product in products)
             {
                 product.IsFavorite = favoriteProductIds.Contains(product.Id);
-
-                // تعيين الكمية إذا كان المنتج موجوداً في السلة
                 if (cartDictionary.TryGetValue(product.Id, out int qty))
                 {
                     product.QuantityInCart = qty;
@@ -57,38 +61,42 @@ namespace Inventory.Web.Controllers
             return View(products);
         }
 
-        // GET: Products/Details/5
-        // Retrieves product details.
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
+            var product = await _client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}", JsonOptions);
+            if (product == null) return NotFound();
 
-            var options = new System.Text.Json.JsonSerializerOptions
+            try
             {
-                PropertyNameCaseInsensitive = true
-            };
+                var favorites = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
+                var cartItems = await _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions) ?? new List<CartVM>();
 
-            // 💡 تمرير options يضمن قراءة categoryName بنجاح بغض النظر عن حالة الأحرف
-            var product = await client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}", options);
+                product.IsFavorite = favorites.Any(f => f.ProductId == id && f.IsFavorite);
 
-            if (product == null)
-                return NotFound();
+                var cartItem = cartItems.FirstOrDefault(c => c.ProductId == id);
+                if (cartItem != null)
+                {
+                    product.QuantityInCart = cartItem.Quantity;
+                }
+            }
+            catch
+            {
+            }
 
             return View(product);
         }
 
-        // GET: Products/Create
-        // Renders the form to create a new product and loads categories for dropdown.
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesDropdownAsync();
             return View();
         }
 
-        // POST: Products/Create
-        // Saves image locally in wwwroot/images/products and posts product data to the API.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> Create(CreateUpdateProductVM model)
         {
             if (!ModelState.IsValid)
@@ -97,28 +105,10 @@ namespace Inventory.Web.Controllers
                 return BadRequest(new { icon = "warning", message = _localizer["ValidationFailed"].Value });
             }
 
-            string? imagePath = null;
+            string? imagePath = model.ImgFile is { Length: > 0 } ? await SaveImageLocallyAsync(model.ImgFile) : null;
 
-            if (model.ImgFile != null && model.ImgFile.Length > 0)
-            {
-                imagePath = await SaveImageLocallyAsync(model.ImgFile);
-            }
-
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            using var content = new MultipartFormDataContent();
-            content.Add(new StringContent(model.Name ?? string.Empty), "Name");
-
-            content.Add(new StringContent(model.Price.ToString(CultureInfo.InvariantCulture)), "Price");
-            content.Add(new StringContent(model.CategoryId.ToString()), "CategoryId");
-
-            if (model.PowerType.HasValue)
-            {
-                content.Add(new StringContent(model.PowerType.Value.ToString()), "PowerType");
-            }
-
-            content.Add(new StringContent(imagePath ?? string.Empty), "Img");
-            var response = await client.PostAsync("Products", content);
+            using var content = BuildProductFormData(model, imagePath);
+            var response = await _client.PostAsync("Products", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -130,34 +120,26 @@ namespace Inventory.Web.Controllers
                 });
             }
 
-            // If API call fails, remove uploaded image to avoid unused file accumulation
             if (!string.IsNullOrEmpty(imagePath))
-            {
                 DeleteLocalImage(imagePath);
-            }
 
             var errorDetails = await response.Content.ReadAsStringAsync();
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        // GET: Products/Edit/5
-        // Retrieves existing Product details and loads categories dropdown to populate the edit form.
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var product = await client.GetFromJsonAsync<CreateUpdateProductVM>($"Products/{id}");
-
-            if (product == null)
-                return NotFound();
+            var product = await _client.GetFromJsonAsync<CreateUpdateProductVM>($"Products/{id}", JsonOptions);
+            if (product == null) return NotFound();
 
             await PopulateCategoriesDropdownAsync(product.CategoryId);
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // Updates product data and replaces old local image file if a new file is uploaded.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> Edit(int id, CreateUpdateProductVM model)
         {
             if (id != model.Id)
@@ -171,35 +153,16 @@ namespace Inventory.Web.Controllers
 
             string? updatedImagePath = model.Img;
 
-            // Check if a new image file was uploaded during edit
-            if (model.ImgFile != null && model.ImgFile.Length > 0)
+            if (model.ImgFile is { Length: > 0 })
             {
-                // Delete existing old image file from wwwroot if present
                 if (!string.IsNullOrEmpty(model.Img))
-                {
                     DeleteLocalImage(model.Img);
-                }
 
-                // Save new image file locally in wwwroot
                 updatedImagePath = await SaveImageLocallyAsync(model.ImgFile);
             }
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            using var content = new MultipartFormDataContent();
-            content.Add(new StringContent(model.Id.ToString()), "Id");
-            content.Add(new StringContent(model.Name ?? string.Empty), "Name");
-            content.Add(new StringContent(model.Price.ToString(CultureInfo.InvariantCulture)), "Price");
-            content.Add(new StringContent(model.CategoryId.ToString()), "CategoryId");
-
-            // FIX: Bind PowerType enum if populated
-            if (model.PowerType.HasValue)
-            {
-                content.Add(new StringContent(((int)model.PowerType.Value).ToString()), "PowerType");
-            }
-
-            content.Add(new StringContent(updatedImagePath ?? string.Empty), "Img");
-            var response = await client.PutAsync($"Products/{id}", content);
+            using var content = BuildProductFormData(model, updatedImagePath, includeId: true);
+            var response = await _client.PutAsync($"Products/{id}", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -215,26 +178,18 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        // POST: Products/Delete/5
-        // Deletes product from API and removes its associated local image file from wwwroot.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            // Retrieve product details to acquire the image path before deletion
-            var product = await client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}");
-
-            var response = await client.DeleteAsync($"Products/{id}");
+            var product = await _client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}", JsonOptions);
+            var response = await _client.DeleteAsync($"Products/{id}");
 
             if (response.IsSuccessStatusCode)
             {
-                // Remove corresponding local image from wwwroot upon successful deletion
                 if (product != null && !string.IsNullOrEmpty(product.Img))
-                {
                     DeleteLocalImage(product.Img);
-                }
 
                 return Ok(new
                 {
@@ -249,51 +204,57 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        #region Helper Methods
-
-        // ✅ تصحيح: جلب التصنيفات الحقيقية من API
         private async Task PopulateCategoriesDropdownAsync(object? selectedCategory = null)
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var categories = await client.GetFromJsonAsync<List<CategoryVM>>("Categories") ?? new List<CategoryVM>();
+            var categories = await _client.GetFromJsonAsync<List<CategoryVM>>("Categories", JsonOptions) ?? new List<CategoryVM>();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedCategory);
         }
 
-        // Saves uploaded file inside Inventory.Web/wwwroot/images/products/ and returns the relative path.
+        private static MultipartFormDataContent BuildProductFormData(CreateUpdateProductVM model, string? imagePath, bool includeId = false)
+        {
+            var content = new MultipartFormDataContent();
+            if (includeId)
+            {
+                content.Add(new StringContent(model.Id.ToString()), "Id");
+            }
+
+            content.Add(new StringContent(model.Name ?? string.Empty), "Name");
+            content.Add(new StringContent(model.Price.ToString(CultureInfo.InvariantCulture)), "Price");
+            content.Add(new StringContent(model.CategoryId.ToString()), "CategoryId");
+
+            if (model.PowerType.HasValue)
+            {
+                content.Add(new StringContent(((int)model.PowerType.Value).ToString()), "PowerType");
+            }
+
+            content.Add(new StringContent(imagePath ?? string.Empty), "Img");
+            return content;
+        }
+
         private async Task<string> SaveImageLocallyAsync(IFormFile file)
         {
             string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products");
-
             if (!Directory.Exists(folderPath))
-            {
                 Directory.CreateDirectory(folderPath);
-            }
 
             string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             string fullPath = Path.Combine(folderPath, uniqueFileName);
 
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
 
             return $"/images/products/{uniqueFileName}";
         }
 
-        // Removes a physical file from wwwroot if it exists.
         private void DeleteLocalImage(string relativePath)
         {
             if (string.IsNullOrWhiteSpace(relativePath)) return;
 
             string fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('/'));
-
             if (System.IO.File.Exists(fullPath))
             {
                 System.IO.File.Delete(fullPath);
             }
         }
-
-        #endregion
     }
-
 }

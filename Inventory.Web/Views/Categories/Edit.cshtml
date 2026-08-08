@@ -1,48 +1,52 @@
-﻿@model Inventory.ViewModel.Categories.CreateUpdateCategoryVM
+﻿@using Inventory.Web.ViewModels.Categories
+@model CreateUpdateCategoryVM
 
 @{
     ViewData["Title"] = "Edit Category";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Category</h4>
+<div class="row justify-content-center my-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-warning text-dark p-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Category</h4>
             </div>
-            <div class="card-body">
-                <form id="editCategoryForm" enctype="multipart/form-data">
+            <div class="card-body p-4">
+                <form id="editCategoryForm" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <!-- 💡 CRITICAL: Preserve existing ID and Image Path -->
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="Img" />
+
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label"></label>
+                        <label asp-for="Name" class="form-label fw-semibold"></label>
                         <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    @if (!string.IsNullOrEmpty(Model.Img))
-                    {
-                        <div class="mb-3 text-center">
-                            <label class="form-label d-block">Current Image</label>
-                            <img src="@Model.Img" alt="@Model.Name" class="img-thumbnail" style="max-height: 120px;" />
-                        </div>
-                    }
-
-                    <div class="mb-3">
-                        <label asp-for="ImgFile" class="form-label">Change Image (Optional)</label>
-                        <!-- 💡 Optional file input -->
-                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
-                        <span asp-validation-for="ImgFile" class="text-danger"></span>
+                    <!-- Current & Preview Image Container -->
+                    <div class="mb-3 text-center p-3 bg-light rounded-3 border">
+                        <label class="form-label d-block small text-muted mb-2">Category Image Preview</label>
+                        <img id="imgPreview"
+                             src="@(string.IsNullOrEmpty(Model.Img) ? "/images/placeholder.png" : Model.Img)"
+                             alt="@Model.Name"
+                             class="img-thumbnail object-fit-cover shadow-sm"
+                             style="max-height: 140px;"
+                             onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                    <div class="mb-4">
+                        <label asp-for="ImgFile" class="form-label fw-semibold">Change Image (Optional)</label>
+                        <input asp-for="ImgFile" id="imgInput" type="file" class="form-control" accept="image/*" />
+                        <span asp-validation-for="ImgFile" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="bi bi-arrow-left me-1"></i> Back to List
                         </a>
-                        <button type="submit" class="btn btn-warning">
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold">
                             <i class="bi bi-save me-1"></i> Update Category
                         </button>
                     </div>
@@ -52,22 +56,34 @@
     </div>
 </div>
 
-                    
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // 💡 Live Image Preview on File Selection
+        $('#imgInput').on('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imgPreview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 💡 AJAX Form Submission
         $('#editCategoryForm').on('submit', function (e) {
             e.preventDefault();
 
             // 1️⃣ التحقق من صحة المدخلات بجهة العميل
             if (!$(this).valid()) return;
 
-            // 2️⃣ تعريف المتغيرات بشكل صحيح لمنع خطأ Uncaught ReferenceError
+            // 2️⃣ حزم البيانات مع الملف
             const $form = $(this);
-            const formData = new FormData(this); // 💡 FormData يحزم النصوص والملفات معاُ
+            const formData = new FormData(this);
 
             $.ajax({
-                url: $form.attr('action') || '/Categories/Edit',
+                url: $form.attr('action') || `@Url.Action("Edit", "Categories")/${$('#Id').val()}`,
                 type: 'POST',
                 data: formData,
                 processData: false, // 👈 ضروري لرفع الملفات والصور
@@ -75,12 +91,12 @@
                 success: function (response) {
                     Swal.fire({
                         icon: response.icon || 'success',
-                        title: 'Success!',
-                        text: response.message,
+                        title: 'Updated!',
+                        text: response.message || 'Category updated successfully.',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = response.redirectUrl || '/Categories';
+                        window.location.href = response.redirectUrl || '@Url.Action("Index", "Categories")';
                     });
                 },
                 error: function (xhr) {
@@ -95,7 +111,7 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Creation Failed',
+                        title: 'Update Failed',
                         html: errorMessage
                     });
                 }
@@ -103,5 +119,3 @@
         });
     </script>
 }
-
-

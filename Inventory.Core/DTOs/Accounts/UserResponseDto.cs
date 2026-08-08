@@ -11,5 +11,6 @@
         public string? Img { get; set; }
         public string Token { get; set; } = string.Empty; // Bearer token for API authentication
         public List<string> Roles { get; set; } = new();
+        public string RoleName { get; internal set; }
     }
 }

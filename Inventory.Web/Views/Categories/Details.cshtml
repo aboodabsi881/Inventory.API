@@ -1,4 +1,4 @@
-﻿@using Inventory.ViewModel.Categories
+﻿@using Inventory.Web.ViewModels.Categories
 @model CategoryDetailsVM
 
 @{
@@ -51,7 +51,6 @@
                 <div class="col" id="product-card-@product.Id">
                     <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden">
 
-                        <!-- 💡 Favorite Toggle Button -->
                         <button type="button"
                                 class="btn btn-light btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm favorite-btn"
                                 id="fav-btn-@product.Id"
@@ -143,48 +142,48 @@
                 headers: {
                     "RequestVerificationToken": token
                 },
-                success: function (response) {
+                success: function(response) {
                     const container = $(`#cart-control-container-${productId}`);
 
                     if (response.removed) {
                         container.html(`
-                            <button type="button"
-                                    class="btn btn-primary bg-primary-subtle text-primary border-0 w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
-                                    onclick="updateCartQuantity(${productId}, 1)">
-                                <i class="bi bi-bag-plus-fill fs-6"></i>
-                                <span>Add to Cart</span>
-                            </button>
-                        `);
+                                    <button type="button"
+                                            class="btn btn-primary bg-primary-subtle text-primary border-0 w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
+                                            onclick="updateCartQuantity(${productId}, 1)">
+                                        <i class="bi bi-bag-plus-fill fs-6"></i>
+                                        <span>Add to Cart</span>
+                                    </button>
+                                `);
                         Toast.fire({ icon: 'info', title: 'Item removed from cart' });
                     } else if (response.item) {
                         const newQty = response.item.quantity;
 
                         container.html(`
-                            <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
-                                <button type="button"
-                                        class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                        style="width: 28px; height: 28px;"
-                                        onclick="updateCartQuantity(${productId}, -1)">
-                                    <i class="bi bi-dash-lg"></i>
-                                </button>
+                                    <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
+                                        <button type="button"
+                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
+                                                style="width: 28px; height: 28px;"
+                                                onclick="updateCartQuantity(${productId}, -1)">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </button>
 
-                                <span class="fw-bold px-3 fs-6 user-select-none" id="card-qty-${productId}">
-                                    ${newQty} <small class="fw-normal text-white-50 ms-1 small">in cart</small>
-                                </span>
+                                        <span class="fw-bold px-3 fs-6 user-select-none" id="card-qty-${productId}">
+                                            ${newQty} <small class="fw-normal text-white-50 ms-1 small">in cart</small>
+                                        </span>
 
-                                <button type="button"
-                                        class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                        style="width: 28px; height: 28px;"
-                                        onclick="updateCartQuantity(${productId}, 1)">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
-                        `);
+                                        <button type="button"
+                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
+                                                style="width: 28px; height: 28px;"
+                                                onclick="updateCartQuantity(${productId}, 1)">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                `);
 
                         Toast.fire({ icon: 'success', title: 'Cart updated' });
                     }
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     console.error("AJAX Error Details:", xhr);
                     Toast.fire({ icon: 'error', title: 'Failed to update cart.' });
                 }
@@ -218,7 +217,7 @@
                 data: {
                     productId: productId
                 },
-                success: function (response) {
+                success: function(response) {
                     const icon = $(`#fav-icon-${productId}`);
 
                     if (response.isFavorite) {
@@ -232,7 +231,7 @@
                         title: response.message
                     });
                 },
-                error: function () {
+                error: function() {
                     Toast.fire({
                         icon: 'error',
                         title: 'Failed to update favorite status.'

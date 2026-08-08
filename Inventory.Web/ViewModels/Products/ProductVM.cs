@@ -1,9 +1,9 @@
 ﻿using Inventory.Core.Utilities.Enums;
-using Inventory.ViewModel.Categories;
+using Inventory.Web.ViewModels.Categories;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Inventory.ViewModel.Products
+namespace Inventory.Web.ViewModels.Products
 {
     public class ProductVM
     {
@@ -17,5 +17,6 @@ namespace Inventory.ViewModel.Products
         public bool IsFavorite { get; set; }
         public int QuantityInCart { get; set; }
         public CategoryDetailsVM? Category { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

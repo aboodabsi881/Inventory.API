@@ -9,6 +9,11 @@
         public string Email { get; set; } = string.Empty;
         public string? Img { get; set; }
         public List<string> Roles { get; set; } = new();
-        public string RoleName => Roles.FirstOrDefault() ?? "User";
+        private string? _roleName;
+        public string RoleName
+        {
+            get => !string.IsNullOrEmpty(_roleName) ? _roleName : (Roles.FirstOrDefault() ?? "User");
+            set => _roleName = value;
+        }
     }
 }

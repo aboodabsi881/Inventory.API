@@ -26,5 +26,7 @@ namespace Inventory.Core.Entities.Users.ApplicationUsers
         }
 
         public string? Img { get; set; }
+
+        public virtual ICollection<IdentityUserRole<int>> UserRoles { get; set; } = new List<IdentityUserRole<int>>();
     }
 }

@@ -1,8 +1,8 @@
-﻿using Inventory.ViewModel.Products;
+﻿using Inventory.Web.ViewModels.Products;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Inventory.ViewModel.Categories
+namespace Inventory.Web.ViewModels.Categories
 {
     public class CategoryVM
     {

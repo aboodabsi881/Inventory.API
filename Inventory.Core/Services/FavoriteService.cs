@@ -1,90 +1,68 @@
-﻿using AutoMapper;
+﻿using Inventory.Core.DTOs;
+using Inventory.Core.Entities.Favorites;
+using Inventory.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Inventory.Core.DTOs;
-using Inventory.Core.Entities.Favorites;
-using Inventory.Core.Entities.Products;
-using Inventory.Core.Interfaces;
 
 namespace Inventory.Core.Services
 {
     public class FavoriteService : IFavoriteService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IRepository<Favorite> _favoriteRepo;
 
-        public FavoriteService(IUnitOfWork unitOfWork, IMapper mapper)
+        public FavoriteService(IRepository<Favorite> favoriteRepo)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _favoriteRepo = favoriteRepo;
         }
 
         public async Task<IReadOnlyList<FavoriteResponseDto>> GetAllFavoritesAsync()
         {
-            var allFavorites = await _unitOfWork.Repository<Favorite>().GetAllAsync();
+            var favorites = await _favoriteRepo.GetAllDtoAsync<FavoriteResponseDto>(
+                include: q => q.Include(f => f.Product)
+            );
 
-            // 💡 تصفية العناصر المفضلة فقط
-            var activeFavorites = allFavorites.Where(f => f.IsFavorite).ToList();
-
-            var products = await _unitOfWork.Repository<Product>().GetAllAsync();
-
-            foreach (var fav in activeFavorites)
-            {
-                fav.Product = products.FirstOrDefault(p => p.Id == fav.ProductId);
-            }
-
-            return _mapper.Map<IReadOnlyList<FavoriteResponseDto>>(activeFavorites);
+            return favorites.Where(f => f.IsFavorite).ToList();
         }
 
         public async Task<FavoriteResponseDto?> ToggleFavoriteAsync(int productId)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(productId);
-            if (product == null)
-                return null;
-
-            var allFavorites = await _unitOfWork.Repository<Favorite>().GetAllAsync();
-            var fav = allFavorites.FirstOrDefault(f => f.ProductId == productId);
+            var fav = await _favoriteRepo.GetFirstOrDefaultAsync(
+                predicate: f => f.ProductId == productId,
+                include: q => q.Include(f => f.Product)
+            );
 
             if (fav != null)
             {
-                // Toggle the existing favorite state
                 fav.IsFavorite = !fav.IsFavorite;
-                _unitOfWork.Repository<Favorite>().Update(fav);
+                _favoriteRepo.Update(fav);
             }
             else
             {
-                // Create a new favorite record
                 fav = new Favorite
                 {
                     ProductId = productId,
                     IsFavorite = true
                 };
 
-                await _unitOfWork.Repository<Favorite>().AddAsync(fav);
+                await _favoriteRepo.AddAsync(fav);
             }
 
-            await _unitOfWork.CompleteAsync();
+            await _favoriteRepo.SaveChangesAsync();
 
-            fav.Product = product; // Attach product reference for mapping
-            return _mapper.Map<FavoriteResponseDto>(fav);
+            return await _favoriteRepo.GetDtoByIdAsync<FavoriteResponseDto>(fav.Id);
         }
 
         public async Task<bool> DeleteFavoriteAsync(int id)
         {
-            var fav = await _unitOfWork.Repository<Favorite>().GetByIdAsync(id);
-            if (fav == null) return false;
-
-            _unitOfWork.Repository<Favorite>().Delete(fav);
-            var result = await _unitOfWork.CompleteAsync();
-
-            return result > 0;
+            return await _favoriteRepo.DeleteAndSaveAsync(id);
         }
 
         public async Task<bool> IsProductFavoriteAsync(int productId)
         {
-            var allFavorites = await _unitOfWork.Repository<Favorite>().GetAllAsync();
-            return allFavorites.Any(f => f.ProductId == productId && f.IsFavorite);
+            var fav = await _favoriteRepo.GetFirstOrDefaultAsync(f => f.ProductId == productId && f.IsFavorite);
+            return fav != null;
         }
     }
 }

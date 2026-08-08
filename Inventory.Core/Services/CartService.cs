@@ -1,52 +1,32 @@
-﻿using AutoMapper;
-using Inventory.Core.DTOs;
+﻿using Inventory.Core.DTOs;
 using Inventory.Core.Entities.Carts;
-using Inventory.Core.Entities.Products;
 using Inventory.Core.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Core.Services
 {
     public class CartService : ICartService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IRepository<Cart> _cartRepo;
 
-        public CartService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CartService(IRepository<Cart> cartRepo)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _cartRepo = cartRepo;
         }
 
         public async Task<IReadOnlyList<CartResponseDto>> GetCartAsync()
         {
-            var cartItems = await _unitOfWork.Repository<Cart>().GetAllAsync();
-            var products = await _unitOfWork.Repository<Product>().GetAllAsync();
-
-            var productDict = products.ToDictionary(p => p.Id);
-
-            foreach (var item in cartItems)
-            {
-                if (productDict.TryGetValue(item.ProductId, out var product))
-                {
-                    item.Product = product;
-                    item.TotalPrice = item.Quantity * product.Price;
-                }
-            }
-
-            return _mapper.Map<IReadOnlyList<CartResponseDto>>(cartItems);
+            return await _cartRepo.GetAllDtoAsync<CartResponseDto>(
+                include: q => q.Include(c => c.Product)
+            );
         }
 
         public async Task<CartResponseDto?> AddOrUpdateItemAsync(int productId, int change)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(productId);
-            if (product == null)
-                throw new KeyNotFoundException($"Product with ID {productId} was not found.");
-
-            var allCartItems = await _unitOfWork.Repository<Cart>().GetAllAsync();
-            var cartItem = allCartItems.FirstOrDefault(c => c.ProductId == productId);
+            var cartItem = await _cartRepo.GetFirstOrDefaultAsync(
+                predicate: c => c.ProductId == productId,
+                include: q => q.Include(c => c.Product)
+            );
 
             if (cartItem == null)
             {
@@ -55,11 +35,10 @@ namespace Inventory.Core.Services
                 cartItem = new Cart
                 {
                     ProductId = productId,
-                    Quantity = change,
-                    TotalPrice = change * product.Price
+                    Quantity = change
                 };
 
-                await _unitOfWork.Repository<Cart>().AddAsync(cartItem);
+                await _cartRepo.AddAsync(cartItem);
             }
             else
             {
@@ -67,50 +46,28 @@ namespace Inventory.Core.Services
 
                 if (cartItem.Quantity <= 0)
                 {
-                    _unitOfWork.Repository<Cart>().Delete(cartItem);
-                    await _unitOfWork.CompleteAsync();
+                    _cartRepo.Delete(cartItem);
+                    await _cartRepo.SaveChangesAsync();
                     return null;
                 }
 
-                cartItem.TotalPrice = cartItem.Quantity * product.Price;
-                _unitOfWork.Repository<Cart>().Update(cartItem);
+                _cartRepo.Update(cartItem);
             }
 
-            await _unitOfWork.CompleteAsync();
+            await _cartRepo.SaveChangesAsync();
 
-            // Re-attach product for mapping to DTO
-            cartItem.Product = product;
-            return _mapper.Map<CartResponseDto>(cartItem);
+            return await _cartRepo.GetDtoByIdAsync<CartResponseDto>(cartItem.Id);
         }
 
         public async Task<bool> RemoveItemAsync(int cartId)
         {
-            var cartItem = await _unitOfWork.Repository<Cart>().GetByIdAsync(cartId);
-            if (cartItem == null) return false;
-
-            _unitOfWork.Repository<Cart>().Delete(cartItem);
-            var result = await _unitOfWork.CompleteAsync();
-
-            return result > 0;
+            return await _cartRepo.DeleteAndSaveAsync(cartId);
         }
 
         public async Task<decimal> GetCartTotalAsync()
         {
-            var cartItems = await _unitOfWork.Repository<Cart>().GetAllAsync();
-            var products = await _unitOfWork.Repository<Product>().GetAllAsync();
-
-            var productDict = products.ToDictionary(p => p.Id);
-
-            decimal total = 0;
-            foreach (var item in cartItems)
-            {
-                if (productDict.TryGetValue(item.ProductId, out var product))
-                {
-                    total += item.Quantity * product.Price;
-                }
-            }
-
-            return total;
+            var cartItems = await _cartRepo.GetAllAsync(include: q => q.Include(c => c.Product));
+            return cartItems.Sum(item => item.Quantity * (item.Product?.Price ?? 0));
         }
     }
 }

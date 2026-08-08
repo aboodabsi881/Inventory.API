@@ -85,7 +85,7 @@
                         headers: {
                             "RequestVerificationToken": token
                         },
-                        success: function (response) {
+                        success: function(response) {
                             Swal.fire({
                                 icon: response.icon || 'info',
                                 title: 'Removed!',
@@ -98,7 +98,7 @@
                                 });
                             });
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             const err = xhr.responseJSON;
                             Swal.fire({
                                 icon: 'error',

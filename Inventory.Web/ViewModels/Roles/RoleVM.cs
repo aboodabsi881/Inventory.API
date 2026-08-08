@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Inventory.ViewModel.Roles
+namespace Inventory.Web.ViewModels.Roles
 {
     public class RoleVM
     {

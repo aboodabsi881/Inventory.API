@@ -1,56 +1,58 @@
 ﻿using Inventory.Web.Resources;
 using Inventory.Web.ViewModels.Favorites;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
+    [Authorize]
     public class FavoriteController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _client;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public FavoriteController(
             IHttpClientFactory httpClientFactory,
             IStringLocalizer<SharedResource> localizer)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = httpClientFactory.CreateClient("InventoryAPI");
             _localizer = localizer;
         }
 
-        // GET: Favorite
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            List<FavoriteVM> favorites = new();
+            try
+            {
+                var response = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
+                favorites = response.Where(f => f.IsFavorite).ToList();
+            }
+            catch
+            {
+            }
 
-            var favorites = await client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", options);
-
-            return View(favorites ?? new List<FavoriteVM>());
+            return View(favorites);
         }
 
-        // POST: Favorite/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId)
         {
             if (productId <= 0)
-            {
                 return BadRequest(new { icon = "error", message = _localizer["ProductNotFound"].Value });
-            }
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            // 💡 Matches API route: POST api/favorites/toggle/{productId}
-            var response = await client.PostAsync($"Favorites/toggle/{productId}", null);
-
+            var response = await _client.PostAsync($"Favorites/toggle/{productId}", null);
             if (response.IsSuccessStatusCode)
             {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var result = await response.Content.ReadFromJsonAsync<FavoriteVM>(options);
-
+                var result = await response.Content.ReadFromJsonAsync<FavoriteVM>(JsonOptions);
                 return Ok(new
                 {
                     icon = "success",
@@ -58,7 +60,7 @@ namespace Inventory.Web.Controllers
                         ? _localizer["AddedToFavorite"].Value
                         : _localizer["RemovedFromFavorite"].Value,
                     isFavorite = result?.IsFavorite ?? false,
-                    productId = productId
+                    productId
                 });
             }
 
@@ -66,21 +68,14 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
         }
 
-        // POST: Favorite/DeleteConfirmed/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (id <= 0)
-            {
                 return BadRequest(new { icon = "error", message = _localizer["ProductNotFound"].Value });
-            }
 
-            var client = _httpClientFactory.CreateClient("InventoryAPI");
-
-            // 💡 Matches API route: DELETE api/favorites/{id}
-            var response = await client.DeleteAsync($"Favorites/{id}");
-
+            var response = await _client.DeleteAsync($"Favorites/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return Ok(new

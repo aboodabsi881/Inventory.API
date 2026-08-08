@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Inventory.Core.DTOs;
+﻿using Inventory.Core.DTOs;
 using Inventory.Core.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.API.Controllers
 {
@@ -67,7 +64,11 @@ namespace Inventory.API.Controllers
                 await _roleService.UpdateRoleAsync(id, model);
                 return Ok(new { message = "Role updated successfully." });
             }
-            catch (Exception ex) when (ex is KeyNotFoundException || ex is InvalidOperationException)
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -82,7 +83,11 @@ namespace Inventory.API.Controllers
                 await _roleService.DeleteRoleAsync(id);
                 return NoContent();
             }
-            catch (Exception ex) when (ex is KeyNotFoundException || ex is InvalidOperationException)
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }

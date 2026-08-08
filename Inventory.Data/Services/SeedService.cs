@@ -33,7 +33,7 @@ namespace Inventory.Data.Services
 
                 // Seeding System Roles
                 logger.LogInformation("Seeding default identity system roles.");
-                await AddRoleAsync(roleManager, "Super Admin");
+                await AddRoleAsync(roleManager, "SuperAdmin");
                 await AddRoleAsync(roleManager, "Admin");
                 await AddRoleAsync(roleManager, "User");
 
@@ -70,8 +70,8 @@ namespace Inventory.Data.Services
 
                         if (result.Succeeded)
                         {
-                            logger.LogInformation("Assigning 'Super Admin' role credentials to user.");
-                            await userManager.AddToRoleAsync(superAdminUser, "Super Admin");
+                            logger.LogInformation("Assigning 'SuperAdmin' role credentials to user.");
+                            await userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
                         }
                         else
                         {

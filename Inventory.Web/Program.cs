@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,6 +12,16 @@ builder.Services.AddHttpClient("InventoryAPI", client =>
     client.BaseAddress = new Uri("https://localhost:7182/api/"); // 👈 Match your API port
     client.DefaultRequestHeaders.Add("Accept",  "application/json");
 });
+
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Accounts/Login";
+        options.AccessDeniedPath = "/Accounts/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+    });
 
 var app = builder.Build();
 
@@ -37,7 +49,7 @@ app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
 
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

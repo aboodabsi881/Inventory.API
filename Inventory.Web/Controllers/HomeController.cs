@@ -1,6 +1,7 @@
 using Inventory.ViewModels;
 using Inventory.Web.ViewModels.Home;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
@@ -48,6 +49,24 @@ namespace Inventory.Web.Controllers
             return View(vm);
         }
 
+        [HttpPost]
+[HttpGet]
+        [HttpPost]
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions 
+                { 
+                    Expires = DateTimeOffset.UtcNow.AddYears(1), 
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
+                }
+            );
+
+            return LocalRedirect(string.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
+        }
         public IActionResult Privacy()
         {
             return View();
@@ -57,6 +76,23 @@ namespace Inventory.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpGet]
+        public IActionResult ChangeLanguage(string lang, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(lang)),
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
+                }
+            );
+
+            return LocalRedirect(string.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
         }
     }
 }

@@ -1053,6 +1053,15 @@ namespace Inventory.Web.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to System Dashboard.
+        /// </summary>
+        public static string System_Dashboard {
+            get {
+                return ResourceManager.GetString("System Dashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Development environment shouldn&apos;t be enabled for deployed applications..
         /// </summary>
         public static string The_Development_environment_shouldn_t_be_enabled_for_deployed_applications_ {

@@ -1,20 +1,27 @@
-﻿@using System.Security.Claims
+﻿@using System.Globalization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Localization
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
     var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0";
     var currentName = User.Identity?.Name ?? "User";
     var currentAvatar = User.FindFirstValue("Avatar") ?? "/images/Portrait_Placeholder.png";
+
+    // Culture Detection
+    var currentLang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isRTL = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
+    var cssPath = isRTL ? "~/css/styleAr.css" : "~/css/style.css";
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@currentLang" dir="@(isRTL ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Inventory Engine</title>
+    <title>@ViewData["Title"] - Inventory</title>
 
-    <!-- Instant State Restorer (Prevents Sidebar Flashing on Page Load) -->
+    <!-- Instant State Restorer -->
     <script>
             (function() {
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && window.innerWidth >= 992) {
@@ -23,224 +30,50 @@
             })();
     </script>
 
-    <!-- Google Fonts (Inter) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 & Icons -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
-    <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
-    <style>
-            :root {
-                --sidebar-width: 260px;
-                --sidebar-collapsed-width: 78px;
-                --brand-primary: #4f46e5;
-                --brand-primary-hover: #4338ca;
-                --brand-subtle: #eef2ff;
-            }
-
-            body {
-                font-family: 'Inter', system-ui, -apple-system, sans-serif;
-                background-color: #f8fafc;
-                color: #0f172a;
-                overflow-x: hidden;
-            }
-
-            .btn:focus {
-                box-shadow: none !important;
-            }
-            /* Fixed Sidebar Styling */
-            .sidebar {
-                width: var(--sidebar-width);
-                height: 100vh;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 1040;
-                background: #ffffff;
-                border-right: 1px solid #e2e8f0;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                display: flex;
-                flex-direction: column;
-            }
-
-                /* Sidebar Navigation Items */
-                .sidebar .nav-link-item {
-                    color: #64748b !important;
-                    font-weight: 500;
-                    padding: 0.75rem 1.25rem !important;
-                    border-radius: 0.75rem;
-                    transition: all 0.2s ease-in-out;
-                    white-space: nowrap;
-                }
-
-                    .sidebar .nav-link-item:hover {
-                        color: var(--brand-primary) !important;
-                        background-color: #f1f5f9;
-                    }
-
-                    .sidebar .nav-link-item.active {
-                        color: var(--brand-primary) !important;
-                        background-color: var(--brand-subtle) !important;
-                        font-weight: 600;
-                    }
-
-            /* Collapsed Sidebar Rules (Desktop) */
-            html.sidebar-collapsed body .sidebar,
-            body.sidebar-collapsed .sidebar {
-                width: var(--sidebar-collapsed-width);
-            }
-
-                html.sidebar-collapsed body .sidebar .link-text,
-                html.sidebar-collapsed body .sidebar .brand-text,
-                body.sidebar-collapsed .sidebar .link-text,
-                body.sidebar-collapsed .sidebar .brand-text {
-                    display: none !important;
-                }
-
-                html.sidebar-collapsed body .sidebar .nav-link-item,
-                body.sidebar-collapsed .sidebar .nav-link-item {
-                    justify-content: center;
-                    padding: 0.75rem !important;
-                }
-
-                html.sidebar-collapsed body .sidebar .sidebar-header,
-                body.sidebar-collapsed .sidebar .sidebar-header {
-                    justify-content: center !important;
-                    padding-left: 0 !important;
-                    padding-right: 0 !important;
-                }
-
-            /* Main Content Shift */
-            .main-wrapper {
-                margin-left: var(--sidebar-width);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-
-            html.sidebar-collapsed body .main-wrapper,
-            body.sidebar-collapsed .main-wrapper {
-                margin-left: var(--sidebar-collapsed-width);
-            }
-
-            /* Top Header Navbar */
-            .glass-header {
-                background: rgba(255, 255, 255, 0.9) !important;
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid #e2e8f0;
-            }
-
-            /* Action Icon Buttons */
-            .btn-action-icon {
-                width: 42px;
-                height: 42px;
-                border-radius: 50%;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.2s ease;
-            }
-
-                .btn-action-icon:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-                }
-
-            .avatar-circle {
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid var(--brand-subtle);
-            }
-
-            .dropdown-menu-custom {
-                border: 0;
-                border-radius: 1rem;
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            }
-
-            /* Mobile Responsive Adjustments */
-            @@media (max-width: 991.98px) {
-                .sidebar {
-                    margin-left: calc(-1 * var(--sidebar-width));
-                }
-
-                body.sidebar-mobile-open .sidebar {
-                    margin-left: 0;
-                    width: var(--sidebar-width) !important;
-                }
-
-                    body.sidebar-mobile-open .sidebar .link-text,
-                    body.sidebar-mobile-open .sidebar .brand-text {
-                        display: inline !important;
-                    }
-
-                .main-wrapper {
-                    margin-left: 0 !important;
-                }
-
-                .sidebar-overlay {
-                    display: none;
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(15, 23, 42, 0.4);
-                    backdrop-filter: blur(4px);
-                    z-index: 1030;
-                }
-
-                body.sidebar-mobile-open .sidebar-overlay {
-                    display: block;
-                }
-            }
-    </style>
-
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Inventory.Web.styles.css" asp-append-version="true" />
+    <!-- Dynamic Compiled SCSS Stylesheet -->
+    <link rel="stylesheet" href="@Url.Content(cssPath)" asp-append-version="true" />
 </head>
 <body>
 
-    <!-- Overlay for Mobile View -->
+    <!-- Overlay for Mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Vertical Sidebar -->
     <aside class="sidebar p-3" id="sidebar">
-        <!-- Brand Header -->
         <div class="sidebar-header d-flex align-items-center gap-2 pb-3 mb-3 border-bottom px-2">
             <span class="bg-primary text-white rounded-3 p-2 d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 40px; height: 40px;">
                 <i class="bi bi-box-seam-fill fs-5"></i>
             </span>
-            <span class="brand-text tracking-tight fw-bold fs-4 text-dark">Inventory<span class="text-primary">Hub</span></span>
+            <span class="brand-text tracking-tight fw-bold fs-4 text-dark">@Localizer["Inventory"]</span>
         </div>
 
-        <!-- Navigation Links -->
         <ul class="nav nav-pills flex-column gap-1 mb-auto">
             <li class="nav-item">
                 <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-speedometer2 fs-5"></i>
-                    <span class="link-text">Dashboard</span>
+                    <span class="link-text">@Localizer["Home"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Categories" asp-action="Index">
                     <i class="bi bi-grid-1x2 fs-5"></i>
-                    <span class="link-text">Categories</span>
+                    <span class="link-text">@Localizer["Category"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Products" asp-action="Index">
                     <i class="bi bi-boxes fs-5"></i>
-                    <span class="link-text">Products</span>
+                    <span class="link-text">@Localizer["Product"]</span>
                 </a>
             </li>
 
@@ -249,76 +82,84 @@
                 <li class="nav-item">
                     <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Accounts" asp-action="Index">
                         <i class="bi bi-people fs-5"></i>
-                        <span class="link-text">Users</span>
+                        <span class="link-text">@Localizer["Users"]</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Roles" asp-action="Index">
                         <i class="bi bi-shield-check fs-5"></i>
-                        <span class="link-text">Roles</span>
+                        <span class="link-text">@Localizer["Role"]</span>
                     </a>
                 </li>
             }
         </ul>
     </aside>
 
-    <!-- Main Wrapper containing Top Navbar, Content and Footer -->
+    <!-- Main Wrapper -->
     <div class="main-wrapper">
-
-        <!-- Sticky Top Header Navbar -->
         <header class="sticky-top">
             <nav class="navbar glass-header py-2 shadow-sm">
                 <div class="container-fluid px-3 px-md-4">
                     <div class="d-flex align-items-center justify-content-between w-100">
 
-                        <!-- Hamburger Toggle Button -->
                         <button class="btn btn-light border-0 btn-action-icon" type="button" id="sidebarToggle" title="Toggle Sidebar">
                             <i class="bi bi-list fs-4"></i>
                         </button>
 
-                        <!-- Right Bar Actions -->
                         <div class="d-flex align-items-center gap-2">
 
-                            <!-- Favorites Button -->
-                            <a class="btn-action-icon bg-danger-subtle text-danger text-decoration-none"
-                               asp-controller="Favorite" asp-action="Index" title="Favorites">
+                            <!-- Language Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 dropdown-toggle d-flex align-items-center gap-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-globe me-1"></i>
+                                    <span class="fw-semibold text-uppercase">@currentLang</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow p-2 rounded-3">
+                                    <li>
+                                        <a class="dropdown-item rounded-2 py-1.5" asp-controller="Home" asp-action="ChangeLanguage" asp-route-lang="en" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
+                                            English (en)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-2 py-1.5" asp-controller="Home" asp-action="ChangeLanguage" asp-route-lang="ar" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
+                                            العربية (ar)
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Cart & Favorites -->
+                            <a class="btn-action-icon bg-danger-subtle text-danger text-decoration-none" asp-controller="Favorite" asp-action="Index" title="Favorites">
                                 <i class="bi bi-heart-fill fs-5"></i>
                             </a>
-
-                            <!-- Cart Button -->
-                            <a class="btn-action-icon bg-primary-subtle text-primary text-decoration-none"
-                               asp-controller="Cart" asp-action="Index" title="Shopping Cart">
+                            <a class="btn-action-icon bg-primary-subtle text-primary text-decoration-none" asp-controller="Cart" asp-action="Index" title="Shopping Cart">
                                 <i class="bi bi-bag-fill fs-5"></i>
                             </a>
 
                             @if (isAuthenticated)
                             {
-                                <!-- Profile Dropdown -->
-                                <div class="dropdown ms-2">
+                                <div class="dropdown ms-1">
                                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-arrow" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="@currentAvatar"
-                                             alt="Profile"
-                                             class="avatar-circle shadow-sm"
-                                             onerror="this.onerror=null; this.src='/images/Portrait_Placeholder.png';" />
+                                        <img src="@currentAvatar" alt="Profile" class="avatar-circle shadow-sm" onerror="this.onerror=null; this.src='/images/Portrait_Placeholder.png';" />
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom p-2 mt-2 shadow" aria-labelledby="userMenu" style="min-width: 220px;">
                                         <li class="px-3 py-2 border-bottom mb-2">
                                             <span class="d-block fw-bold text-dark">@currentName</span>
                                         </li>
                                         <li>
-                                            <a class="dropdown-menu-item dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="PersonalData" asp-route-id="@currentUserId">
-                                                <i class="bi bi-person me-2 text-primary"></i> Personal Profile
+                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="PersonalData" asp-route-id="@currentUserId">
+                                                <i class="bi bi-person me-2 text-primary"></i> @Localizer["PersonalProfile"]
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-menu-item dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="ChangePassword" asp-route-id="@currentUserId">
-                                                <i class="bi bi-key me-2 text-warning"></i> Change Password
+                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="ChangePassword" asp-route-id="@currentUserId">
+                                                <i class="bi bi-key me-2 text-warning"></i> @Localizer["ChangePassword"]
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <a class="dropdown-menu-item dropdown-item rounded-3 py-2 text-danger" asp-controller="Accounts" asp-action="Logout">
-                                                <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                                            <a class="dropdown-item rounded-3 py-2 text-danger" asp-controller="Accounts" asp-action="Logout">
+                                                <i class="bi bi-box-arrow-right me-2"></i> @Localizer["SignOut"]
                                             </a>
                                         </li>
                                     </ul>
@@ -326,7 +167,7 @@
                             }
                             else
                             {
-                                <a class="btn btn-outline-primary rounded-pill px-3 ms-2" asp-controller="Accounts" asp-action="Login">Sign In</a>
+                                <a class="btn btn-outline-primary rounded-pill px-3 ms-1" asp-controller="Accounts" asp-action="Login">@Localizer["SignIn"]</a>
                             }
 
                         </div>
@@ -335,14 +176,12 @@
             </nav>
         </header>
 
-        <!-- Main Body Content -->
         <div class="container-fluid px-3 px-md-4 my-4 flex-grow-1">
             <main role="main" class="pb-3">
                 @RenderBody()
             </main>
         </div>
 
-        <!-- Footer -->
         <footer class="bg-white border-top py-4 mt-auto">
             <div class="container-fluid px-3 px-md-4">
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
@@ -350,32 +189,23 @@
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">v2.5</span>
                         <span>&copy; 2026 <strong>InventoryHub Systems</strong>. All rights reserved.</span>
                     </div>
-                    <div class="d-flex gap-4">
-                        <a class="text-secondary text-decoration-none" asp-controller="Home" asp-action="Index">Privacy Policy</a>
-                        <a class="text-secondary text-decoration-none" asp-controller="Home" asp-action="Index">Terms of Service</a>
-                        <a class="text-secondary text-decoration-none" asp-controller="Home" asp-action="Index">System Support</a>
-                    </div>
                 </div>
             </div>
         </footer>
-
     </div>
 
-    <!-- Core Scripts -->
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Sidebar Toggle & Persistence Script -->
     <script>
             $(document).ready(function() {
-                // Restore collapsed class onto <body> if saved in localStorage
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && $(window).width() >= 992) {
                     $('body').addClass('sidebar-collapsed');
                 }
 
-                // Toggle logic & save preference
                 $('#sidebarToggle, #sidebarOverlay').on('click', function() {
                     if ($(window).width() < 992) {
                         $('body').toggleClass('sidebar-mobile-open');
@@ -386,7 +216,6 @@
                     }
                 });
 
-                // Route Highlighting Script
                 const currentPath = window.location.pathname.toLowerCase();
                 $('.sidebar .nav-link-item').each(function() {
                     const href = $(this).attr('href').toLowerCase();

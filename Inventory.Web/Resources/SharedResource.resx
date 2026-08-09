@@ -447,6 +447,9 @@
   <data name="Swapping to" xml:space="preserve">
     <value>Swapping to </value>
   </data>
+  <data name="System Dashboard" xml:space="preserve">
+    <value>System Dashboard</value>
+  </data>
   <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
     <value>The Development environment shouldn't be enabled for deployed applications.</value>
   </data>

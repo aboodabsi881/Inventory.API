@@ -1,0 +1,16 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/style.css",
+    "inputFile": "wwwroot/scss/style.scss",
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFile": "wwwroot/css/styleAr.css",
+    "inputFile": "wwwroot/scss/styleAr.scss",
+    "minify": {
+      "enabled": true
+    }
+  }
+]

@@ -447,6 +447,9 @@
   <data name="Swapping to" xml:space="preserve">
     <value>التبديل إلى </value>
   </data>
+  <data name="System Dashboard" xml:space="preserve">
+    <value>لوحة معلومات النظام</value>
+  </data>
   <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
     <value>لا ينبغي تمكين بيئة التطوير للتطبيقات المنشورة.</value>
   </data>

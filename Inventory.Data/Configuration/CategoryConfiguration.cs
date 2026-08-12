@@ -18,8 +18,7 @@ namespace Inventory.Data.Configuration
                    .HasMaxLength(200);
             builder.Property(c => c.Img).HasMaxLength(500);
 
-            //Relationships
-            builder.HasMany(x => x.Products) //Lambda expression
+            builder.HasMany(x => x.Products) 
                    .WithOne(x => x.Category)
                    .HasForeignKey(x => x.CategoryId)
                    .OnDelete(DeleteBehavior.Cascade)

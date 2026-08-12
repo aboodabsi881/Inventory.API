@@ -129,6 +129,21 @@
   <data name="?" xml:space="preserve">
     <value>?</value>
   </data>
+  <data name="Access Control" xml:space="preserve">
+    <value>Access Control</value>
+  </data>
+  <data name="Add Category" xml:space="preserve">
+    <value>Add Category</value>
+  </data>
+  <data name="Add New Category" xml:space="preserve">
+    <value>Add New Category</value>
+  </data>
+  <data name="Add New Product" xml:space="preserve">
+    <value>Add New Product</value>
+  </data>
+  <data name="Add to Cart" xml:space="preserve">
+    <value>Add to Cart</value>
+  </data>
   <data name="AddedToCart" xml:space="preserve">
     <value>Added to Cart</value>
   </data>
@@ -137,6 +152,9 @@
   </data>
   <data name="AddQuantity" xml:space="preserve">
     <value>Added Quantity</value>
+  </data>
+  <data name="All rights reserved" xml:space="preserve">
+    <value>All rights reserved</value>
   </data>
   <data name="An error occurred while processing your request." xml:space="preserve">
     <value>An error occurred while processing your request.</value>
@@ -150,6 +168,15 @@
   <data name="Are you sure you want to delete" xml:space="preserve">
     <value>Are you sure you want to delete?</value>
   </data>
+  <data name="Are you sure?" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Back to List</value>
+  </data>
   <data name="BackToList" xml:space="preserve">
     <value>Back to List</value>
   </data>
@@ -158,6 +185,12 @@
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="Cart updated" xml:space="preserve">
+    <value>Cart updated</value>
+  </data>
+  <data name="Cart updated successfully." xml:space="preserve">
+    <value>Cart updated successfully.</value>
   </data>
   <data name="CartDeleteFailed" xml:space="preserve">
     <value>Cart Delete Failed</value>
@@ -174,11 +207,20 @@
   <data name="Category" xml:space="preserve">
     <value>Category</value>
   </data>
+  <data name="Category Image Preview" xml:space="preserve">
+    <value>Category Image Preview</value>
+  </data>
   <data name="CategoryDeleted" xml:space="preserve">
     <value>Category Deleted</value>
   </data>
   <data name="CategoryName" xml:space="preserve">
     <value>Category Name</value>
+  </data>
+  <data name="Change Image (Optional)" xml:space="preserve">
+    <value>Change Image (Optional)</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
@@ -200,6 +242,9 @@
   </data>
   <data name="Create a New Role" xml:space="preserve">
     <value>Create a New Role</value>
+  </data>
+  <data name="Create New Category" xml:space="preserve">
+    <value>Create New Category</value>
   </data>
   <data name="CreateCategory" xml:space="preserve">
     <value>Create Category</value>
@@ -231,6 +276,9 @@
   <data name="DeleteCategory" xml:space="preserve">
     <value>Delete Category</value>
   </data>
+  <data name="Deleted!" xml:space="preserve">
+    <value>Deleted!</value>
+  </data>
   <data name="DeleteProduct" xml:space="preserve">
     <value>Delete Product</value>
   </data>
@@ -243,8 +291,14 @@
   <data name="Development Mode" xml:space="preserve">
     <value>Development Mode</value>
   </data>
+  <data name="Do you really want to delete the category" xml:space="preserve">
+    <value>Do you really want to delete the category</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="Edit Category" xml:space="preserve">
+    <value>Edit Category</value>
   </data>
   <data name="EditedCategory" xml:space="preserve">
     <value>Edited Category</value>
@@ -264,6 +318,9 @@
   <data name="EnglishName" xml:space="preserve">
     <value>English Name</value>
   </data>
+  <data name="Enter category name..." xml:space="preserve">
+    <value>Enter category name...</value>
+  </data>
   <data name="environment by setting the" xml:space="preserve">
     <value> environment by setting the </value>
   </data>
@@ -281,6 +338,12 @@
   </data>
   <data name="Failed to assign Role '" xml:space="preserve">
     <value>Failed to assign Role '</value>
+  </data>
+  <data name="Failed to delete category." xml:space="preserve">
+    <value>Failed to delete category.</value>
+  </data>
+  <data name="Failed to remove item." xml:space="preserve">
+    <value>Failed to remove item.</value>
   </data>
   <data name="FailedToCreateUser" xml:space="preserve">
     <value>Failed to Create User</value>
@@ -300,8 +363,20 @@
   <data name="Id" xml:space="preserve">
     <value>Id</value>
   </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
   <data name="Img" xml:space="preserve">
     <value>Image</value>
+  </data>
+  <data name="in cart" xml:space="preserve">
+    <value>in cart</value>
+  </data>
+  <data name="In Stock" xml:space="preserve">
+    <value>In Stock</value>
+  </data>
+  <data name="Invalid Cart ID." xml:space="preserve">
+    <value>Invalid Cart ID.</value>
   </data>
   <data name="InvalidCartItem" xml:space="preserve">
     <value>Invalid CartItem</value>
@@ -312,8 +387,17 @@
   <data name="Inventory" xml:space="preserve">
     <value>Inventory</value>
   </data>
+  <data name="InventoryHub Systems" xml:space="preserve">
+    <value>InventoryHub Systems</value>
+  </data>
   <data name="It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the" xml:space="preserve">
     <value>It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the </value>
+  </data>
+  <data name="Item removed from cart" xml:space="preserve">
+    <value>Item removed from cart</value>
+  </data>
+  <data name="Item removed from cart." xml:space="preserve">
+    <value>Item removed from cart.</value>
   </data>
   <data name="ItemRemoved" xml:space="preserve">
     <value>Item Removed</value>
@@ -326,6 +410,9 @@
   </data>
   <data name="Learn about" xml:space="preserve">
     <value>Learn about</value>
+  </data>
+  <data name="Live Status" xml:space="preserve">
+    <value>Live Status</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Login</value>
@@ -341,6 +428,12 @@
   </data>
   <data name="LogoutSuccess" xml:space="preserve">
     <value>Logout Success</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Low Stock Items" xml:space="preserve">
+    <value>Low Stock Items</value>
   </data>
   <data name="MyCart" xml:space="preserve">
     <value>My Cart</value>
@@ -360,6 +453,9 @@
   <data name="NewPassword" xml:space="preserve">
     <value>New password</value>
   </data>
+  <data name="No categories found. Click" xml:space="preserve">
+    <value>No categories found. Click </value>
+  </data>
   <data name="No favorite products yet." xml:space="preserve">
     <value>No favorite products yet.</value>
   </data>
@@ -369,14 +465,26 @@
   <data name="No products in cart yet." xml:space="preserve">
     <value>No products in cart yet.</value>
   </data>
+  <data name="No products in this category yet." xml:space="preserve">
+    <value>No products in this category yet.</value>
+  </data>
+  <data name="No recent items available." xml:space="preserve">
+    <value>No recent items available.</value>
+  </data>
   <data name="NotFoundRole" xml:space="preserve">
     <value>Not foundRole</value>
   </data>
   <data name="NotFoundRoleId" xml:space="preserve">
     <value>Not found Role ID</value>
   </data>
+  <data name="Oops..." xml:space="preserve">
+    <value>Oops...</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
+  </data>
+  <data name="PersonalProfile" xml:space="preserve">
+    <value>Personal Profile</value>
   </data>
   <data name="PowerType" xml:space="preserve">
     <value>Power Type</value>
@@ -396,6 +504,9 @@
   <data name="Product" xml:space="preserve">
     <value>Product</value>
   </data>
+  <data name="Product Name" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
   <data name="ProductDeleted" xml:space="preserve">
     <value> Product Deleted</value>
   </data>
@@ -405,11 +516,26 @@
   <data name="Products" xml:space="preserve">
     <value>Products</value>
   </data>
+  <data name="Products in this Category" xml:space="preserve">
+    <value>Products in this Category</value>
+  </data>
   <data name="QuantityUpdated" xml:space="preserve">
     <value>Quantity Updated</value>
   </data>
+  <data name="Quick Actions" xml:space="preserve">
+    <value>Quick Actions</value>
+  </data>
+  <data name="Real-time overview of system inventory and accounts." xml:space="preserve">
+    <value>Real-time overview of system inventory and accounts.</value>
+  </data>
+  <data name="Recent Products" xml:space="preserve">
+    <value>Recent Products</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="Register System User" xml:space="preserve">
+    <value>Register System User</value>
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember me</value>
@@ -438,8 +564,23 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="Save Category" xml:space="preserve">
+    <value>Save Category</value>
+  </data>
+  <data name="Select an image..." xml:space="preserve">
+    <value>Select an image...</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Sign Out</value>
+  </data>
   <data name="SomethingWentWrong" xml:space="preserve">
     <value>Something Went Wrong</value>
+  </data>
+  <data name="Stock Status" xml:space="preserve">
+    <value>Stock Status</value>
   </data>
   <data name="SubtractQuantity" xml:space="preserve">
     <value>Subtracted Quantity</value>
@@ -450,14 +591,26 @@
   <data name="System Dashboard" xml:space="preserve">
     <value>System Dashboard</value>
   </data>
+  <data name="System Users" xml:space="preserve">
+    <value>System Users</value>
+  </data>
   <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
     <value>The Development environment shouldn't be enabled for deployed applications.</value>
   </data>
   <data name="this page to detail your site's privacy policy." xml:space="preserve">
     <value>this page to detail your site's privacy policy.</value>
   </data>
+  <data name="to create one!" xml:space="preserve">
+    <value>to create one!</value>
+  </data>
+  <data name="Total Products" xml:space="preserve">
+    <value>Total Products</value>
+  </data>
   <data name="TotalPrice:" xml:space="preserve">
     <value>Total Price:</value>
+  </data>
+  <data name="Update Category" xml:space="preserve">
+    <value>Update Category</value>
   </data>
   <data name="UpdatedRole" xml:space="preserve">
     <value>Role Updated</value>
@@ -468,10 +621,22 @@
   <data name="UserName" xml:space="preserve">
     <value>User Name</value>
   </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
   <data name="ValidationFailed" xml:space="preserve">
     <value>Validation Failed</value>
   </data>
+  <data name="View All" xml:space="preserve">
+    <value>View All</value>
+  </data>
+  <data name="View Details" xml:space="preserve">
+    <value>View Details</value>
+  </data>
   <data name="Welcome" xml:space="preserve">
     <value>Hello</value>
+  </data>
+  <data name="Yes, delete it!" xml:space="preserve">
+    <value>Yes, delete it!</value>
   </data>
 </root>

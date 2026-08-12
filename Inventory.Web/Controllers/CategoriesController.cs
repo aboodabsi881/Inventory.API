@@ -1,4 +1,4 @@
-﻿using Inventory.Web.Resources;
+﻿using Inventory.Web;
 using Inventory.Web.ViewModels.Carts;
 using Inventory.Web.ViewModels.Categories;
 using Inventory.Web.ViewModels.Favorites;

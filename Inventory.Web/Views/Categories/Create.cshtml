@@ -9,30 +9,30 @@
     <div class="col-md-6">
         <div class="card shadow border-0">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-lg me-2"></i>Create New Category</h4>
+                <h4 class="mb-0"><i class="bi bi-plus-lg me-2"></i>@Localizer["Create New Category"]</h4>
             </div>
             <div class="card-body">
                 <form id="createCategoryForm" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label"></label>
-                        <input asp-for="Name" class="form-control" placeholder="Enter category name..." />
+                        <label asp-for="Name" class="form-label">@Localizer["Name"]</label>
+                        <input asp-for="Name" class="form-control" placeholder="@Localizer["Enter category name..."]" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="ImgFile" class="form-label"></label>
-                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
+                        <label asp-for="ImgFile" class="form-label">@Localizer["Image"]</label>
+                        <input asp-for="ImgFile" type="file" placeholder="@Localizer["Select an image..."]" class="form-control" accept="image/*" />
                         <span asp-validation-for="ImgFile" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
                         <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                            <i class="bi bi-arrow-left"></i> @Localizer["Back to List"]
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg"></i> Save Category
+                            <i class="bi bi-check-lg"></i> @Localizer["Save Category"]
                         </button>
                     </div>
                 </form>

@@ -10,16 +10,16 @@
 </form>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-dark"><i class="bi bi-tags me-2 text-primary"></i>Categories</h2>
+    <h2 class="fw-bold text-dark"><i class="bi bi-tags me-2 text-primary"></i>@Localizer["Categories"]</h2>
     <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-1"></i> Add New Category
+        <i class="bi bi-plus-circle me-1"></i> @Localizer["Add New Category"]   
     </a>
 </div>
 
 @if (!Model.Any())
 {
     <div class="alert alert-info text-center" role="alert">
-        No categories found. Click <strong>Add New Category</strong> to create one!
+        @Localizer["No categories found. Click"] <strong>@Localizer["Add New Category"]</strong> @Localizer["to create one!"]
     </div>
 }
 else
@@ -29,7 +29,6 @@ else
         {
             <div class="col" id="category-card-@category.Id">
                 <div class="card h-100 shadow-sm border-0">
-                    <!-- 💡 Full image display with click-to-enlarge modal -->
                     <a href="javascript:void(0)"
                        onclick="showFullImage('@(string.IsNullOrEmpty(category.Img) ? "/images/placeholder.png" : category.Img)', '@category.Name')">
                         <img src="@(string.IsNullOrEmpty(category.Img) ? "/images/placeholder.png" : category.Img)"
@@ -42,20 +41,20 @@ else
                     <div class="card-body">
                         <h5 class="card-title fw-bold">@category.Name</h5>
                         <p class="card-text text-muted">
-                            <i class="bi bi-box-seam me-1"></i> Products: @(category.Products?.Count ?? 0)
+                            <i class="bi bi-box-seam me-1"></i> @Localizer["Products"]: @(category.Products?.Count ?? 0)
                         </p>
                     </div>
 
                     <div class="card-footer bg-transparent border-0 pb-3 d-flex justify-content-between">
                         <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-outline-info btn-sm">
-                            <i class="bi bi-eye"></i> Details
+                            <i class="bi bi-eye"></i> @Localizer["Details"]
                         </a>
                         <div>
                             <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-outline-warning btn-sm me-1">
-                                <i class="bi bi-pencil"></i> Edit
+                                <i class="bi bi-pencil"></i> @Localizer["Edit"]
                             </a>
                             <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCategory(@category.Id, '@category.Name')">
-                                <i class="bi bi-trash"></i> Delete
+                                <i class="bi bi-trash"></i> @Localizer["Delete"]
                             </button>
                         </div>
                     </div>
@@ -67,7 +66,15 @@ else
 
 @section Scripts {
     <script>
-        // 🔍 Lightbox Preview for Full Image
+       const localizedTexts = {
+            areYouSure: "@Html.Raw(Localizer["Are you sure?"].Value)",
+            deleteConfirm: "@Html.Raw(Localizer["Do you really want to delete the category"].Value)",
+            yesDelete: "@Html.Raw(Localizer["Yes, delete it!"].Value)",
+            deleted: "@Html.Raw(Localizer["Deleted!"].Value)",
+            oops: "@Html.Raw(Localizer["Oops..."].Value)",
+            errorDefault: "@Html.Raw(Localizer["Failed to delete category."].Value)"
+        };
+
         function showFullImage(imgUrl, categoryName) {
             Swal.fire({
                 title: categoryName || 'Category Image',
@@ -84,16 +91,15 @@ else
             });
         }
 
-        // 🗑️ Delete Category Function
         function deleteCategory(id, name) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you really want to delete the category "${name}"?`,
+                title: localizedTexts.areYouSure,
+                text: `${localizedTexts.deleteConfirm} "${name}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: localizedTexts.yesDelete
             }).then((result) => {
                 if (result.isConfirmed) {
                     const token = $('input[name="__RequestVerificationToken"]').val();
@@ -107,7 +113,7 @@ else
                         success: function(response) {
                             Swal.fire({
                                 icon: response.icon || 'success',
-                                title: 'Deleted!',
+                                title: localizedTexts.deleted,
                                 text: response.message,
                                 timer: 1500,
                                 showConfirmButton: false
@@ -121,8 +127,8 @@ else
                             const err = xhr.responseJSON;
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Oops...',
-                                text: err ? err.message : 'Failed to delete category.'
+                                title: localizedTexts.oops,
+                                text: err ? err.message : localizedTexts.errorDefault
                             });
                         }
                     });

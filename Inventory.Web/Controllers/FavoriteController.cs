@@ -1,14 +1,9 @@
-﻿using Inventory.Web.Resources;
+﻿using Inventory.Web;
 using Inventory.Web.ViewModels.Favorites;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {

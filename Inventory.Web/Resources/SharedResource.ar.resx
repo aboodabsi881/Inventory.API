@@ -129,6 +129,21 @@
   <data name="?" xml:space="preserve">
     <value>؟</value>
   </data>
+  <data name="Access Control" xml:space="preserve">
+    <value>التحكم في الوصول</value>
+  </data>
+  <data name="Add Category" xml:space="preserve">
+    <value>إضافة فئة</value>
+  </data>
+  <data name="Add New Category" xml:space="preserve">
+    <value>إضافة فئة جديدة</value>
+  </data>
+  <data name="Add New Product" xml:space="preserve">
+    <value>إضافة منتج جديد</value>
+  </data>
+  <data name="Add to Cart" xml:space="preserve">
+    <value>أضف إلى السلة</value>
+  </data>
   <data name="AddedToCart" xml:space="preserve">
     <value>تمت الإضافة إلى سلة التسوق</value>
   </data>
@@ -137,6 +152,9 @@
   </data>
   <data name="AddQuantity" xml:space="preserve">
     <value>اضافة  الكمية</value>
+  </data>
+  <data name="All rights reserved" xml:space="preserve">
+    <value>جميع الحقوق محفوظة</value>
   </data>
   <data name="An error occurred while processing your request." xml:space="preserve">
     <value>حدث خطأ أثناء معالجة طلبك.</value>
@@ -150,6 +168,15 @@
   <data name="Are you sure you want to delete" xml:space="preserve">
     <value>هل أنت متأكد أنك تريد الحذف؟</value>
   </data>
+  <data name="Are you sure?" xml:space="preserve">
+    <value>هل أنت متأكد؟</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>عُد</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>العودة إلى القائمة</value>
+  </data>
   <data name="BackToList" xml:space="preserve">
     <value>العودة إلى القائمة</value>
   </data>
@@ -158,6 +185,12 @@
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>تراجع</value>
+  </data>
+  <data name="Cart updated" xml:space="preserve">
+    <value>تم تحديث سلة التسوق</value>
+  </data>
+  <data name="Cart updated successfully." xml:space="preserve">
+    <value>تم تحديث سلة التسوق بنجاح.</value>
   </data>
   <data name="CartDeleteFailed" xml:space="preserve">
     <value>فشل حذف عربة التسوق</value>
@@ -174,11 +207,20 @@
   <data name="Category" xml:space="preserve">
     <value>الفئة</value>
   </data>
+  <data name="Category Image Preview" xml:space="preserve">
+    <value>معاينة صورة الفئة</value>
+  </data>
   <data name="CategoryDeleted" xml:space="preserve">
     <value>تم حذف الفئة</value>
   </data>
   <data name="CategoryName" xml:space="preserve">
     <value>اسم الفئة</value>
+  </data>
+  <data name="Change Image (Optional)" xml:space="preserve">
+    <value>تغيير الصورة (اختياري)</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>تغيير كلمة المرور</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>أغلق</value>
@@ -200,6 +242,9 @@
   </data>
   <data name="Create a New Role" xml:space="preserve">
     <value>إنشاء دور جديد</value>
+  </data>
+  <data name="Create New Category" xml:space="preserve">
+    <value>إنشاء فئة جديدة</value>
   </data>
   <data name="CreateCategory" xml:space="preserve">
     <value>إنشاء فئة</value>
@@ -231,6 +276,9 @@
   <data name="DeleteCategory" xml:space="preserve">
     <value>حذف الفئة</value>
   </data>
+  <data name="Deleted!" xml:space="preserve">
+    <value>تم الحذف!</value>
+  </data>
   <data name="DeleteProduct" xml:space="preserve">
     <value>حذف المنتج</value>
   </data>
@@ -243,8 +291,14 @@
   <data name="Development Mode" xml:space="preserve">
     <value>وضع التطوير</value>
   </data>
+  <data name="Do you really want to delete the category" xml:space="preserve">
+    <value>هل تريد حقاً حذف الفئة</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>يحرر</value>
+  </data>
+  <data name="Edit Category" xml:space="preserve">
+    <value>تعديل الفئة</value>
   </data>
   <data name="EditedCategory" xml:space="preserve">
     <value>الفئة المحررة</value>
@@ -264,6 +318,9 @@
   <data name="EnglishName" xml:space="preserve">
     <value>الاسم الانجليزي</value>
   </data>
+  <data name="Enter category name..." xml:space="preserve">
+    <value>أدخل اسم الفئة...</value>
+  </data>
   <data name="environment by setting the" xml:space="preserve">
     <value> البيئة عن طريق ضبط </value>
   </data>
@@ -281,6 +338,12 @@
   </data>
   <data name="Failed to assign Role '" xml:space="preserve">
     <value>فشل في تعيين الدور '</value>
+  </data>
+  <data name="Failed to delete category." xml:space="preserve">
+    <value>فشل حذف الفئة.</value>
+  </data>
+  <data name="Failed to remove item." xml:space="preserve">
+    <value>فشل في إزالة العنصر.</value>
   </data>
   <data name="FailedToCreateUser" xml:space="preserve">
     <value>فشل إنشاء المستخدم</value>
@@ -300,8 +363,20 @@
   <data name="Id" xml:space="preserve">
     <value>بطاقة تعريف</value>
   </data>
+  <data name="Image" xml:space="preserve">
+    <value>صورة</value>
+  </data>
   <data name="Img" xml:space="preserve">
     <value>الصورة</value>
+  </data>
+  <data name="in cart" xml:space="preserve">
+    <value>في السلة</value>
+  </data>
+  <data name="In Stock" xml:space="preserve">
+    <value>متوفر </value>
+  </data>
+  <data name="Invalid Cart ID." xml:space="preserve">
+    <value>معرف سلة التسوق غير صالح.</value>
   </data>
   <data name="InvalidCartItem" xml:space="preserve">
     <value>عنصر سلة التسوق غير صالح</value>
@@ -312,8 +387,17 @@
   <data name="Inventory" xml:space="preserve">
     <value>جرد</value>
   </data>
+  <data name="InventoryHub Systems" xml:space="preserve">
+    <value>أنظمة مركز المخزون</value>
+  </data>
   <data name="It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the" xml:space="preserve">
     <value>قد يؤدي ذلك إلى عرض معلومات حساسة من الاستثناءات للمستخدمين النهائيين. لتصحيح الأخطاء محليًا، فعّل </value>
+  </data>
+  <data name="Item removed from cart" xml:space="preserve">
+    <value>تم حذف المنتج من سلة التسوق</value>
+  </data>
+  <data name="Item removed from cart." xml:space="preserve">
+    <value>تمت إزالة المنتج من سلة التسوق.</value>
   </data>
   <data name="ItemRemoved" xml:space="preserve">
     <value>تمت إزالة العنصر</value>
@@ -326,6 +410,9 @@
   </data>
   <data name="Learn about" xml:space="preserve">
     <value>تعرف على</value>
+  </data>
+  <data name="Live Status" xml:space="preserve">
+    <value>حالة البث المباشر</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value> تسجيل دخول</value>
@@ -341,6 +428,12 @@
   </data>
   <data name="LogoutSuccess" xml:space="preserve">
     <value>تم تسجيل الخروج بنجاح</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>قليل</value>
+  </data>
+  <data name="Low Stock Items" xml:space="preserve">
+    <value>المنتجات ذات المخزون المنخفض</value>
   </data>
   <data name="MyCart" xml:space="preserve">
     <value>سلة التسوق الخاصة بي:</value>
@@ -360,6 +453,9 @@
   <data name="NewPassword" xml:space="preserve">
     <value>كلمة المرور الجديدة</value>
   </data>
+  <data name="No categories found. Click" xml:space="preserve">
+    <value>لم يتم العثور على أي تصنيفات. انقر</value>
+  </data>
   <data name="No favorite products yet." xml:space="preserve">
     <value>لا يوجد منتجات مفضلة حتى الآن.</value>
   </data>
@@ -369,14 +465,26 @@
   <data name="No products in cart yet." xml:space="preserve">
     <value>لا يوجد منتجات في سلة التسوق حتى الآن.</value>
   </data>
+  <data name="No products in this category yet." xml:space="preserve">
+    <value>لا توجد منتجات في هذه الفئة حتى الآن.</value>
+  </data>
+  <data name="No recent items available." xml:space="preserve">
+    <value>لا توجد عناصر حديثة متاحة.</value>
+  </data>
   <data name="NotFoundRole" xml:space="preserve">
     <value>لم يتم العثور على الدور</value>
   </data>
   <data name="NotFoundRoleId" xml:space="preserve">
     <value>لم يتم العثور على معرف الدور</value>
   </data>
+  <data name="Oops..." xml:space="preserve">
+    <value>أُووبس...</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>كلمة المرور</value>
+  </data>
+  <data name="PersonalProfile" xml:space="preserve">
+    <value>الملف الشخصي</value>
   </data>
   <data name="PowerType" xml:space="preserve">
     <value>نوع الطاقة</value>
@@ -396,6 +504,9 @@
   <data name="Product" xml:space="preserve">
     <value>المنتج</value>
   </data>
+  <data name="Product Name" xml:space="preserve">
+    <value>اسم المنتج</value>
+  </data>
   <data name="ProductDeleted" xml:space="preserve">
     <value>تم حذف المنتج</value>
   </data>
@@ -405,11 +516,26 @@
   <data name="Products" xml:space="preserve">
     <value>منتجات</value>
   </data>
+  <data name="Products in this Category" xml:space="preserve">
+    <value>المنتجات في هذه الفئة</value>
+  </data>
   <data name="QuantityUpdated" xml:space="preserve">
     <value>تم تحديث الكمية</value>
   </data>
+  <data name="Quick Actions" xml:space="preserve">
+    <value>إجراءات سريعة</value>
+  </data>
+  <data name="Real-time overview of system inventory and accounts." xml:space="preserve">
+    <value>نظرة عامة فورية على مخزون النظام والحسابات.</value>
+  </data>
+  <data name="Recent Products" xml:space="preserve">
+    <value>المنتجات الحديثة</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>تسجيل</value>
+  </data>
+  <data name="Register System User" xml:space="preserve">
+    <value>تسجيل مستخدم النظام</value>
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>تذكرني</value>
@@ -438,8 +564,23 @@
   <data name="Save" xml:space="preserve">
     <value>حفظ</value>
   </data>
+  <data name="Save Category" xml:space="preserve">
+    <value>حفظ الفئة</value>
+  </data>
+  <data name="Select an image..." xml:space="preserve">
+    <value>اختر صورة...</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
   <data name="SomethingWentWrong" xml:space="preserve">
     <value>لقد حدث خطأ ما</value>
+  </data>
+  <data name="Stock Status" xml:space="preserve">
+    <value>حالة المخزون</value>
   </data>
   <data name="SubtractQuantity" xml:space="preserve">
     <value>طرح الكمية</value>
@@ -450,14 +591,26 @@
   <data name="System Dashboard" xml:space="preserve">
     <value>لوحة معلومات النظام</value>
   </data>
+  <data name="System Users" xml:space="preserve">
+    <value>مستخدمو النظام</value>
+  </data>
   <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
     <value>لا ينبغي تمكين بيئة التطوير للتطبيقات المنشورة.</value>
   </data>
   <data name="this page to detail your site's privacy policy." xml:space="preserve">
     <value>هذه الصفحة لتفصيل سياسة الخصوصية لموقعك.</value>
   </data>
+  <data name="to create one!" xml:space="preserve">
+    <value>لإنشاء واحد!</value>
+  </data>
+  <data name="Total Products" xml:space="preserve">
+    <value>إجمالي المنتجات</value>
+  </data>
   <data name="TotalPrice:" xml:space="preserve">
     <value>السعر الإجمالي:</value>
+  </data>
+  <data name="Update Category" xml:space="preserve">
+    <value>تحديث الفئات</value>
   </data>
   <data name="UpdatedRole" xml:space="preserve">
     <value>تم تحديث الدور</value>
@@ -468,10 +621,22 @@
   <data name="UserName" xml:space="preserve">
     <value>اسم المستخدم</value>
   </data>
+  <data name="Users" xml:space="preserve">
+    <value>المستخدمون</value>
+  </data>
   <data name="ValidationFailed" xml:space="preserve">
     <value>فشل التحقق</value>
   </data>
+  <data name="View All" xml:space="preserve">
+    <value>عرض الكل</value>
+  </data>
+  <data name="View Details" xml:space="preserve">
+    <value>عرض التفاصيل</value>
+  </data>
   <data name="Welcome" xml:space="preserve">
     <value>اهلا  </value>
+  </data>
+  <data name="Yes, delete it!" xml:space="preserve">
+    <value>نعم، احذفه!</value>
   </data>
 </root>

@@ -17,14 +17,13 @@ namespace Inventory.Data.Configuration
             builder.Property(c => c.TotalPrice).HasColumnType("decimal(18,2)");
 
 
-            //Relationships
+
             builder.HasOne(x => x.Product)
                    .WithMany(x => x.Cart)
                    .HasForeignKey(x => x.ProductId)
                    .OnDelete(DeleteBehavior.Cascade)
                    .HasConstraintName("Fk_Carts_Products");
 
-            // Table name
             builder.ToTable("Carts");
         }
 

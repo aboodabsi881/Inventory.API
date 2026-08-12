@@ -25,7 +25,6 @@ namespace Inventory.Data.Configuration
 
 
 
-            //Relationships
             builder.HasMany(x => x.Favorites)
                    .WithOne(x => x.Product)
                    .HasForeignKey(x => x.ProductId);

@@ -11,10 +11,10 @@
         <h2 class="fw-bold text-dark mb-1">
             <i class="bi bi-speedometer2 me-2 text-primary"></i>@Localizer["System Dashboard"]
         </h2>
-        <p class="text-muted mb-0">Real-time overview of system inventory and accounts.</p>
+        <p class="text-muted mb-0">@Localizer["Real-time overview of system inventory and accounts."]</p>
     </div>
     <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
-        <i class="bi bi-clock me-1"></i> Live Status
+        <i class="bi bi-clock me-1"></i> @Localizer["Live Status"]
     </span>
 </div>
 
@@ -25,7 +25,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small fw-medium d-block mb-1">Total Products</span>
+                    <span class="text-muted small fw-medium d-block mb-1">@Localizer["Total Products"]</span>
                     <h3 class="fw-bold text-dark mb-0">@Model.TotalProducts</h3>
                 </div>
                 <div class="bg-primary-subtle text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
@@ -40,7 +40,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small fw-medium d-block mb-1">Low Stock Items</span>
+                    <span class="text-muted small fw-medium d-block mb-1"> @Localizer["Low Stock Items"]</span>
                     <h3 class="fw-bold text-danger mb-0">@Model.LowStockCount</h3>
                 </div>
                 <div class="bg-danger-subtle text-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
@@ -55,7 +55,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small fw-medium d-block mb-1">Categories</span>
+                    <span class="text-muted small fw-medium d-block mb-1">@Localizer["Categories"]</span>
                     <h3 class="fw-bold text-dark mb-0">@Model.TotalCategories</h3>
                 </div>
                 <div class="bg-info-subtle text-info rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
@@ -70,7 +70,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small fw-medium d-block mb-1">System Users</span>
+                    <span class="text-muted small fw-medium d-block mb-1">@Localizer["System Users"]</span>
                     <h3 class="fw-bold text-dark mb-0">@Model.TotalUsers</h3>
                 </div>
                 <div class="bg-success-subtle text-success rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
@@ -86,24 +86,24 @@
     <!-- Quick Actions Panel -->
     <div class="col-12 col-lg-4">
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-            <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge me-2 text-warning"></i>Quick Actions</h5>
+            <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge me-2 text-warning"></i>@Localizer["Quick Actions"]</h5>
             <div class="d-grid gap-2">
                 @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("Super Admin"))
                 {
                     <a asp-controller="Products" asp-action="Create" class="btn btn-outline-primary text-start rounded-3 p-3">
-                        <i class="bi bi-plus-circle me-2"></i> Add New Product
+                        <i class="bi bi-plus-circle me-2"></i> @Localizer["Add New Product"]
                     </a>
                     <a asp-controller="Categories" asp-action="Create" class="btn btn-outline-secondary text-start rounded-3 p-3">
-                        <i class="bi bi-folder-plus me-2"></i> Add Category
+                        <i class="bi bi-folder-plus me-2"></i> @Localizer["Add Category"]
                     </a>
                 }
                 @if (User.IsInRole("SuperAdmin") || User.IsInRole("Super Admin"))
                 {
                     <a asp-controller="Accounts" asp-action="Register" class="btn btn-outline-info text-start rounded-3 p-3">
-                        <i class="bi bi-person-plus me-2"></i> Register System User
+                        <i class="bi bi-person-plus me-2"></i> @Localizer["Register System User"]
                     </a>
                     <a asp-controller="Roles" asp-action="Index" class="btn btn-outline-dark text-start rounded-3 p-3">
-                        <i class="bi bi-shield-lock me-2"></i> Access Control
+                        <i class="bi bi-shield-lock me-2"></i> @Localizer["Access Control"]
                     </a>
                 }
             </div>
@@ -114,17 +114,17 @@
     <div class="col-12 col-lg-8">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
             <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Products</h5>
-                <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-link text-decoration-none">View All</a>
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>@Localizer["Recent Products"]</h5>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-link text-decoration-none">@Localizer["View All"]</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light text-secondary small fw-semibold">
                         <tr>
-                            <th class="ps-4">Product Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock Status</th>
+                            <th class="ps-4">@Localizer["Product Name"]</th>
+                            <th>@Localizer["Category"]</th>
+                            <th>@Localizer["Price"]</th>
+                            <th>@Localizer["Stock Status"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -139,11 +139,11 @@
                                     <td>
                                         @if (p.StockQuantity <= 5)
                                         {
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1">Low (@p.StockQuantity)</span>
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1">@Localizer["Low"] (@p.StockQuantity)</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1">In Stock (@p.StockQuantity)</span>
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1">@Localizer["In Stock"] (@p.StockQuantity)</span>
                                         }
                                     </td>
                                 </tr>
@@ -152,7 +152,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">No recent items available.</td>
+                                <td colspan="4" class="text-center py-4 text-muted">@Localizer["No recent items available."]</td>
                             </tr>
                         }
                     </tbody>

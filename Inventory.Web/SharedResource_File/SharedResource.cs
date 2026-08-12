@@ -1,4 +1,4 @@
-﻿namespace Inventory.Web.SharedResource_File
+﻿namespace Inventory.Web
 {
     public class SharedResource
     {

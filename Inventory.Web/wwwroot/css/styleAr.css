@@ -47,7 +47,6 @@ body {
   text-align: start;
 }
 
-/* Sidebar Component (RTL Flipped) */
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -80,8 +79,10 @@ body {
   background-color: var(--brand-subtle) !important;
   font-weight: 600;
 }
+.sidebar ul {
+  padding-right: 0px !important;
+}
 
-/* Collapsed Sidebar Rules (Desktop RTL) */
 html.sidebar-collapsed body .sidebar,
 body.sidebar-collapsed .sidebar {
   width: var(--sidebar-collapsed-width);
@@ -104,7 +105,6 @@ body.sidebar-collapsed .sidebar .sidebar-header {
   padding-right: 0 !important;
 }
 
-/* Main Content Shift (RTL) */
 .main-wrapper {
   margin-right: var(--sidebar-width);
   margin-left: 0;
@@ -120,7 +120,6 @@ body.sidebar-collapsed .main-wrapper {
   margin-left: 0;
 }
 
-/* Navbar & Actions */
 .glass-header {
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(12px);
@@ -156,7 +155,20 @@ body.sidebar-collapsed .main-wrapper {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Mobile Layout (RTL) */
+.dropdown-menu-end[data-bs-popper] {
+  right: auto;
+  left: 0;
+}
+
+.text-start {
+  text-align: right !important;
+}
+
+.container .card .card-body .ms-auto {
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
 @media (max-width: 991.98px) {
   .sidebar {
     margin-right: calc(-1 * var(--sidebar-width));

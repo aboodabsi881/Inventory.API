@@ -16,7 +16,6 @@ namespace Inventory.Data.Configuration
             builder.Property(f => f.IsFavorite).IsRequired();
 
 
-            //Relationships
             builder.HasOne(x => x.Product)
                    .WithMany(x => x.Favorites)
                    .HasForeignKey(x => x.ProductId)

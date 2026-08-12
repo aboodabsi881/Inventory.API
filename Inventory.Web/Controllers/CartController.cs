@@ -1,5 +1,4 @@
-﻿using Inventory.Web.Resources;
-using Inventory.Web.ViewModels.Carts;
+﻿using Inventory.Web.ViewModels.Carts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -43,17 +42,27 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> AddOrUpdate(int productId, int change = 1)
         {
             if (productId <= 0)
-                return BadRequest(new { icon = "error", message = "Invalid Product ID." });
+                return BadRequest(new { icon = "error", message = _localizer["Invalid Product ID."].Value });
 
-            var response = await _client.PostAsync($"Carts/items?productId={productId}&change={change}", null);
+            string formattedChange = change.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var response = await _client.PostAsync($"Carts/items?productId={productId}&change={formattedChange}", null);
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 CartVM? updatedItem = null;
 
-                if (!responseContent.Contains("removed from cart"))
+                try
                 {
                     updatedItem = JsonSerializer.Deserialize<CartVM>(responseContent, JsonOptions);
+                    if (updatedItem == null || updatedItem.Quantity <= 0)
+                    {
+                        updatedItem = null;
+                    }
+                }
+                catch (JsonException)
+                {
+                    updatedItem = null;
                 }
 
                 decimal grandTotal = await GetSafeCartTotalAsync();
@@ -61,7 +70,7 @@ namespace Inventory.Web.Controllers
                 return Ok(new
                 {
                     icon = "success",
-                    message = "Cart updated successfully.",
+                    message = _localizer["Cart updated successfully."].Value,
                     item = updatedItem,
                     grandTotal,
                     removed = updatedItem == null
@@ -77,7 +86,7 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> Remove(int id)
         {
             if (id <= 0)
-                return BadRequest(new { icon = "error", message = "Invalid Cart ID." });
+                return BadRequest(new { icon = "error", message = _localizer["Invalid Cart ID."].Value });
 
             var response = await _client.DeleteAsync($"Carts/{id}");
             if (response.IsSuccessStatusCode)
@@ -87,13 +96,13 @@ namespace Inventory.Web.Controllers
                 return Ok(new
                 {
                     icon = "info",
-                    message = "Item removed from cart.",
+                    message = _localizer["Item removed from cart."].Value,
                     cartId = id,
                     grandTotal
                 });
             }
 
-            return BadRequest(new { icon = "error", message = "Failed to remove item." });
+            return BadRequest(new { icon = "error", message = _localizer["Failed to remove item."].Value });
         }
 
         private async Task<decimal> GetSafeCartTotalAsync()
@@ -104,7 +113,7 @@ namespace Inventory.Web.Controllers
                 if (!response.IsSuccessStatusCode) return 0;
 
                 var content = await response.Content.ReadAsStringAsync();
-                if (decimal.TryParse(content, out decimal simpleTotal))
+                if (decimal.TryParse(content, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal simpleTotal))
                     return simpleTotal;
 
                 using var doc = JsonDocument.Parse(content);

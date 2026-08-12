@@ -1,4 +1,4 @@
-﻿using Inventory.Web.Resources;
+﻿using Inventory.Web;
 using Inventory.Web.ViewModels.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -49,24 +49,6 @@ namespace Inventory.Web.Controllers
             return View(vm);
         }
 
-        [HttpPost]
-[HttpGet]
-        [HttpPost]
-        public IActionResult SetLanguage(string culture, string returnUrl)
-        {
-            Response.Cookies.Append(
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions 
-                { 
-                    Expires = DateTimeOffset.UtcNow.AddYears(1), 
-                    IsEssential = true,
-                    SameSite = SameSiteMode.Lax
-                }
-            );
-
-            return LocalRedirect(string.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
-        }
         public IActionResult Privacy()
         {
             return View();
@@ -86,6 +68,7 @@ namespace Inventory.Web.Controllers
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(lang)),
                 new CookieOptions
                 {
+                    Path = "/", // Ensures cookie is sent for all routes
                     Expires = DateTimeOffset.UtcNow.AddYears(1),
                     IsEssential = true,
                     SameSite = SameSiteMode.Lax

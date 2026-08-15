@@ -10,8 +10,8 @@
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
-                    <h3 class="fw-bold text-primary"><i class="bi bi-person-plus-fill me-2"></i>Create Account</h3>
-                    <p class="text-muted small">Fill in the details to register a new user</p>
+                    <h3 class="fw-bold text-primary"><i class="bi bi-person-plus-fill me-2"></i>@Localizer["Create Account"]</h3>
+                    <p class="text-muted small">@Localizer["Fill in the details to register a new user"]</p>
                 </div>
 
                 <form id="registerForm" asp-action="Register" method="post" enctype="multipart/form-data">
@@ -20,12 +20,12 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="UserName" class="form-label fw-semibold text-secondary small"></label>
+                            <label xasp-for="UserName" class="form-label fw-semibold text-secondary small">@Localizer["User Name"]</label>
                             <input asp-for="UserName" class="form-control rounded-3" />
                             <span asp-validation-for="UserName" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="Email" class="form-label fw-semibold text-secondary small"></label>
+                            <label asp-for="Email" class="form-label fw-semibold text-secondary small">@Localizer["Email"]</label>
                             <input asp-for="Email" class="form-control rounded-3" />
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
@@ -33,12 +33,12 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="NameEn" class="form-label fw-semibold text-secondary small"></label>
+                            <label asp-for="NameEn" class="form-label fw-semibold text-secondary small">@Localizer["Name in English"]</label>
                             <input asp-for="NameEn" class="form-control rounded-3" />
                             <span asp-validation-for="NameEn" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="NameAr" class="form-label fw-semibold text-secondary small"></label>
+                            <label asp-for="NameAr" class="form-label fw-semibold text-secondary small">@Localizer["Name in Arabic"]</label>
                             <input asp-for="NameAr" class="form-control rounded-3 text-end" dir="rtl" />
                             <span asp-validation-for="NameAr" class="text-danger small"></span>
                         </div>
@@ -46,29 +46,29 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="Password" class="form-label fw-semibold text-secondary small"></label>
+                            <label asp-for="Password" class="form-label fw-semibold text-secondary small">@Localizer["Password"]</label>
                             <input asp-for="Password" class="form-control rounded-3" />
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="ConfirmPassword" class="form-label fw-semibold text-secondary small"></label>
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold text-secondary small">@Localizer["Confirm Password"]</label>
                             <input asp-for="ConfirmPassword" class="form-control rounded-3" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="ImgFile" class="form-label fw-semibold text-secondary small"></label>
+                        <label asp-for="ImgFile" class="form-label fw-semibold text-secondary small">@Localizer["Profile Image"]</label>
                         <input asp-for="ImgFile" type="file" accept="image/*" class="form-control rounded-3" />
                         <span asp-validation-for="ImgFile" class="text-danger small"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold shadow-sm mb-3">
-                        Complete Registration
+                        @Localizer["Complete Registration"]
                     </button>
 
                     <div class="text-center">
-                        <a asp-action="Index" class="text-secondary text-decoration-none small"><i class="bi bi-arrow-left me-1"></i> Back to User List</a>
+                        <a asp-action="Index" class="text-secondary text-decoration-none small"><i class="bi bi-arrow-left me-1"></i> @Localizer["Back to User List"]</a>
                     </div>
                 </form>
             </div>
@@ -98,8 +98,8 @@
                 success: function(response) {
                     Swal.fire({
                         icon: response.icon || 'success',
-                        title: 'Success!',
-                        text: response.message || 'User registered successfully!',
+                        title: Localizer["Success!"],
+                        text: response.message || Localizer["User registered successfully!"],
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {

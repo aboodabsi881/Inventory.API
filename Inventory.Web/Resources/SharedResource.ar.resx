@@ -126,11 +126,23 @@
   <data name="' to User." xml:space="preserve">
     <value>' الى المستخدم.</value>
   </data>
+  <data name="-- Select Category --" xml:space="preserve">
+    <value>-- اختر الفئة --</value>
+  </data>
+  <data name="-- Select Power Type --" xml:space="preserve">
+    <value>-- حدد نوع الطاقة --</value>
+  </data>
+  <data name="-- Select Role --" xml:space="preserve">
+    <value>-- اختيار الدور --</value>
+  </data>
   <data name="?" xml:space="preserve">
     <value>؟</value>
   </data>
   <data name="Access Control" xml:space="preserve">
     <value>التحكم في الوصول</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>فعل</value>
   </data>
   <data name="Add Category" xml:space="preserve">
     <value>إضافة فئة</value>
@@ -140,6 +152,12 @@
   </data>
   <data name="Add New Product" xml:space="preserve">
     <value>إضافة منتج جديد</value>
+  </data>
+  <data name="Add New Role" xml:space="preserve">
+    <value>إضافة دور جديد</value>
+  </data>
+  <data name="Add New User" xml:space="preserve">
+    <value>إضافة مستخدم جديد</value>
   </data>
   <data name="Add to Cart" xml:space="preserve">
     <value>أضف إلى السلة</value>
@@ -162,6 +180,9 @@
   <data name="and restarting the app." xml:space="preserve">
     <value> وإعادة تشغيل التطبيق.</value>
   </data>
+  <data name="Application Roles" xml:space="preserve">
+    <value>أدوار التطبيق</value>
+  </data>
   <data name="ArabicName" xml:space="preserve">
     <value>الاسم العربي</value>
   </data>
@@ -171,14 +192,29 @@
   <data name="Are you sure?" xml:space="preserve">
     <value>هل أنت متأكد؟</value>
   </data>
+  <data name="Avatar" xml:space="preserve">
+    <value>أفاتار</value>
+  </data>
   <data name="Back" xml:space="preserve">
     <value>عُد</value>
   </data>
   <data name="Back to List" xml:space="preserve">
     <value>العودة إلى القائمة</value>
   </data>
+  <data name="Back to Products" xml:space="preserve">
+    <value>العودة إلى المنتجات</value>
+  </data>
+  <data name="Back to User List" xml:space="preserve">
+    <value>العودة إلى قائمة المستخدمين</value>
+  </data>
+  <data name="Back to Users" xml:space="preserve">
+    <value>العودة إلى المستخدمين</value>
+  </data>
   <data name="BackToList" xml:space="preserve">
     <value>العودة إلى القائمة</value>
+  </data>
+  <data name="Browse Products" xml:space="preserve">
+    <value>تصفح المنتجات</value>
   </data>
   <data name="building Web apps with ASP.NET Core." xml:space="preserve">
     <value>بناء تطبيقات الويب باستخدام ASP.NET Core.</value>
@@ -222,11 +258,26 @@
   <data name="ChangePassword" xml:space="preserve">
     <value>تغيير كلمة المرور</value>
   </data>
+  <data name="Click image to enlarge" xml:space="preserve">
+    <value>انقر على الصورة لتكبيرها</value>
+  </data>
+  <data name="Click to view full image" xml:space="preserve">
+    <value>انقر لعرض الصورة كاملة</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>أغلق</value>
   </data>
+  <data name="Complete Registration" xml:space="preserve">
+    <value>إتمام التسجيل</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>تأكيد كلمة المرور</value>
+  </data>
   <data name="ConfirmPassword" xml:space="preserve">
     <value>تأكيد كلمة المرور</value>
+  </data>
+  <data name="Continue Shopping" xml:space="preserve">
+    <value>تابع التسوق</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>إنشاء</value>
@@ -243,8 +294,14 @@
   <data name="Create a New Role" xml:space="preserve">
     <value>إنشاء دور جديد</value>
   </data>
+  <data name="Create Account" xml:space="preserve">
+    <value>إنشاء حساب</value>
+  </data>
   <data name="Create New Category" xml:space="preserve">
     <value>إنشاء فئة جديدة</value>
+  </data>
+  <data name="Create New Role" xml:space="preserve">
+    <value>إنشاء دور جديد</value>
   </data>
   <data name="CreateCategory" xml:space="preserve">
     <value>إنشاء فئة</value>
@@ -266,6 +323,12 @@
   </data>
   <data name="CreateRole" xml:space="preserve">
     <value>إنشاء دور</value>
+  </data>
+  <data name="Current Product Image" xml:space="preserve">
+    <value>عالم المنتجات الحالي</value>
+  </data>
+  <data name="Define access control roles for system users" xml:space="preserve">
+    <value>حدد أدوار التحكم في الوصول لمستخدمي النظام</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>حذف</value>
@@ -294,11 +357,20 @@
   <data name="Do you really want to delete the category" xml:space="preserve">
     <value>هل تريد حقاً حذف الفئة</value>
   </data>
+  <data name="Don't have an account?" xml:space="preserve">
+    <value>ليس لديك حساب؟</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>يحرر</value>
   </data>
   <data name="Edit Category" xml:space="preserve">
     <value>تعديل الفئة</value>
+  </data>
+  <data name="Edit Product" xml:space="preserve">
+    <value>تعديل المنتج</value>
+  </data>
+  <data name="Edit Role" xml:space="preserve">
+    <value>Edit Role</value>
   </data>
   <data name="EditedCategory" xml:space="preserve">
     <value>الفئة المحررة</value>
@@ -321,6 +393,9 @@
   <data name="Enter category name..." xml:space="preserve">
     <value>أدخل اسم الفئة...</value>
   </data>
+  <data name="Enter product name" xml:space="preserve">
+    <value>أدخل اسم المنتج</value>
+  </data>
   <data name="environment by setting the" xml:space="preserve">
     <value> البيئة عن طريق ضبط </value>
   </data>
@@ -335,6 +410,9 @@
   </data>
   <data name="Error." xml:space="preserve">
     <value>خطأ.</value>
+  </data>
+  <data name="Explore our catalog and save your preferred products here!" xml:space="preserve">
+    <value>تصفحوا كتالوجنا واحفظوا منتجاتكم المفضلة هنا!</value>
   </data>
   <data name="Failed to assign Role '" xml:space="preserve">
     <value>فشل في تعيين الدور '</value>
@@ -353,6 +431,15 @@
   </data>
   <data name="Favorites" xml:space="preserve">
     <value>المفضلة</value>
+  </data>
+  <data name="Fill in the details to register a new user" xml:space="preserve">
+    <value>أدخل البيانات لتسجيل مستخدم جديد</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>الاسم الأول</value>
+  </data>
+  <data name="Grand Total" xml:space="preserve">
+    <value>المجموع الإجمالي</value>
   </data>
   <data name="Home" xml:space="preserve">
     <value>الصفحة الرئيسية</value>
@@ -408,6 +495,9 @@
   <data name="JD" xml:space="preserve">
     <value>د.أ</value>
   </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>اسم العائلة</value>
+  </data>
   <data name="Learn about" xml:space="preserve">
     <value>تعرف على</value>
   </data>
@@ -429,11 +519,23 @@
   <data name="LogoutSuccess" xml:space="preserve">
     <value>تم تسجيل الخروج بنجاح</value>
   </data>
+  <data name="Looks like you haven't added anything to your cart yet." xml:space="preserve">
+    <value>يبدو أنك لم تُضف أي شيء إلى سلة التسوق الخاصة بك حتى الآن.</value>
+  </data>
   <data name="Low" xml:space="preserve">
     <value>قليل</value>
   </data>
   <data name="Low Stock Items" xml:space="preserve">
     <value>المنتجات ذات المخزون المنخفض</value>
+  </data>
+  <data name="Manage personal profile details &amp; role" xml:space="preserve">
+    <value>إدارة تفاصيل الملف الشخصي والدور</value>
+  </data>
+  <data name="Manage system roles and permissions" xml:space="preserve">
+    <value>إدارة أدوار النظام وصلاحياته</value>
+  </data>
+  <data name="My Favorites" xml:space="preserve">
+    <value>مفضلاتي</value>
   </data>
   <data name="MyCart" xml:space="preserve">
     <value>سلة التسوق الخاصة بي:</value>
@@ -446,6 +548,12 @@
   </data>
   <data name="Name " xml:space="preserve">
     <value>اسم الفئة</value>
+  </data>
+  <data name="Name in Arabic" xml:space="preserve">
+    <value>الاسم باللغة العربية</value>
+  </data>
+  <data name="Name in English" xml:space="preserve">
+    <value>الاسم باللغة الإنجليزية</value>
   </data>
   <data name="NameRole" xml:space="preserve">
     <value>الاسم الدور</value>
@@ -462,6 +570,9 @@
   <data name="No favorites found." xml:space="preserve">
     <value>لم يتم العثور على المفضلة.</value>
   </data>
+  <data name="No products found. Click" xml:space="preserve">
+    <value>لم يتم العثور على منتجات. انقر هنا</value>
+  </data>
   <data name="No products in cart yet." xml:space="preserve">
     <value>لا يوجد منتجات في سلة التسوق حتى الآن.</value>
   </data>
@@ -470,6 +581,12 @@
   </data>
   <data name="No recent items available." xml:space="preserve">
     <value>لا توجد عناصر حديثة متاحة.</value>
+  </data>
+  <data name="No roles found in the system." xml:space="preserve">
+    <value>لم يتم العثور على أي أدوار في النظام.</value>
+  </data>
+  <data name="No users registered yet. Click" xml:space="preserve">
+    <value>لم يتم تسجيل أي مستخدمين بعد. انقر هنا</value>
   </data>
   <data name="NotFoundRole" xml:space="preserve">
     <value>لم يتم العثور على الدور</value>
@@ -480,11 +597,17 @@
   <data name="Oops..." xml:space="preserve">
     <value>أُووبس...</value>
   </data>
+  <data name="Order Summary" xml:space="preserve">
+    <value>ملخص الطلب</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>كلمة المرور</value>
   </data>
   <data name="PersonalProfile" xml:space="preserve">
     <value>الملف الشخصي</value>
+  </data>
+  <data name="Power Type" xml:space="preserve">
+    <value>نوع الطاقة</value>
   </data>
   <data name="PowerType" xml:space="preserve">
     <value>نوع الطاقة</value>
@@ -501,8 +624,17 @@
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>سياسة الخصوصية</value>
   </data>
+  <data name="Proceed to Checkout" xml:space="preserve">
+    <value>الشروع في الخروج</value>
+  </data>
   <data name="Product" xml:space="preserve">
     <value>المنتج</value>
+  </data>
+  <data name="Product ID" xml:space="preserve">
+    <value>معرف المنتج</value>
+  </data>
+  <data name="Product Image" xml:space="preserve">
+    <value>صورة المنتج</value>
   </data>
   <data name="Product Name" xml:space="preserve">
     <value>اسم المنتج</value>
@@ -519,6 +651,12 @@
   <data name="Products in this Category" xml:space="preserve">
     <value>المنتجات في هذه الفئة</value>
   </data>
+  <data name="Profile Image" xml:space="preserve">
+    <value>صورة الملف الشخصي</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>كمية</value>
+  </data>
   <data name="QuantityUpdated" xml:space="preserve">
     <value>تم تحديث الكمية</value>
   </data>
@@ -534,11 +672,20 @@
   <data name="Register" xml:space="preserve">
     <value>تسجيل</value>
   </data>
+  <data name="Register Now" xml:space="preserve">
+    <value>سجل الآن</value>
+  </data>
   <data name="Register System User" xml:space="preserve">
     <value>تسجيل مستخدم النظام</value>
   </data>
+  <data name="Remember Me" xml:space="preserve">
+    <value>تذكرنى</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>تذكرني</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>حذف</value>
   </data>
   <data name="RemovedFavoriteFromList" xml:space="preserve">
     <value>تمت إزالة المفضلة من القائمة</value>
@@ -555,6 +702,9 @@
   <data name="Role" xml:space="preserve">
     <value>الدور</value>
   </data>
+  <data name="Role Name" xml:space="preserve">
+    <value>اسم الدور</value>
+  </data>
   <data name="RoleDeleted" xml:space="preserve">
     <value>تم حذف الدور</value>
   </data>
@@ -567,8 +717,32 @@
   <data name="Save Category" xml:space="preserve">
     <value>حفظ الفئة</value>
   </data>
+  <data name="Save Changes" xml:space="preserve">
+    <value>حفظ التغييرات</value>
+  </data>
+  <data name="Save Product" xml:space="preserve">
+    <value>حفظ المنتج</value>
+  </data>
+  <data name="Save Role" xml:space="preserve">
+    <value>حفظ الدور</value>
+  </data>
   <data name="Select an image..." xml:space="preserve">
     <value>اختر صورة...</value>
+  </data>
+  <data name="Selected Image Preview" xml:space="preserve">
+    <value>معاينة الصورة المختارة</value>
+  </data>
+  <data name="Shipping" xml:space="preserve">
+    <value>شحن</value>
+  </data>
+  <data name="Shopping Cart" xml:space="preserve">
+    <value>سلة التسوق</value>
+  </data>
+  <data name="Sign In" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="Sign in to manage your inventory" xml:space="preserve">
+    <value>سجّل الدخول لإدارة مخزونك</value>
   </data>
   <data name="SignIn" xml:space="preserve">
     <value>تسجيل الدخول</value>
@@ -582,8 +756,14 @@
   <data name="Stock Status" xml:space="preserve">
     <value>حالة المخزون</value>
   </data>
+  <data name="Subtotal" xml:space="preserve">
+    <value>المجموع الفرعي</value>
+  </data>
   <data name="SubtractQuantity" xml:space="preserve">
     <value>طرح الكمية</value>
+  </data>
+  <data name="Success!" xml:space="preserve">
+    <value>نجاح!</value>
   </data>
   <data name="Swapping to" xml:space="preserve">
     <value>التبديل إلى </value>
@@ -603,14 +783,32 @@
   <data name="to create one!" xml:space="preserve">
     <value>لإنشاء واحد!</value>
   </data>
+  <data name="to get started." xml:space="preserve">
+    <value>للبدء.</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>المجموع</value>
+  </data>
   <data name="Total Products" xml:space="preserve">
     <value>إجمالي المنتجات</value>
   </data>
   <data name="TotalPrice:" xml:space="preserve">
     <value>السعر الإجمالي:</value>
   </data>
+  <data name="Uncategorized" xml:space="preserve">
+    <value>غير مصنف</value>
+  </data>
+  <data name="Unnamed Product" xml:space="preserve">
+    <value>منتج غير مسمى</value>
+  </data>
   <data name="Update Category" xml:space="preserve">
     <value>تحديث الفئات</value>
+  </data>
+  <data name="Update Product" xml:space="preserve">
+    <value>تحديث المنتج</value>
+  </data>
+  <data name="Update Role" xml:space="preserve">
+    <value>تحديث الدور</value>
   </data>
   <data name="UpdatedRole" xml:space="preserve">
     <value>تم تحديث الدور</value>
@@ -618,11 +816,23 @@
   <data name="UploadImage" xml:space="preserve">
     <value>تحميل الصورة</value>
   </data>
+  <data name="User Info" xml:space="preserve">
+    <value>معلومات المستخدم</value>
+  </data>
+  <data name="User Name" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="User registered successfully!" xml:space="preserve">
+    <value>تم تسجيل المستخدم بنجاح!</value>
+  </data>
   <data name="UserName" xml:space="preserve">
     <value>اسم المستخدم</value>
   </data>
   <data name="Users" xml:space="preserve">
     <value>المستخدمون</value>
+  </data>
+  <data name="Users List" xml:space="preserve">
+    <value>قائمة المستخدمين</value>
   </data>
   <data name="ValidationFailed" xml:space="preserve">
     <value>فشل التحقق</value>
@@ -633,10 +843,22 @@
   <data name="View Details" xml:space="preserve">
     <value>عرض التفاصيل</value>
   </data>
+  <data name="View Product" xml:space="preserve">
+    <value>عرض المنتج</value>
+  </data>
   <data name="Welcome" xml:space="preserve">
     <value>اهلا  </value>
   </data>
+  <data name="Welcome Back" xml:space="preserve">
+    <value>مرحبًا بعودتك</value>
+  </data>
   <data name="Yes, delete it!" xml:space="preserve">
     <value>نعم، احذفه!</value>
+  </data>
+  <data name="Your cart is empty" xml:space="preserve">
+    <value>سلة التسوق الخاصة بك فارغة</value>
+  </data>
+  <data name="Your favorite list is empty" xml:space="preserve">
+    <value>قائمة مفضلاتك فارغة</value>
   </data>
 </root>

@@ -13,8 +13,8 @@
                     <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
                         <i class="bi bi-box-arrow-in-right fs-3"></i>
                     </div>
-                    <h3 class="fw-bold text-dark">Welcome Back</h3>
-                    <p class="text-muted small">Sign in to manage your inventory</p>
+                    <h3 class="fw-bold text-dark">@Localizer["Welcome Back"]</h3>
+                    <p class="text-muted small">@Localizer["Sign in to manage your inventory"]</p>
                 </div>
 
                 <form id="loginForm" asp-action="Login" method="post">
@@ -22,29 +22,29 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="UserName" class="form-control rounded-3" placeholder="UserName / Email" />
+                        <input asp-for="UserName" class="form-control rounded-3" placeholder="@Localizer["User Name"] / @Localizer["Email"]" />
                         <label asp-for="UserName"></label>
                         <span asp-validation-for="UserName" class="text-danger small"></span>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="Password" />
+                        <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="@Localizer["Password"]" />
                         <label asp-for="Password"></label>
                         <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
 
                     <div class="form-check mb-4">
                         <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label text-muted small"></label>
+                        <label asp-for="RememberMe" class="form-check-label text-muted small">@Localizer["Remember Me"]</label>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold shadow-sm mb-3">
-                        Sign In
+                        @Localizer["Sign In"]
                     </button>
 
                     <div class="text-center">
-                        <span class="text-muted small">Don't have an account?</span>
-                        <a asp-action="Register" class="text-primary text-decoration-none fw-bold small ms-1">Register Now</a>
+                        <span class="text-muted small">@Localizer["Don't have an account?"]</span>
+                        <a asp-action="Register" class="text-primary text-decoration-none fw-bold small ms-1">@Localizer["Register Now"]</a>
                     </div>
                 </form>
             </div>
@@ -69,8 +69,8 @@
                 success: function (response) {
                     Swal.fire({
                         icon: response.icon || 'success',
-                        title: 'Welcome!',
-                        text: response.message || 'Login successful!',
+                        title: Localizer["Welcome!"],
+                        text: response.message || Localizer["Login successful!"],
                         timer: 1200,
                         showConfirmButton: false
                     }).then(() => {

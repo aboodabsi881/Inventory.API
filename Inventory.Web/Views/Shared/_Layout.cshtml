@@ -1,6 +1,5 @@
 ﻿@using System.Globalization
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Localization
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -8,7 +7,6 @@
     var currentName = User.Identity?.Name ?? "User";
     var currentAvatar = User.FindFirstValue("Avatar") ?? "/images/Portrait_Placeholder.png";
 
-    // Culture Detection
     var currentLang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
     var isRTL = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
     var cssPath = isRTL ? "~/css/styleAr.css" : "~/css/style.css";
@@ -21,7 +19,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Inventory</title>
 
-    <!-- Instant State Restorer -->
     <script>
             (function() {
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && window.innerWidth >= 992) {

@@ -126,11 +126,23 @@
   <data name="' to User." xml:space="preserve">
     <value>' to User.</value>
   </data>
+  <data name="-- Select Category --" xml:space="preserve">
+    <value>-- Select Category --</value>
+  </data>
+  <data name="-- Select Power Type --" xml:space="preserve">
+    <value>-- Select Power Type --</value>
+  </data>
+  <data name="-- Select Role --" xml:space="preserve">
+    <value>-- Select Role --</value>
+  </data>
   <data name="?" xml:space="preserve">
     <value>?</value>
   </data>
   <data name="Access Control" xml:space="preserve">
     <value>Access Control</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>Action</value>
   </data>
   <data name="Add Category" xml:space="preserve">
     <value>Add Category</value>
@@ -140,6 +152,12 @@
   </data>
   <data name="Add New Product" xml:space="preserve">
     <value>Add New Product</value>
+  </data>
+  <data name="Add New Role" xml:space="preserve">
+    <value>Add New Role</value>
+  </data>
+  <data name="Add New User" xml:space="preserve">
+    <value>Add New User</value>
   </data>
   <data name="Add to Cart" xml:space="preserve">
     <value>Add to Cart</value>
@@ -162,6 +180,9 @@
   <data name="and restarting the app." xml:space="preserve">
     <value> and restarting the app.</value>
   </data>
+  <data name="Application Roles" xml:space="preserve">
+    <value>Application Roles</value>
+  </data>
   <data name="ArabicName" xml:space="preserve">
     <value>Arabic Name</value>
   </data>
@@ -171,14 +192,29 @@
   <data name="Are you sure?" xml:space="preserve">
     <value>Are you sure?</value>
   </data>
+  <data name="Avatar" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
   <data name="Back to List" xml:space="preserve">
     <value>Back to List</value>
   </data>
+  <data name="Back to Products" xml:space="preserve">
+    <value>Back to Products</value>
+  </data>
+  <data name="Back to User List" xml:space="preserve">
+    <value>Back to User List</value>
+  </data>
+  <data name="Back to Users" xml:space="preserve">
+    <value>Back to Users</value>
+  </data>
   <data name="BackToList" xml:space="preserve">
     <value>Back to List</value>
+  </data>
+  <data name="Browse Products" xml:space="preserve">
+    <value>Browse Products</value>
   </data>
   <data name="building Web apps with ASP.NET Core." xml:space="preserve">
     <value>building Web apps with ASP.NET Core.</value>
@@ -222,11 +258,26 @@
   <data name="ChangePassword" xml:space="preserve">
     <value>Change Password</value>
   </data>
+  <data name="Click image to enlarge" xml:space="preserve">
+    <value>Click image to enlarge</value>
+  </data>
+  <data name="Click to view full image" xml:space="preserve">
+    <value>Click to view full image</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="Complete Registration" xml:space="preserve">
+    <value>Complete Registration</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Confirm Password</value>
+  </data>
+  <data name="Continue Shopping" xml:space="preserve">
+    <value>Continue Shopping</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
@@ -243,8 +294,14 @@
   <data name="Create a New Role" xml:space="preserve">
     <value>Create a New Role</value>
   </data>
+  <data name="Create Account" xml:space="preserve">
+    <value>Create Account</value>
+  </data>
   <data name="Create New Category" xml:space="preserve">
     <value>Create New Category</value>
+  </data>
+  <data name="Create New Role" xml:space="preserve">
+    <value>Create New Role</value>
   </data>
   <data name="CreateCategory" xml:space="preserve">
     <value>Create Category</value>
@@ -266,6 +323,12 @@
   </data>
   <data name="CreateRole" xml:space="preserve">
     <value>Create Role</value>
+  </data>
+  <data name="Current Product Image" xml:space="preserve">
+    <value>Current Product Image</value>
+  </data>
+  <data name="Define access control roles for system users" xml:space="preserve">
+    <value>Define access control roles for system users</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -294,11 +357,20 @@
   <data name="Do you really want to delete the category" xml:space="preserve">
     <value>Do you really want to delete the category</value>
   </data>
+  <data name="Don't have an account?" xml:space="preserve">
+    <value>Don't have an account?</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
   <data name="Edit Category" xml:space="preserve">
     <value>Edit Category</value>
+  </data>
+  <data name="Edit Product" xml:space="preserve">
+    <value>Edit Product</value>
+  </data>
+  <data name="Edit Role" xml:space="preserve">
+    <value>Edit Role</value>
   </data>
   <data name="EditedCategory" xml:space="preserve">
     <value>Edited Category</value>
@@ -321,6 +393,9 @@
   <data name="Enter category name..." xml:space="preserve">
     <value>Enter category name...</value>
   </data>
+  <data name="Enter product name" xml:space="preserve">
+    <value>Enter product name</value>
+  </data>
   <data name="environment by setting the" xml:space="preserve">
     <value> environment by setting the </value>
   </data>
@@ -335,6 +410,9 @@
   </data>
   <data name="Error." xml:space="preserve">
     <value>Error.</value>
+  </data>
+  <data name="Explore our catalog and save your preferred products here!" xml:space="preserve">
+    <value>Explore our catalog and save your preferred products here!</value>
   </data>
   <data name="Failed to assign Role '" xml:space="preserve">
     <value>Failed to assign Role '</value>
@@ -353,6 +431,15 @@
   </data>
   <data name="Favorites" xml:space="preserve">
     <value>Favorites</value>
+  </data>
+  <data name="Fill in the details to register a new user" xml:space="preserve">
+    <value>Fill in the details to register a new user</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="Grand Total" xml:space="preserve">
+    <value>Grand Total</value>
   </data>
   <data name="Home" xml:space="preserve">
     <value>Home Page</value>
@@ -408,6 +495,9 @@
   <data name="JD" xml:space="preserve">
     <value>JD</value>
   </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
   <data name="Learn about" xml:space="preserve">
     <value>Learn about</value>
   </data>
@@ -429,11 +519,23 @@
   <data name="LogoutSuccess" xml:space="preserve">
     <value>Logout Success</value>
   </data>
+  <data name="Looks like you haven't added anything to your cart yet." xml:space="preserve">
+    <value>Looks like you haven't added anything to your cart yet.</value>
+  </data>
   <data name="Low" xml:space="preserve">
     <value>Low</value>
   </data>
   <data name="Low Stock Items" xml:space="preserve">
     <value>Low Stock Items</value>
+  </data>
+  <data name="Manage personal profile details &amp; role" xml:space="preserve">
+    <value>Manage personal profile details &amp; role</value>
+  </data>
+  <data name="Manage system roles and permissions" xml:space="preserve">
+    <value>Manage system roles and permissions</value>
+  </data>
+  <data name="My Favorites" xml:space="preserve">
+    <value>My Favorites</value>
   </data>
   <data name="MyCart" xml:space="preserve">
     <value>My Cart</value>
@@ -446,6 +548,12 @@
   </data>
   <data name="Name " xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="Name in Arabic" xml:space="preserve">
+    <value>Name in Arabic</value>
+  </data>
+  <data name="Name in English" xml:space="preserve">
+    <value>Name in English</value>
   </data>
   <data name="NameRole" xml:space="preserve">
     <value>Name Role</value>
@@ -462,6 +570,9 @@
   <data name="No favorites found." xml:space="preserve">
     <value>No favorites found.</value>
   </data>
+  <data name="No products found. Click" xml:space="preserve">
+    <value>No products found. Click</value>
+  </data>
   <data name="No products in cart yet." xml:space="preserve">
     <value>No products in cart yet.</value>
   </data>
@@ -470,6 +581,12 @@
   </data>
   <data name="No recent items available." xml:space="preserve">
     <value>No recent items available.</value>
+  </data>
+  <data name="No roles found in the system." xml:space="preserve">
+    <value>No roles found in the system.</value>
+  </data>
+  <data name="No users registered yet. Click" xml:space="preserve">
+    <value>No users registered yet. Click</value>
   </data>
   <data name="NotFoundRole" xml:space="preserve">
     <value>Not foundRole</value>
@@ -480,11 +597,17 @@
   <data name="Oops..." xml:space="preserve">
     <value>Oops...</value>
   </data>
+  <data name="Order Summary" xml:space="preserve">
+    <value>Order Summary</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
   <data name="PersonalProfile" xml:space="preserve">
     <value>Personal Profile</value>
+  </data>
+  <data name="Power Type" xml:space="preserve">
+    <value>Power Type</value>
   </data>
   <data name="PowerType" xml:space="preserve">
     <value>Power Type</value>
@@ -501,8 +624,17 @@
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Privacy Policy</value>
   </data>
+  <data name="Proceed to Checkout" xml:space="preserve">
+    <value>Proceed to Checkout</value>
+  </data>
   <data name="Product" xml:space="preserve">
     <value>Product</value>
+  </data>
+  <data name="Product ID" xml:space="preserve">
+    <value>Product ID</value>
+  </data>
+  <data name="Product Image" xml:space="preserve">
+    <value>Product Image</value>
   </data>
   <data name="Product Name" xml:space="preserve">
     <value>Product Name</value>
@@ -519,6 +651,12 @@
   <data name="Products in this Category" xml:space="preserve">
     <value>Products in this Category</value>
   </data>
+  <data name="Profile Image" xml:space="preserve">
+    <value>Profile Image</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
   <data name="QuantityUpdated" xml:space="preserve">
     <value>Quantity Updated</value>
   </data>
@@ -534,11 +672,20 @@
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>
+  <data name="Register Now" xml:space="preserve">
+    <value>Register Now</value>
+  </data>
   <data name="Register System User" xml:space="preserve">
     <value>Register System User</value>
   </data>
+  <data name="Remember Me" xml:space="preserve">
+    <value>Remember Me</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember me</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
   </data>
   <data name="RemovedFavoriteFromList" xml:space="preserve">
     <value>Removed Favorite From List</value>
@@ -555,6 +702,9 @@
   <data name="Role" xml:space="preserve">
     <value>Role</value>
   </data>
+  <data name="Role Name" xml:space="preserve">
+    <value>Role Name</value>
+  </data>
   <data name="RoleDeleted" xml:space="preserve">
     <value>Role Deleted</value>
   </data>
@@ -567,8 +717,32 @@
   <data name="Save Category" xml:space="preserve">
     <value>Save Category</value>
   </data>
+  <data name="Save Changes" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="Save Product" xml:space="preserve">
+    <value>Save Product</value>
+  </data>
+  <data name="Save Role" xml:space="preserve">
+    <value>Save Role</value>
+  </data>
   <data name="Select an image..." xml:space="preserve">
     <value>Select an image...</value>
+  </data>
+  <data name="Selected Image Preview" xml:space="preserve">
+    <value>Selected Image Preview</value>
+  </data>
+  <data name="Shipping" xml:space="preserve">
+    <value>Shipping</value>
+  </data>
+  <data name="Shopping Cart" xml:space="preserve">
+    <value>Shopping Cart</value>
+  </data>
+  <data name="Sign In" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="Sign in to manage your inventory" xml:space="preserve">
+    <value>Sign in to manage your inventory</value>
   </data>
   <data name="SignIn" xml:space="preserve">
     <value>Sign In</value>
@@ -582,8 +756,14 @@
   <data name="Stock Status" xml:space="preserve">
     <value>Stock Status</value>
   </data>
+  <data name="Subtotal" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
   <data name="SubtractQuantity" xml:space="preserve">
     <value>Subtracted Quantity</value>
+  </data>
+  <data name="Success!" xml:space="preserve">
+    <value>Success!</value>
   </data>
   <data name="Swapping to" xml:space="preserve">
     <value>Swapping to </value>
@@ -603,14 +783,32 @@
   <data name="to create one!" xml:space="preserve">
     <value>to create one!</value>
   </data>
+  <data name="to get started." xml:space="preserve">
+    <value>to get started.</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
   <data name="Total Products" xml:space="preserve">
     <value>Total Products</value>
   </data>
   <data name="TotalPrice:" xml:space="preserve">
     <value>Total Price:</value>
   </data>
+  <data name="Uncategorized" xml:space="preserve">
+    <value>Uncategorized</value>
+  </data>
+  <data name="Unnamed Product" xml:space="preserve">
+    <value>Unnamed Product</value>
+  </data>
   <data name="Update Category" xml:space="preserve">
     <value>Update Category</value>
+  </data>
+  <data name="Update Product" xml:space="preserve">
+    <value>Update Product</value>
+  </data>
+  <data name="Update Role" xml:space="preserve">
+    <value>Update Role</value>
   </data>
   <data name="UpdatedRole" xml:space="preserve">
     <value>Role Updated</value>
@@ -618,11 +816,23 @@
   <data name="UploadImage" xml:space="preserve">
     <value>Upload Image</value>
   </data>
+  <data name="User Info" xml:space="preserve">
+    <value>User Info</value>
+  </data>
+  <data name="User Name" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="User registered successfully!" xml:space="preserve">
+    <value>User registered successfully!</value>
+  </data>
   <data name="UserName" xml:space="preserve">
     <value>User Name</value>
   </data>
   <data name="Users" xml:space="preserve">
     <value>Users</value>
+  </data>
+  <data name="Users List" xml:space="preserve">
+    <value>Users List</value>
   </data>
   <data name="ValidationFailed" xml:space="preserve">
     <value>Validation Failed</value>
@@ -633,10 +843,22 @@
   <data name="View Details" xml:space="preserve">
     <value>View Details</value>
   </data>
+  <data name="View Product" xml:space="preserve">
+    <value>View Product</value>
+  </data>
   <data name="Welcome" xml:space="preserve">
     <value>Hello</value>
   </data>
+  <data name="Welcome Back" xml:space="preserve">
+    <value>Welcome Back</value>
+  </data>
   <data name="Yes, delete it!" xml:space="preserve">
     <value>Yes, delete it!</value>
+  </data>
+  <data name="Your cart is empty" xml:space="preserve">
+    <value>Your cart is empty</value>
+  </data>
+  <data name="Your favorite list is empty" xml:space="preserve">
+    <value>Your favorite list is empty</value>
   </data>
 </root>

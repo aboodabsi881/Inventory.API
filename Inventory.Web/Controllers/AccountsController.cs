@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Inventory.Web.Controllers
+namespace Inventory.Web.Controllers 
 {
     public class AccountsController : Controller
     {

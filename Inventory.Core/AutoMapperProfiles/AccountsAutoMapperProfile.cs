@@ -28,6 +28,8 @@ namespace Inventory.Core.AutoMapperProfiles
             CreateMap<RoleRequestDto, ApplicationRole>();
 
             CreateMap<ApplicationRole, RoleResponseDto>();
+
+
         }
     }
 }

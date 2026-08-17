@@ -187,11 +187,9 @@ namespace Inventory.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NameAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameEn")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -203,7 +201,6 @@ namespace Inventory.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<byte[]>("PasswordByte")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PasswordHash")

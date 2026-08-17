@@ -93,7 +93,8 @@ namespace Inventory.Data.Services
                 throw new KeyNotFoundException($"Item with ID {id} was not found.");
 
             _mapper.Map(dto, existingEntity);
-            _context.Set<TEntity>().Update(existingEntity);
+
+            _context.Entry(existingEntity).State = EntityState.Modified;
             await SaveChangesAsync();
 
             return _mapper.Map<TResponseDto>(existingEntity);

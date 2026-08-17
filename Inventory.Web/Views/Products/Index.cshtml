@@ -10,7 +10,7 @@
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
-
+<div class="container py-3">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-dark"><i class="bi bi-box-seam me-2 text-primary"></i>@Localizer["Products"]</h2>
     <a asp-action="Create" class="btn btn-primary shadow-sm">
@@ -18,9 +18,10 @@
     </a>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-    @if (Model != null && Model.Any())
-    {
+@if (Model != null && Model.Any())
+{
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+
         @foreach (var item in Model)
         {
             <div class="col" id="product-card-@item.Id">
@@ -105,17 +106,15 @@
                 </div>
             </div>
         }
+    </div>
     }
     else
     {
-        <div class="col-12">
-            <div class="alert alert-info text-center shadow-sm" role="alert">
-                <i class="bi bi-info-circle me-2"></i> @Localizer["No products found. Click"]<strong class="mx-1"> @Localizer["Add New Product"] </strong> @Localizer["to get started."]
+            <div class="alert alert-info text-center" role="alert">
+                @Localizer["No products found. Click"] <strong>@Localizer["Add New Product"]</strong> @Localizer["to create one!"]
             </div>
-        </div>
     }
 </div>
-
 @section Scripts {
     <script>
         const Toast = Swal.mixin({

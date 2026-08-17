@@ -47,7 +47,7 @@
                                         <td style="width: 45%;">
                                             <div class="d-flex align-items-center">
                                                 <a href="javascript:void(0)"
-                                                   onclick="showFullImage(@Html.Raw(Json.Serialize(imgUrl)), @Html.Raw(Json.Serialize(item.ProductName)))">
+                                                   onclick="showFullImage('@imgUrl', '@item.ProductName')">
                                                     <img src="@imgUrl"
                                                          class="rounded me-3 object-fit-contain shadow-sm border bg-light"
                                                          style="width: 85px; height: 85px; min-width: 85px; cursor: pointer;"
@@ -78,7 +78,7 @@
                                             $@calculatedTotal.ToString("F2")
                                         </td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(@item.Id, @Html.Raw(Json.Serialize(item.ProductName)))">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(@item.Id, '@item.ProductName')">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>

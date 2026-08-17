@@ -9,10 +9,10 @@
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
-
+<div class="container py-3">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-dark"><i class="bi bi-people-fill me-2 text-primary"></i>@Localizer["Users List"]</h2>
-    <a asp-action="Register" class="btn btn-primary rounded-pill px-4 shadow-sm">
+    <a asp-action="Register" class="btn btn-primary  px-4 shadow-sm">
         <i class="bi bi-person-plus-fill me-1"></i> @Localizer["Add New User"]
     </a>
 </div>
@@ -37,7 +37,7 @@
                         var avatarUrl = string.IsNullOrEmpty(user.Img) ? DefaultAvatar : user.Img;
                         <tr id="user-row-@user.Id">
                             <td class="ps-4">
-                                <a href="javascript:void(0)" onclick="showFullImage(@Html.Raw(Json.Serialize(avatarUrl)), @Html.Raw(Json.Serialize(user.UserName)))">
+                                <a href="javascript:void(0)" onclick="showFullImage('@avatarUrl', '@user.UserName')">
                                     <img src="@avatarUrl"
                                          class="rounded-circle object-fit-cover border shadow-sm"
                                          style="width: 44px; height: 44px; cursor: pointer;"
@@ -62,7 +62,7 @@
                                     <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-sm btn-outline-warning text-nowrap mx-1">
                                         <i class="bi bi-key"></i> 
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger text-nowrap" onclick="deleteUser('@user.Id', @Html.Raw(Json.Serialize(user.UserName)))">
+                                    <button type="button" class="btn btn-sm btn-outline-danger text-nowrap" onclick="deleteUser(@user.Id, '@user.UserName')">
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 </div>
@@ -83,7 +83,7 @@
         </table>
     </div>
 </div>
-
+</div>
 @section Scripts {
     <script>
         function deleteUser(id, userName) {

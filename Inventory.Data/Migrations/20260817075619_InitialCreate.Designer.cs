@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260716091606_InitialInventoryMigration")]
-    partial class InitialInventoryMigration
+    [Migration("20260817075619_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -190,11 +190,9 @@ namespace Inventory.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NameAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameEn")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -206,7 +204,6 @@ namespace Inventory.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<byte[]>("PasswordByte")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PasswordHash")
@@ -318,7 +315,12 @@ namespace Inventory.Data.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ApplicationUserId")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("RoleId");
 
@@ -409,6 +411,10 @@ namespace Inventory.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
+                    b.HasOne("Inventory.Core.Entities.Users.ApplicationUsers.ApplicationUser", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("Inventory.Core.Entities.Users.ApplicationRoles.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
@@ -441,6 +447,11 @@ namespace Inventory.Data.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("Favorites");
+                });
+
+            modelBuilder.Entity("Inventory.Core.Entities.Users.ApplicationUsers.ApplicationUser", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

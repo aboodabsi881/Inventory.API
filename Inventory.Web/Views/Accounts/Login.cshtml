@@ -2,51 +2,73 @@
 @model LoginVM
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = Localizer["Sign In"];
 }
 
-<div class="row justify-content-center align-items-center my-5">
-    <div class="col-md-5">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
-                        <i class="bi bi-box-arrow-in-right fs-3"></i>
+<div class="auth-page-wrapper d-flex align-items-center justify-content-center min-vh-100 ">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+                <!-- Card -->
+                <div class="card auth-card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-sm-5">
+                        <form id="loginForm" asp-action="Login" method="post" novalidate>
+                            @Html.AntiForgeryToken()
+                            
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4" role="alert"></div>
+
+                            <div class="text-center mb-4">
+                                <div class="auth-brand-icon mx-auto mb-3">
+                                    <i class="bi bi-box-seam-fill"></i>
+                                </div>
+                                <h3 class="fw-bold text-main mb-1">@Localizer["Welcome Back"]</h3>
+                                <p class="text-muted small mb-0">@Localizer["Sign in to manage your inventory"]</p>
+                            </div>
+
+                            <!-- Username / Email Field -->
+                            <div class="form-floating mb-3">
+                                <input asp-for="UserName" class="form-control rounded-3"  autocomplete="username" />
+                                <label asp-for="UserName">@Localizer["User Name or Email"]</label>
+                                <span asp-validation-for="UserName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <!-- Password Field with Bi-Directional Eye Toggle -->
+                            <div class="form-floating mb-3 position-relative auth-password-group">
+                                <input asp-for="Password" type="password" id="passwordInput" class="form-control rounded-3 auth-password-input"  autocomplete="current-password" />
+                                <label asp-for="Password">@Localizer["Password"]</label>
+                                <button type="button" class="btn btn-link auth-toggle-btn text-muted text-decoration-none shadow-none" id="togglePassword" aria-label="@Localizer["Toggle password visibility"]" tabindex="-1">
+                                    <i class="bi bi-eye-slash fs-5" id="toggleIcon"></i>
+                                </button>
+                                <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <!-- Options: Remember Me & Forgot Password -->
+                            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                                <div class="form-check m-0">
+                                    <input asp-for="RememberMe" class="form-check-input rounded" />
+                                    <label asp-for="RememberMe" class="form-check-label text-muted small user-select-none">
+                                        @Localizer["Remember Me"]
+                                    </label>
+                                </div>
+                                <a asp-action="ForgotPassword" class="auth-link small text-decoration-none">
+                                    @Localizer["Forgot Password?"]
+                                </a>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit"  class="btn btn-primary w-100 rounded-pill py-2 fw-semibold shadow-sm mb-4">
+                                <span id="">@Localizer["Sign In"]</span>
+                            </button>
+
+                            <!-- Footer Navigation -->
+                            <div class="text-center">
+                                <span class="text-muted small">@Localizer["Don't have an account?"]</span>
+                                <a asp-action="Register" class="auth-link fw-bold small ms-1 me-1 text-decoration-none">@Localizer["Register Now"]</a>
+                            </div>
+                        </form>
                     </div>
-                    <h3 class="fw-bold text-dark">@Localizer["Welcome Back"]</h3>
-                    <p class="text-muted small">@Localizer["Sign in to manage your inventory"]</p>
                 </div>
 
-                <form id="loginForm" asp-action="Login" method="post">
-                    @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="UserName" class="form-control rounded-3" placeholder="@Localizer["User Name"] / @Localizer["Email"]" />
-                        <label asp-for="UserName"></label>
-                        <span asp-validation-for="UserName" class="text-danger small"></span>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="@Localizer["Password"]" />
-                        <label asp-for="Password"></label>
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-
-                    <div class="form-check mb-4">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label text-muted small">@Localizer["Remember Me"]</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold shadow-sm mb-3">
-                        @Localizer["Sign In"]
-                    </button>
-
-                    <div class="text-center">
-                        <span class="text-muted small">@Localizer["Don't have an account?"]</span>
-                        <a asp-action="Register" class="text-primary text-decoration-none fw-bold small ms-1">@Localizer["Register Now"]</a>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -55,45 +77,84 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#loginForm').on('submit', function (e) {
-            e.preventDefault();
+        $(function () {
+            $('#togglePassword').on('click', function () {
+                const $input = $('#passwordInput');
+                const $icon = $('#toggleIcon');
+                const isPassword = $input.attr('type') === 'password';
 
-            const $form = $(this);
-            if (!$form.valid()) return;
-
-            // 💡 Use form.serialize() instead of FormData for clean ASP.NET Core Model Binding
-            $.ajax({
-                url: $form.attr('action') || '/Accounts/Login',
-                type: 'POST',
-                data: $form.serialize(),
-                success: function (response) {
-                    Swal.fire({
-                        icon: response.icon || 'success',
-                        title: Localizer["Welcome!"],
-                        text: response.message || Localizer["Login successful!"],
-                        timer: 1200,
-                        showConfirmButton: false
-                    }).then(() => {
-                        // 💡 Full browser navigation to home page after setting authentication ticket
-                        window.location.href = response.redirectUrl || '/Home/Index';
-                    });
-                },
-                error: function (xhr) {
-                    const err = xhr.responseJSON;
-                    let errorMessage = 'Invalid login credentials.';
-
-                    if (err && err.errors) {
-                        errorMessage = Object.values(err.errors).flat().join('<br/>');
-                    } else if (err && err.message) {
-                        errorMessage = err.message;
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Login Failed',
-                        html: errorMessage
-                    });
+                if (isPassword) {
+                    $input.attr('type', 'text');
+                    $icon.removeClass('bi-eye-slash').addClass('bi-eye text-primary');
+                } else {
+                    $input.attr('type', 'password');
+                    $icon.removeClass('bi-eye text-primary').addClass('bi-eye-slash');
                 }
+            });
+
+            function setButtonError($btn, $text, $spinner, message) {
+                $spinner.addClass('d-none');
+                $btn.prop('disabled', false)
+                    .removeClass('btn-primary')
+                    .addClass('btn-danger');
+                $text.text(message);
+
+                setTimeout(() => {
+                    $btn.removeClass('btn-danger').addClass('btn-primary');
+                    $text.text('@Localizer["Sign In"]');
+                }, 3000);
+            }
+
+            $('#loginForm').on('submit', function (e) {
+                e.preventDefault();
+                const $form = $(this);
+                const $btn = $('#submitBtn');
+                const $spinner = $('#submitSpinner');
+                const $text = $('#submitText');
+
+                if (!$form.valid()) {
+                    setButtonError($btn, $text, $spinner, '@Localizer["Please fill all required fields"]');
+                    return;
+                }
+
+                $btn.prop('disabled', true);
+                $spinner.removeClass('d-none');
+                $text.text('@Localizer["Signing in..."]');
+
+                $.ajax({
+                    url: $form.attr('action') || '/Accounts/Login',
+                    type: 'POST',
+                    data: $form.serialize(),
+                    success: function (response) {
+                        Swal.fire({
+                            icon: response.icon || 'success',
+                            title: '@Localizer["Welcome!"]',
+                            text: response.message || '@Localizer["Login successful!"]',
+                            timer: 1200,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = response.redirectUrl || '/Home/Index';
+                        });
+                    },
+                    error: function (xhr) {
+                        const err = xhr.responseJSON;
+                        let errorMessage = '@Localizer["Invalid credentials"]';
+
+                        if (err && err.message) {
+                            errorMessage = err.message;
+                        } else if (err && err.errors) {
+                            errorMessage = Object.values(err.errors).flat()[0] || errorMessage;
+                        }
+
+                        setButtonError($btn, $text, $spinner, errorMessage);
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: '@Localizer["Login Failed"]',
+                            text: response.message || errorMessage,
+                        });
+                    }
+                });
             });
         });
     </script>

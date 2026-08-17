@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Inventory.Web.ViewModels.Accounts
 {
@@ -33,6 +34,7 @@ namespace Inventory.Web.ViewModels.Accounts
         public SelectList? RoleLookup { get; set; }
 
         [ValidateNever]
+        [JsonPropertyName("img")]
         public string? Img { get; set; }
 
         [ValidateNever]

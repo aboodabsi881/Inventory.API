@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Inventory.Web.Controllers 
+namespace Inventory.Web.Controllers
 {
     public class AccountsController : Controller
     {
@@ -59,8 +59,7 @@ namespace Inventory.Web.Controllers
             var response = await _client.PostAsJsonAsync("Accounts/login", model);
             if (!response.IsSuccessStatusCode)
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                return BadRequest(new { message = !string.IsNullOrWhiteSpace(errorContent) ? errorContent : "Invalid username or password." });
+                return BadRequest(new { message = "Invalid username or password." });
             }
 
             var userObj = await response.Content.ReadFromJsonAsync<UsersVM>(JsonOptions);
@@ -81,7 +80,7 @@ namespace Inventory.Web.Controllers
             {
                 icon = "success",
                 message = "Login successful!",
-                redirectUrl = Url.Action("Index", "Accounts")
+                redirectUrl = Url.Action("Index", "Home")
             });
         }
 
@@ -110,7 +109,15 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> Register(RegisterVM model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+            {
+                return BadRequest(new
+                {
+                    errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
 
             string? imagePath = model.ImgFile is { Length: > 0 } ? await SaveUserImageAsync(model.ImgFile) : null;
 
@@ -128,7 +135,12 @@ namespace Inventory.Web.Controllers
             var response = await _client.PostAsJsonAsync("Accounts/register", registerPayload);
             if (response.IsSuccessStatusCode)
             {
-                return Ok(new { icon = "success", message = "User registered successfully!", redirectUrl = Url.Action("Login") });
+                return Ok(new
+                {
+                    icon = "success",
+                    message = "User registered successfully!",
+                    redirectUrl = Url.Action("Login")
+                });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
@@ -160,9 +172,13 @@ namespace Inventory.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var rolesList = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
-                model.RoleLookup = new SelectList(rolesList.Select(r => r.Name), model.RoleName);
-                return View(model);
+                return BadRequest(new
+                {
+                    errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
             }
 
             if (model.ImgFile is { Length: > 0 })
@@ -179,7 +195,12 @@ namespace Inventory.Web.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return Ok(new { icon = "success", message = "Profile updated successfully!", redirectUrl = Url.Action("Index", "Accounts") });
+                return Ok(new
+                {
+                    icon = "success",
+                    message = "Profile updated successfully!",
+                    redirectUrl = Url.Action("Index", "Accounts")
+                });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
@@ -203,7 +224,15 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+            {
+                return BadRequest(new
+                {
+                    errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
 
             var payload = new { CurrentPassword = model.OldPassword, NewPassword = model.NewPassword };
             var response = await _client.PostAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
@@ -234,6 +263,8 @@ namespace Inventory.Web.Controllers
             return BadRequest(new { icon = "error", message = "Failed to delete user." });
         }
 
+        #region Helpers
+
         private static ClaimsPrincipal CreateClaimsPrincipal(UsersVM userObj)
         {
             var claims = new List<Claim>
@@ -241,6 +272,8 @@ namespace Inventory.Web.Controllers
                 new(ClaimTypes.NameIdentifier, userObj.Id.ToString()),
                 new(ClaimTypes.Name, !string.IsNullOrWhiteSpace(userObj.UserName) ? userObj.UserName : "User"),
                 new(ClaimTypes.Email, userObj.Email ?? ""),
+                new("NameAr", userObj.NameAr ?? ""),
+                new("NameEn", userObj.NameEn ?? ""),
                 new("Avatar", !string.IsNullOrWhiteSpace(userObj.Img) ? userObj.Img : "/images/Portrait_Placeholder.png")
             };
 
@@ -316,5 +349,7 @@ namespace Inventory.Web.Controllers
 
             return "/images/users/" + fileName;
         }
+
+        #endregion
     }
 }

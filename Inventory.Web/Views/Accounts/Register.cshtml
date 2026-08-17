@@ -2,7 +2,7 @@
 @model RegisterVM
 
 @{
-    ViewData["Title"] = "Register User";
+    ViewData["Title"] = Localizer["Register User"];
 }
 
 <div class="row justify-content-center my-4">
@@ -10,7 +10,9 @@
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
-                    <h3 class="fw-bold text-primary"><i class="bi bi-person-plus-fill me-2"></i>@Localizer["Create Account"]</h3>
+                    <h3 class="fw-bold text-primary">
+                        <i class="bi bi-person-plus-fill me-2"></i>@Localizer["Create Account"]
+                    </h3>
                     <p class="text-muted small">@Localizer["Fill in the details to register a new user"]</p>
                 </div>
 
@@ -20,13 +22,13 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label xasp-for="UserName" class="form-label fw-semibold text-secondary small">@Localizer["User Name"]</label>
+                            <label asp-for="UserName" class="form-label fw-semibold text-secondary small">@Localizer["User Name"]</label>
                             <input asp-for="UserName" class="form-control rounded-3" />
                             <span asp-validation-for="UserName" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
                             <label asp-for="Email" class="form-label fw-semibold text-secondary small">@Localizer["Email"]</label>
-                            <input asp-for="Email" class="form-control rounded-3" />
+                            <input asp-for="Email" type="email" class="form-control rounded-3" />
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
                     </div>
@@ -47,12 +49,12 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label asp-for="Password" class="form-label fw-semibold text-secondary small">@Localizer["Password"]</label>
-                            <input asp-for="Password" class="form-control rounded-3" />
+                            <input asp-for="Password" type="password" class="form-control rounded-3" />
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
                             <label asp-for="ConfirmPassword" class="form-label fw-semibold text-secondary small">@Localizer["Confirm Password"]</label>
-                            <input asp-for="ConfirmPassword" class="form-control rounded-3" />
+                            <input asp-for="ConfirmPassword" type="password" class="form-control rounded-3" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                         </div>
                     </div>
@@ -68,7 +70,9 @@
                     </button>
 
                     <div class="text-center">
-                        <a asp-action="Index" class="text-secondary text-decoration-none small"><i class="bi bi-arrow-left me-1"></i> @Localizer["Back to User List"]</a>
+                        <a asp-action="Index" class="text-secondary text-decoration-none small">
+                            <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to User List"]
+                        </a>
                     </div>
                 </form>
             </div>
@@ -82,10 +86,8 @@
         $('#registerForm').on('submit', function(e) {
             e.preventDefault();
 
-            // 1️⃣ التحقق من صحة المدخلات بجهة العميل
             if (!$(this).valid()) return;
 
-            // 2️⃣ تعريف المتغيرات بـ FormData لحزم النصوص والصورة
             const $form = $(this);
             const formData = new FormData(this);
 
@@ -98,17 +100,17 @@
                 success: function(response) {
                     Swal.fire({
                         icon: response.icon || 'success',
-                        title: Localizer["Success!"],
-                        text: response.message || Localizer["User registered successfully!"],
+                        title: '@Localizer["Success!"]',
+                        text: response.message || '@Localizer["User registered successfully!"]',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = response.redirectUrl || '/Accounts';
+                        window.location.href = response.redirectUrl || '/Accounts/Login';
                     });
                 },
                 error: function(xhr) {
                     const err = xhr.responseJSON;
-                    let errorMessage = 'Validation failed or server error.';
+                    let errorMessage = '@Localizer["Validation failed or server error."]';
 
                     if (err && err.errors) {
                         errorMessage = Object.values(err.errors).flat().join('<br/>');
@@ -118,7 +120,7 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Registration Failed',
+                        title: '@Localizer["Registration Failed"]',
                         html: errorMessage
                     });
                 }

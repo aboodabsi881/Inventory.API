@@ -1,10 +1,15 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap");
 :root {
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 78px;
   --brand-primary: #4f46e5;
   --brand-primary-hover: #4338ca;
   --brand-subtle: #eef2ff;
+  --bg-body: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --card-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
 }
 
 html {
@@ -20,13 +25,14 @@ html {
 
 body {
   font-family: "Cairo", system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
-  overflow-x: hidden;
+  background-color: var(--bg-body);
+  color: var(--text-main);
   direction: rtl;
   text-align: right;
+  overflow-x: hidden;
 }
 
+/* ==================== Interactive Resets & Focus Rings ==================== */
 .btn:focus, .btn:active:focus,
 .btn-link.nav-link:focus,
 .btn-link.nav-link:active:focus,
@@ -34,19 +40,98 @@ body {
 .form-control:active:focus,
 .form-check-input:focus,
 .form-check-input:active:focus {
-  box-shadow: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  border-color: var(--brand-primary);
 }
 
+/* ==================== Auth & Login Module ==================== */
+.auth-page-wrapper {
+  background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.08) 0%, transparent 60%);
+}
+
+.auth-brand-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.35);
+}
+
+.auth-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow) !important;
+}
+
+.auth-link {
+  color: var(--brand-primary);
+  font-weight: 600;
+  transition: color 0.15s ease-in-out;
+}
+.auth-link:hover {
+  color: var(--brand-primary-hover);
+}
+
+/* Form Controls & Floating Labels (RTL) */
+.form-floating > .form-control-plaintext,
+.form-floating > .form-control {
+  text-align: right;
+}
 .form-floating > .form-control-plaintext::placeholder,
 .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+  color: var(--bs-secondary-color, #94a3b8);
+  text-align: right;
 }
-.form-floating > .form-control-plaintext:focus::placeholder,
-.form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.form-floating > label {
+  right: 0;
+  left: auto;
+  transform-origin: top right;
+  text-align: right;
 }
 
+.form-check {
+  padding-right: 1.75em;
+  padding-left: 0;
+}
+.form-check .form-check-input {
+  float: right;
+  margin-right: -1.75em;
+  margin-left: 0;
+}
+.form-check .form-check-input:checked {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+/* Password Group with Eye Toggle (RTL) */
+.auth-password-group .auth-password-input {
+  padding-left: 3.25rem !important;
+  padding-right: 0.75rem !important;
+}
+.auth-password-group .auth-toggle-btn {
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  right: auto;
+  transform: translateY(-50%);
+  padding: 0.5rem 0.75rem;
+  z-index: 5;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-password-group .auth-toggle-btn:hover i {
+  color: var(--brand-primary) !important;
+}
+
+/* ==================== Sidebar Component (RTL) ==================== */
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -56,19 +141,27 @@ body {
   left: auto;
   z-index: 1040;
   background: #ffffff;
-  border-left: 1px solid #e2e8f0;
+  border-left: 1px solid var(--border-color);
   border-right: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
 }
+.sidebar ul {
+  padding-right: 0;
+  padding-left: 0;
+  list-style: none;
+}
 .sidebar .nav-link-item {
-  color: #64748b !important;
+  color: var(--text-muted) !important;
   font-weight: 500;
   padding: 0.75rem 1.25rem !important;
   border-radius: 0.75rem;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 .sidebar .nav-link-item:hover {
   color: var(--brand-primary) !important;
@@ -77,12 +170,10 @@ body {
 .sidebar .nav-link-item.active {
   color: var(--brand-primary) !important;
   background-color: var(--brand-subtle) !important;
-  font-weight: 600;
-}
-.sidebar ul {
-  padding-right: 0px !important;
+  font-weight: 700;
 }
 
+/* Collapsed Sidebar (RTL) */
 html.sidebar-collapsed body .sidebar,
 body.sidebar-collapsed .sidebar {
   width: var(--sidebar-collapsed-width);
@@ -101,30 +192,30 @@ body.sidebar-collapsed .sidebar .nav-link-item {
 html.sidebar-collapsed body .sidebar .sidebar-header,
 body.sidebar-collapsed .sidebar .sidebar-header {
   justify-content: center !important;
-  padding-left: 0 !important;
   padding-right: 0 !important;
+  padding-left: 0 !important;
 }
-
-.main-wrapper {
-  margin-right: var(--sidebar-width);
-  margin-left: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 html.sidebar-collapsed body .main-wrapper,
 body.sidebar-collapsed .main-wrapper {
   margin-right: var(--sidebar-collapsed-width);
   margin-left: 0;
 }
 
+/* ==================== Main Content & Header (RTL) ==================== */
+.main-wrapper {
+  margin-right: var(--sidebar-width);
+  margin-left: 0;
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .glass-header {
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .btn-action-icon {
@@ -134,7 +225,7 @@ body.sidebar-collapsed .main-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-action-icon:hover {
   transform: translateY(-2px);
@@ -152,23 +243,39 @@ body.sidebar-collapsed .main-wrapper {
 .dropdown-menu-custom {
   border: 0;
   border-radius: 1rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
+  text-align: right;
 }
 
 .dropdown-menu-end[data-bs-popper] {
-  right: auto;
   left: 0;
+  right: auto;
 }
 
+/* RTL Text Alignment Overrides */
 .text-start {
   text-align: right !important;
 }
 
-.container .card .card-body .ms-auto {
+.text-end {
+  text-align: left !important;
+}
+
+.ms-auto {
   margin-right: auto !important;
   margin-left: 0 !important;
 }
 
+.me-auto {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* ==================== Mobile Responsiveness (RTL) ==================== */
 @media (max-width: 991.98px) {
   .sidebar {
     margin-right: calc(-1 * var(--sidebar-width));
@@ -184,17 +291,13 @@ body.sidebar-collapsed .main-wrapper {
   }
   body.sidebar-mobile-open .sidebar-overlay {
     display: block;
-  }
-  .main-wrapper {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-  .sidebar-overlay {
-    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.4);
     backdrop-filter: blur(4px);
     z-index: 1030;
+  }
+  .main-wrapper {
+    margin-right: 0 !important;
   }
 }

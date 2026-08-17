@@ -822,6 +822,9 @@
   <data name="User Name" xml:space="preserve">
     <value>User Name</value>
   </data>
+  <data name="User Name or Email" xml:space="preserve">
+    <value>User Name or Email</value>
+  </data>
   <data name="User registered successfully!" xml:space="preserve">
     <value>User registered successfully!</value>
   </data>

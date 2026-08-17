@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <None Include="Configuration\UserRoleConfiguration.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Configuration\UserRoleConfiguration.cs" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

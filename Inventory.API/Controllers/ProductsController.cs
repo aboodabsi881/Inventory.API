@@ -15,20 +15,16 @@ namespace Inventory.API.Controllers
             _productService = productService;
         }
 
-        // GET: api/products
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<ProductResponseDto>>> GetAllProducts()
         {
-            // 💡 التعديل هنا: استخدام الاسم الجديد للميثود في السيرفيس
             var products = await _productService.GetAllProductsDtoAsync();
             return Ok(products);
         }
 
-        // GET: api/products/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ProductResponseDto>> GetProductById(int id)
         {
-            // 💡 التعديل هنا: استخدام الاسم الجديد للميثود في السيرفيس
             var product = await _productService.GetProductDtoByIdAsync(id);
 
             if (product == null)
@@ -37,7 +33,6 @@ namespace Inventory.API.Controllers
             return Ok(product);
         }
 
-        // POST: api/products
         [HttpPost]
         public async Task<ActionResult<ProductResponseDto>> CreateProduct([FromForm] ProductRequestDto model)
         {
@@ -48,7 +43,6 @@ namespace Inventory.API.Controllers
             return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
         }
 
-        // PUT: api/products/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ProductResponseDto>> UpdateProduct(int id, [FromForm] ProductRequestDto model)
         {
@@ -66,7 +60,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // DELETE: api/products/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

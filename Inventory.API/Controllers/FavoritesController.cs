@@ -15,7 +15,6 @@ namespace Inventory.API.Controllers
             _favoriteService = favoriteService;
         }
 
-        // GET: api/favorites
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<FavoriteResponseDto>>> GetAllFavorites()
         {
@@ -23,7 +22,6 @@ namespace Inventory.API.Controllers
             return Ok(favorites);
         }
 
-        // GET: api/favorites/check/5
         [HttpGet("check/{productId:int}")]
         public async Task<ActionResult<bool>> IsProductFavorite(int productId)
         {
@@ -31,7 +29,6 @@ namespace Inventory.API.Controllers
             return Ok(new { productId, isFavorite });
         }
 
-        // POST: api/favorites/toggle/5
         [HttpPost("toggle/{productId:int}")]
         public async Task<ActionResult<FavoriteResponseDto>> ToggleFavorite(int productId)
         {
@@ -42,7 +39,6 @@ namespace Inventory.API.Controllers
             return Ok(favorite);
         }
 
-        // DELETE: api/favorites/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteFavorite(int id)
         {

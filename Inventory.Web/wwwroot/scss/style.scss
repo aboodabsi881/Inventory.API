@@ -39,8 +39,6 @@ body {
 .form-check-input {
     &:focus,
     &:active:focus {
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        border-color: var(--brand-primary);
     }
 }
 

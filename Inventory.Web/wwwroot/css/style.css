@@ -33,17 +33,6 @@ body {
 }
 
 /* ==================== Interactive Resets & Focus Rings ==================== */
-.btn:focus, .btn:active:focus,
-.btn-link.nav-link:focus,
-.btn-link.nav-link:active:focus,
-.form-control:focus,
-.form-control:active:focus,
-.form-check-input:focus,
-.form-check-input:active:focus {
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-  border-color: var(--brand-primary);
-}
-
 /* ==================== Auth & Login Module ==================== */
 .auth-brand-icon {
   width: 56px;

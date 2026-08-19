@@ -29,6 +29,7 @@ namespace Inventory.Data.Data
                 modelBuilder.ApplyConfiguration(new ProductConfiguration());
                 modelBuilder.ApplyConfiguration(new CartConfiguration());
                 modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
+                modelBuilder.ApplyConfiguration(new UserConfiguration());
             }
 
         }

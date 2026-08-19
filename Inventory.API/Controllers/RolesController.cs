@@ -15,7 +15,6 @@ namespace Inventory.API.Controllers
             _roleService = roleService;
         }
 
-        // GET: api/roles
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<RoleResponseDto>>> GetAllRoles()
         {
@@ -23,7 +22,6 @@ namespace Inventory.API.Controllers
             return Ok(roles);
         }
 
-        // GET: api/roles/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<RoleResponseDto>> GetRoleById(int id)
         {
@@ -34,7 +32,6 @@ namespace Inventory.API.Controllers
             return Ok(role);
         }
 
-        // POST: api/roles
         [HttpPost]
         public async Task<ActionResult<RoleResponseDto>> CreateRole([FromBody] RoleRequestDto model)
         {
@@ -52,7 +49,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // PUT: api/roles/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleRequestDto model)
         {
@@ -74,7 +70,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // DELETE: api/roles/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteRole(int id)
         {

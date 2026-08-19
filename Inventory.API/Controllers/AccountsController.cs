@@ -4,9 +4,10 @@ using Inventory.Core.Interfaces;
 
 namespace Inventory.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AccountsController : ControllerBase
+    [ApiController] // Indicates that this controller responds to web API requests and enables automatic model validation and other API-specific behaviors.
+    [Route("api/[controller]")] // Defines the route template for the controller. so this route will be "api/accounts".
+    // [] its call atribute
+    public class AccountsController : ControllerBase // ControllerBase is for API controllers that do not need view support, while Controller is for MVC controllers that return views.
     {
         private readonly IAccountService _accountService;
 
@@ -15,9 +16,8 @@ namespace Inventory.API.Controllers
             _accountService = accountService;
         }
 
-        // POST: api/accounts/register
         [HttpPost("register")]
-        public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterRequestDto model)
+        public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterRequestDto model) //FormBody attribute indicates that the model should be bound from the request body, typically in JSON format.
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -33,7 +33,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // POST: api/accounts/login
         [HttpPost("login")]
         public async Task<ActionResult<UserResponseDto>> Login([FromBody] LoginRequestDto model)
         {
@@ -47,7 +46,6 @@ namespace Inventory.API.Controllers
             return Ok(user);
         }
 
-        // GET: api/accounts/users
         [HttpGet("users")]
         public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetAllUsers()
         {
@@ -55,7 +53,6 @@ namespace Inventory.API.Controllers
             return Ok(users);
         }
 
-        // GET: api/accounts/users/5
         [HttpGet("users/{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
         {
@@ -70,7 +67,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // GET: api/accounts/personal-data/5
         [HttpGet("personal-data/{id}")]
         public async Task<ActionResult<PersonalDataResponseDto>> GetPersonalData(string id)
         {
@@ -85,7 +81,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // PUT: api/accounts/personal-data/5
         [HttpPut("personal-data/{id}")]
         public async Task<ActionResult<PersonalDataResponseDto>> UpdatePersonalData(
             string id,
@@ -123,7 +118,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // DELETE: api/accounts/users/5
         [HttpDelete("users/{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {

@@ -15,7 +15,6 @@ namespace Inventory.API.Controllers
             _cartService = cartService;
         }
 
-        // GET: api/carts
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<CartResponseDto>>> GetCart()
         {
@@ -23,7 +22,6 @@ namespace Inventory.API.Controllers
             return Ok(cartItems);
         }
 
-        // GET: api/carts/total
         [HttpGet("total")]
         public async Task<ActionResult<decimal>> GetCartTotal()
         {
@@ -31,7 +29,6 @@ namespace Inventory.API.Controllers
             return Ok(new { total });
         }
 
-        // POST: api/carts/items?productId=5&change=1
         [HttpPost("items")]
         public async Task<ActionResult<CartResponseDto>> AddOrUpdateItem([FromQuery] int productId, [FromQuery] int change = 1)
         {
@@ -49,7 +46,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // DELETE: api/carts/5
         [HttpDelete("{cartId:int}")]
         public async Task<IActionResult> RemoveItem(int cartId)
         {

@@ -38,12 +38,26 @@ namespace Inventory.Core.Services
                 var roles = await GetRolesForUserAsync(user.Id);
                 dto.Roles = roles;
                 dto.RoleName = roles.FirstOrDefault() ?? "User"; 
+
+
             }
+
             return dto;
         }
 
         public async Task<UserResponseDto> CreateUserAsync(RegisterRequestDto model)
         {
+            var existingUser = await _appUserRepo.GetFirstOrDefaultAsync(u =>
+                u.Email == model.Email || (!string.IsNullOrEmpty(model.Username) && u.UserName == model.Username));
+
+            if (existingUser != null)
+            {
+                if (existingUser.Email == model.Email)
+                    throw new InvalidOperationException($"The email '{model.Email}' is already in use.");
+
+                throw new InvalidOperationException($"The username '{model.Username}' is already taken.");
+            }
+
             var dto = await _appUserRepo.CreateFromDtoAsync<RegisterRequestDto, UserResponseDto>(model);
 
             var roleName = string.IsNullOrEmpty(model.RoleName) ? "User" : model.RoleName;
@@ -101,31 +115,17 @@ namespace Inventory.Core.Services
 
         public async Task<IReadOnlyList<UserResponseDto>> GetAllUsersAsync()
         {
-            var dtos = await _appUserRepo.GetAllDtoAsync<UserResponseDto>();
-            var userRoles = await _userRoleRepo.GetAllAsync();
-            var roles = await _roleRepo.GetAllAsync();
+            var users = await _appUserRepo.GetAllDtoAsync<UserResponseDto>();
 
-            var roleDict = roles.ToDictionary(r => r.Id, r => r.Name ?? string.Empty);
-            var userRoleLookup = userRoles
-                .GroupBy(ur => ur.UserId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(ur => roleDict.TryGetValue(ur.RoleId, out var name) ? name : null)
-                          .Where(n => !string.IsNullOrEmpty(n))
-                          .Cast<string>()
-                          .ToList()
-                );
-
-            foreach (var dto in dtos)
+            foreach (var user in users)
             {
-                if (userRoleLookup.TryGetValue(dto.Id, out var rolesList))
-                {
-                    dto.Roles = rolesList;
-                    dto.RoleName = rolesList.FirstOrDefault() ?? "User";
-                }
+                var roles = await GetRolesForUserAsync(user.Id);
+
+                user.Roles = roles;
+                user.RoleName = roles.FirstOrDefault() ?? "User";
             }
 
-            return dtos;
+            return users;
         }
 
 

@@ -15,7 +15,6 @@ namespace Inventory.API.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: api/categories
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<CategoryResponseDto>>> GetAllCategories()
         {
@@ -23,7 +22,6 @@ namespace Inventory.API.Controllers
             return Ok(categories);
         }
 
-        // GET: api/categories/index
         [HttpGet("index")]
         public async Task<ActionResult<CategoryIndexResponseDto>> GetCategoriesIndex()
         {
@@ -31,7 +29,6 @@ namespace Inventory.API.Controllers
             return Ok(indexData);
         }
 
-        // GET: api/categories/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CategoryResponseDto>> GetCategoryById(int id)
         {
@@ -42,7 +39,6 @@ namespace Inventory.API.Controllers
             return Ok(category);
         }
 
-        // POST: api/categories
         [HttpPost]
         public async Task<ActionResult<CategoryResponseDto>> CreateCategory([FromForm] CategoryRequestDto model)
         {
@@ -53,7 +49,6 @@ namespace Inventory.API.Controllers
             return CreatedAtAction(nameof(GetCategoryById), new { id = createdCategory.Id }, createdCategory);
         }
 
-        // PUT: api/categories/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<CategoryResponseDto>> UpdateCategory(int id, [FromForm] CategoryRequestDto model)
         {
@@ -71,7 +66,6 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // DELETE: api/categories/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

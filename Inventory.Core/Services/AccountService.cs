@@ -3,11 +3,6 @@ using Inventory.Core.Entities.Users.ApplicationRoles;
 using Inventory.Core.Entities.Users.ApplicationUsers;
 using Inventory.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Inventory.Core.Services
 {

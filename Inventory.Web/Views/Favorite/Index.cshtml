@@ -9,108 +9,111 @@
     @Html.AntiForgeryToken()
 </form>
 
-<div class="container py-3">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-danger">
-        <i class="bi bi-heart-fill me-2"></i>@Localizer["My Favorites"]
-    </h2>
-    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary shadow-sm">
-        <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to Products"]
-    </a>
-</div>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 d-flex align-items-center">
+                <span class="p-2 rounded-circle bg-danger-subtle text-danger me-2 d-inline-flex">
+                    <i class="bi bi-heart-fill fs-5"></i>
+                </span>
+                @Localizer["My Favorites"]
+            </h2>
+            <p class="text-muted mb-0 small">@Localizer["Items you have saved to your wishlist."]</p>
+        </div>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to Products"]
+        </a>
+    </div>
 
-@if (Model != null && Model.Any())
-{
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        @foreach (var item in Model)
+    <!-- Cards Grid -->
+    <div id="favorites-wrapper">
+        @if (Model != null && Model.Any())
         {
-            <div class="col" id="favorite-card-@item.Id">
-                <div class="card h-100 shadow-sm border-0 position-relative">
-                    <img src="@(string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg)"
-                         class="card-img-top object-fit-cover"
-                         alt="@item.ProductName"
-                         style="height: 180px;" />
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="favorites-container">
+                @foreach (var item in Model)
+                {
+                    var imgSrc = string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg;
+                    <div class="col" id="favorite-card-@item.Id">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative product-card">
 
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-semibold text-truncate mb-0">@(item.ProductName ?? Localizer["Unnamed Product"])</h5>
-                            <span class="badge bg-primary rounded-pill">$@item.ProductPrice.ToString("F2")</span>
-                        </div>
-
-                        <div class="mt-auto d-flex justify-content-between gap-2 pt-3 border-top">
-                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-info btn-sm flex-fill">
-                                <i class="bi bi-eye"></i> @Localizer["View Product"]
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeFavorite(@item.Id, '@item.ProductName')">
-                                <i class="bi bi-trash me-1"></i> @Localizer["Remove"]
+                            <!-- Floating Heart Action -->
+                            <button type="button"
+                                    class="btn btn-white bg-white text-danger rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
+                                    onclick="removeFavorite(@item.Id, '@item.ProductName')"
+                                    title="@Localizer["Remove from favorites"]"
+                                    style="width: 36px; height: 36px; z-index: 5;">
+                                <i class="bi bi-heart-fill fs-6"></i>
                             </button>
+
+                            <!-- Image Container -->
+                            <div class="bg-light p-3 d-flex align-items-center justify-content-center" style="height: 190px;">
+                                <img src="@imgSrc"
+                                     class="img-fluid object-fit-contain h-100 w-100"
+                                     alt="@item.ProductName"
+                                     onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                            </div>
+
+                            <!-- Body -->
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold text-dark text-truncate mb-2" title="@item.ProductName">
+                                    @(item.ProductName ?? Localizer["Unnamed Product"])
+                                </h6>
+
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <span class="fs-5 fw-bold text-primary">$@item.ProductPrice.ToString("F2")</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small">
+                                        @Localizer["In Stock"]
+                                    </span>
+                                </div>
+
+                                <div class="mt-auto d-flex">
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-info rounded-pill btn-sm flex-fill fw-semibold py-2">
+                                        <i class="bi bi-eye me-1"></i> @Localizer["View Product"]
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+                <div class="py-4">
+                    <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="bi bi-heartbreak display-4"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2">@Localizer["Your favorite list is empty"]</h4>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                        @Localizer["Explore our catalog and save your preferred products here!"]
+                    </p>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-grid-fill me-1"></i> @Localizer["Browse Products"]
+                    </a>
                 </div>
             </div>
         }
     </div>
-}
-else
-{
-    <div class="col-12">
-        <div class="alert alert-light text-center border shadow-sm p-5" role="alert">
-            <i class="bi bi-heartbreak text-muted display-4 d-block mb-3"></i>
-            <h4 class="fw-bold text-secondary">@Localizer["Your favorite list is empty"]</h4>
-            <p class="text-muted">@Localizer["Explore our catalog and save your preferred products here!"]</p>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-2">
-                @Localizer["Browse Products"]
-            </a>
-        </div>
-    </div>
-}
 </div>
+
+
 
 @section Scripts {
     <script>
-        function removeFavorite(favoriteId, name) {
-            Swal.fire({
-                title: 'Remove from Favorites?',
-                text: `Are you sure you want to remove "${name}" from your favorites?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, remove it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const token = $('input[name="__RequestVerificationToken"]').val();
-
-                    $.ajax({
-                        url: `@Url.Action("DeleteConfirmed", "Favorite")/${favoriteId}`,
-                        type: 'POST',
-                        headers: {
-                            "RequestVerificationToken": token
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: response.icon || 'info',
-                                title: 'Removed!',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                $(`#favorite-card-${favoriteId}`).fadeOut(300, function() {
-                                    $(this).remove();
-                                });
-                            });
-                        },
-                        error: function(xhr) {
-                            const err = xhr.responseJSON;
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: err ? err.message : 'Failed to remove favorite.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
+        window.FavoriteConfig = {
+            deleteUrl: '@Url.Action("DeleteConfirmed", "Favorite")',
+            texts: {
+                removeTitle: @Json.Serialize(Localizer["Remove from Favorites?"].Value),
+                removeConfirm: @Json.Serialize(Localizer["Are you sure you want to remove"].Value),
+                fromFavorites: @Json.Serialize(Localizer["from your favorites?"].Value),
+                yesRemove: @Json.Serialize(Localizer["Yes, remove it!"].Value),
+                removed: @Json.Serialize(Localizer["Removed!"].Value),
+                oops: @Json.Serialize(Localizer["Oops..."].Value),
+                errorDefault: @Json.Serialize(Localizer["Failed to remove favorite."].Value)
+            }
+        };
     </script>
+    <script src="~/js/Favorite/Index.js"></script>
 }

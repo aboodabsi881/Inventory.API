@@ -24,7 +24,6 @@
             <div class="row g-0">
 
                 <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-4 border-end position-relative">
-
                     <button type="button"
                             class="btn btn-light btn-sm rounded-circle position-absolute top-0 start-0 m-3 shadow-sm"
                             onclick="toggleFavorite(@Model.Id)"
@@ -66,7 +65,6 @@
                             </li>
                         </ul>
 
-                        <!-- 🛒 Pure Bootstrap Primary Cart Stepper (Identical to Index) -->
                         <div class="my-3" id="cart-control-container-@Model.Id">
                             @if (Model.QuantityInCart > 0)
                             {
@@ -101,18 +99,13 @@
                             }
                         </div>
 
-                        <!-- Bottom Action Buttons -->
                         <div class="mt-auto d-flex flex-wrap gap-2 border-top pt-3">
-
-                            <!-- Edit Button (Visible ONLY to Admins & SuperAdmins) -->
                             @if (isAdmin)
                             {
                                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 flex-fill fw-semibold">
                                     <i class="bi bi-pencil me-1"></i> @Localizer["Edit"]
                                 </a>
                             }
-
-                            <!-- Back to List Button -->
                             <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 flex-fill">
                                 <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to Products"]
                             </a>
@@ -127,133 +120,25 @@
 
 @section Scripts {
     <script>
-        const isAuthenticated = @(isAuthenticated.ToString().ToLower());
-
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true
-        });
-
-        function checkAuthOrRedirect() {
-            if (!isAuthenticated) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Sign In Required',
-                    text: 'Please log in to manage your cart and favorites.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sign In',
-                    confirmButtonColor: '#4f46e5'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/Accounts/Login';
-                    }
-                });
-                return false;
+        window.AppConfig = {
+            isAuthenticated: @(isAuthenticated.ToString().ToLower()),
+            loginUrl: '@Url.Action("Login", "Accounts")',
+            endpoints: {
+                cartAddOrUpdate: '@Url.Action("AddOrUpdate", "Cart")',
+                favoriteAdd: '@Url.Action("Add", "Favorite")'
+            },
+            texts: {
+                inCart: @Json.Serialize(Localizer["in cart"].Value),
+                addToCart: @Json.Serialize(Localizer["Add to Cart"].Value),
+                signInRequired: @Json.Serialize(Localizer["Sign In Required"].Value),
+                signInPrompt: @Json.Serialize(Localizer["Please log in to manage your cart and favorites."].Value),
+                signInBtn: @Json.Serialize(Localizer["Sign In"].Value),
+                cartRemoved: @Json.Serialize(Localizer["Item removed from cart"].Value),
+                cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
+                cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
+                favError: @Json.Serialize(Localizer["Failed to update favorite status."].Value)
             }
-            return true;
-        }
-
-        // 🛒 Add / Update Cart Quantity (Same logic as Index)
-        function updateCartQuantity(productId, change) {
-            if (!checkAuthOrRedirect()) return;
-
-            const token = $('input[name="__RequestVerificationToken"]').val();
-
-            $.ajax({
-                url: `@Url.Action("AddOrUpdate", "Cart")?productId=${productId}&change=${change}`,
-                type: 'POST',
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                success: function(response) {
-                    const container = $(`#cart-control-container-${productId}`);
-
-                    if (response.removed) {
-                        container.html(`
-                                    <button type="button"
-                                            class="btn btn-primary bg-primary-subtle text-primary border-0 w-100 rounded-pill py-2.5 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
-                                            onclick="updateCartQuantity(${productId}, 1)">
-                                        <i class="bi bi-bag-plus-fill fs-5"></i>
-                                        <span>Add to Cart</span>
-                                    </button>
-                                `);
-                        Toast.fire({ icon: 'info', title: 'Item removed from cart' });
-                    } else if (response.item) {
-                        const newQty = response.item.quantity;
-
-                        container.html(`
-                                    <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-3 py-2 shadow-sm" style="min-height: 45px;">
-                                        <button type="button"
-                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                                style="width: 32px; height: 32px;"
-                                                onclick="updateCartQuantity(${productId}, -1)">
-                                            <i class="bi bi-dash-lg fs-6"></i>
-                                        </button>
-
-                                        <span class="fw-bold px-3 fs-6 user-select-none" id="card-qty-${productId}">
-                                            ${newQty} <small class="fw-normal text-white-50 ms-1 small">in cart</small>
-                                        </span>
-
-                                        <button type="button"
-                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                                style="width: 32px; height: 32px;"
-                                                onclick="updateCartQuantity(${productId}, 1)">
-                                            <i class="bi bi-plus-lg fs-6"></i>
-                                        </button>
-                                    </div>
-                                `);
-
-                        Toast.fire({ icon: 'success', title: 'Cart updated' });
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.status === 401) {
-                        checkAuthOrRedirect();
-                    } else {
-                        Toast.fire({ icon: 'error', title: 'Failed to update cart.' });
-                    }
-                }
-            });
-        }
-
-        // ❤️ Toggle Favorite Status
-        function toggleFavorite(productId) {
-            if (!checkAuthOrRedirect()) return;
-
-            const token = $('input[name="__RequestVerificationToken"]').val();
-
-            $.ajax({
-                url: '@Url.Action("Add", "Favorite")',
-                type: 'POST',
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                data: { productId: productId },
-                success: function(response) {
-                    const icon = $(`#fav-icon-${productId}`);
-
-                    if (response.isFavorite) {
-                        icon.removeClass('bi-heart text-secondary').addClass('bi-heart-fill text-danger');
-                    } else {
-                        icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart text-secondary');
-                    }
-
-                    Toast.fire({
-                        icon: response.icon || 'success',
-                        title: response.message
-                    });
-                },
-                error: function(xhr) {
-                    if (xhr.status === 401) {
-                        checkAuthOrRedirect();
-                    } else {
-                        Toast.fire({ icon: 'error', title: 'Failed to update favorite status.' });
-                    }
-                }
-            });
-        }
+        };
     </script>
+    <script src="~/js/Product/Details.js"></script>
 }

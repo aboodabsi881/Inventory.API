@@ -5,262 +5,170 @@
     ViewData["Title"] = "Products";
 }
 
-
-
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
-<div class="container py-3">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-dark"><i class="bi bi-box-seam me-2 text-primary"></i>@Localizer["Products"]</h2>
-    <a asp-action="Create" class="btn btn-primary shadow-sm">
-        <i class="bi bi-plus-circle me-1"></i> @Localizer["Add New Product"]
-    </a>
-</div>
 
-@if (Model != null && Model.Any())
-{
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bolder text-dark mb-1 d-flex align-items-center">
+                <span class="p-2 rounded-circle bg-primary-subtle text-primary me-2 d-inline-flex">
+                    <i class="bi bi-box-seam-fill fs-5"></i>
+                </span>
+                @Localizer["Products Catalog"]
+            </h2>
+            <p class="text-muted mb-0 small">@Localizer["Manage inventory, update stock items, and adjust prices."]</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>@Localizer["Add New Product"]</span>
+        </a>
+    </div>
 
-        @foreach (var item in Model)
+    <!-- Products Grid -->
+    <div id="products-wrapper">
+        @if (Model != null && Model.Any())
         {
-            <div class="col" id="product-card-@item.Id">
-                <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="products-container">
+                @foreach (var item in Model)
+                {
+                    var imgSrc = string.IsNullOrEmpty(item.Img) ? "/images/placeholder.png" : item.Img;
+                    <div class="col" id="product-card-@item.Id">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative product-card">
 
-                    <!-- Favorite Toggle Button -->
-                    <button type="button"
-                            class="btn btn-light btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm favorite-btn"
-                            id="fav-btn-@item.Id"
-                            onclick="toggleFavorite(@item.Id)"
-                            style="z-index: 10; width: 36px; height: 36px;">
-                        <i class="bi @(item.IsFavorite ? "bi-heart-fill text-danger" : "bi-heart text-secondary") fs-5" id="fav-icon-@item.Id"></i>
-                    </button>
+                            <!-- Favorite Action Button -->
+                            <button type="button"
+                                    class="btn btn-white bg-white rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
+                                    id="fav-btn-@item.Id"
+                                    onclick="toggleFavorite(@item.Id)"
+                                    title="@Localizer["Toggle favorite"]"
+                                    style="width: 36px; height: 36px; z-index: 5;">
+                                <i class="bi @(item.IsFavorite ? "bi-heart-fill text-danger" : "bi-heart text-secondary") fs-6" id="fav-icon-@item.Id"></i>
+                            </button>
 
-                    <!-- 💡 Full image display with click-to-enlarge lightbox -->
-                    <a href="javascript:void(0)"
-                       onclick="showFullImage('@(string.IsNullOrEmpty(item.Img) ? "/images/placeholder.png" : item.Img)', '@item.Name')">
-                        <img src="@(string.IsNullOrEmpty(item.Img) ? "/images/placeholder.png" : item.Img)"
-                             class="card-img-top object-fit-contain p-2 bg-light border-bottom"
-                             alt="@item.Name"
-                             style="height: 180px; cursor: pointer;"
-                             title="Click to view full image" />
-                    </a>
+                            <!-- Image Container -->
+                            <div class="bg-light p-3 d-flex align-items-center justify-content-center position-relative product-img-wrap" style="height: 190px;">
+                                <a href="javascript:void(0)"
+                                   onclick="showFullImage('@imgSrc', '@item.Name')"
+                                   class="w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none">
+                                    <img src="@imgSrc"
+                                         class="img-fluid object-fit-contain h-100 w-100 product-img"
+                                         alt="@item.Name"
+                                         onerror="this.onerror=null; this.src='/images/placeholder.png';"
+                                         title="@Localizer["Click to enlarge"]" />
+                                </a>
+                            </div>
 
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-semibold text-truncate mb-0">@item.Name</h5>
-                            <span class="badge bg-primary rounded-pill">$@item.Price.ToString("F2")</span>
-                        </div>
-
-                        <p class="card-text text-muted small mb-2">
-                            <i class="bi bi-tag me-1"></i>@(string.IsNullOrEmpty(item.Category?.Name) ? @Localizer["Uncategorized"] : item.Category.Name)
-                        </p>
-
-                        <!-- Pure Bootstrap Primary Cart Stepper -->
-                        <div class="my-2" id="cart-control-container-@item.Id">
-                            @if (item.QuantityInCart > 0)
-                            {
-                                <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
-                                    <button type="button"
-                                            class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                            style="width: 28px; height: 28px;"
-                                            onclick="updateCartQuantity(@item.Id, -1)">
-                                        <i class="bi bi-dash-lg"></i>
-                                    </button>
-
-                                    <span class="fw-bold px-3 fs-6 user-select-none" id="card-qty-@item.Id">
-                                        @item.QuantityInCart <small class="fw-normal text-white-50 ms-1 small">in cart</small>
+                            <!-- Card Body -->
+                            <div class="card-body d-flex flex-column p-3">
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2 py-1 small text-truncate" style="max-width: 100%;">
+                                        <i class="bi bi-tag me-1"></i>@(string.IsNullOrEmpty(item.Category?.Name) ? Localizer["Uncategorized"] : item.Category.Name)
                                     </span>
+                                </div>
 
-                                    <button type="button"
-                                            class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                            style="width: 28px; height: 28px;"
-                                            onclick="updateCartQuantity(@item.Id, 1)">
-                                        <i class="bi bi-plus-lg"></i>
+                                <h6 class="card-title fw-bold text-dark text-truncate mb-2" title="@item.Name">
+                                    @item.Name
+                                </h6>
+
+                                <div class="d-flex align-items-baseline gap-1 mb-3">
+                                    <span class="fs-4 fw-bolder text-primary">$@item.Price.ToString("F2")</span>
+                                </div>
+
+                                <!-- Dynamic Cart Control Stepper -->
+                                <div class="my-2" id="cart-control-container-@item.Id">
+                                    @if (item.QuantityInCart > 0)
+                                    {
+                                        <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
+                                            <button type="button"
+                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                                    style="width: 28px; height: 28px;"
+                                                    onclick="updateCartQuantity(@item.Id, -1)">
+                                                <i class="bi bi-dash-lg"></i>
+                                            </button>
+
+                                            <span class="fw-bold px-2 fs-6 user-select-none" id="card-qty-@item.Id">
+                                                @item.QuantityInCart <small class="fw-normal text-white-50 ms-1 small">@Localizer["in cart"]</small>
+                                            </span>
+
+                                            <button type="button"
+                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                                    style="width: 28px; height: 28px;"
+                                                    onclick="updateCartQuantity(@item.Id, 1)">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn btn-outline-primary w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
+                                                onclick="updateCartQuantity(@item.Id, 1)">
+                                            <i class="bi bi-bag-plus fs-6"></i>
+                                            <span>@Localizer["Add to Cart"]</span>
+                                        </button>
+                                    }
+                                </div>
+
+                                <!-- Card Footer Actions -->
+                                <div class="mt-auto d-flex justify-content-between gap-1 pt-3 border-top">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light btn-sm rounded-pill flex-fill text-muted fw-semibold">
+                                        <i class="bi bi-eye"></i> @Localizer["View"]
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-light btn-sm rounded-pill flex-fill text-warning-emphasis fw-semibold">
+                                        <i class="bi bi-pencil"></i> @Localizer["Edit"]
+                                    </a>
+                                    <button type="button" class="btn btn-light btn-sm rounded-pill px-3 text-danger" onclick="deleteProduct(@item.Id, '@item.Name')">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
-                            }
-                            else
-                            {
-                                <button type="button"
-                                        class="btn btn-primary bg-primary-subtle text-primary border-0 w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
-                                        onclick="updateCartQuantity(@item.Id, 1)">
-                                    <i class="bi bi-bag-plus-fill fs-6"></i>
-                                    <span>Add to Cart</span>
-                                </button>
-                            }
-                        </div>
-
-                        <div class="mt-auto d-flex justify-content-between gap-2 pt-2 border-top">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm flex-fill">
-                                <i class="bi bi-eye"></i> @Localizer["Details"]
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm flex-fill">
-                                <i class="bi bi-pencil"></i> @Localizer["Edit"]
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteProduct(@item.Id, '@item.Name')">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            </div>
                         </div>
                     </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+                <div class="py-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="bi bi-box-seam display-4"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2">@Localizer["No products found"]</h4>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                        @Localizer["Get started by adding your first product to the inventory database."]
+                    </p>
+                    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> @Localizer["Add New Product"]
+                    </a>
                 </div>
             </div>
         }
     </div>
-    }
-    else
-    {
-            <div class="alert alert-info text-center" role="alert">
-                @Localizer["No products found. Click"] <strong>@Localizer["Add New Product"]</strong> @Localizer["to create one!"]
-            </div>
-    }
 </div>
+
 @section Scripts {
     <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true
-        });
-
-        function updateCartQuantity(productId, change) {
-            const token = $('input[name="__RequestVerificationToken"]').val();
-
-            $.ajax({
-                url: `@Url.Action("AddOrUpdate", "Cart")?productId=${productId}&change=${change}`,
-                type: 'POST',
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                success: function(response) {
-                    const container = $(`#cart-control-container-${productId}`);
-
-                    if (response.removed) {
-                        container.html(`
-                                    <button type="button"
-                                            class="btn btn-primary bg-primary-subtle text-primary border-0 w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
-                                            onclick="updateCartQuantity(${productId}, 1)">
-                                        <i class="bi bi-bag-plus-fill fs-6"></i>
-                                        <span>Add to Cart</span>
-                                    </button>
-                                `);
-                        Toast.fire({ icon: 'info', title: 'Item removed from cart' });
-                    } else if (response.item) {
-                        const newQty = response.item.quantity;
-
-                        container.html(`
-                                    <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
-                                        <button type="button"
-                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                                style="width: 28px; height: 28px;"
-                                                onclick="updateCartQuantity(${productId}, -1)">
-                                            <i class="bi bi-dash-lg"></i>
-                                        </button>
-
-                                        <span class="fw-bold px-3 fs-6 user-select-none" id="card-qty-${productId}">
-                                            ${newQty} <small class="fw-normal text-white-50 ms-1 small">in cart</small>
-                                        </span>
-
-                                        <button type="button"
-                                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25"
-                                                style="width: 28px; height: 28px;"
-                                                onclick="updateCartQuantity(${productId}, 1)">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </div>
-                                `);
-
-                        Toast.fire({ icon: 'success', title: 'Cart updated' });
-                    }
-                },
-                error: function(xhr) {
-                    console.error("AJAX Error Details:", xhr);
-                    Toast.fire({ icon: 'error', title: 'Failed to update cart.' });
-                }
-            });
-        }
-
-        function toggleFavorite(productId) {
-            const token = $('input[name="__RequestVerificationToken"]').val();
-
-            $.ajax({
-                url: '@Url.Action("Add", "Favorite")',
-                type: 'POST',
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                data: { productId: productId },
-                success: function(response) {
-                    const icon = $(`#fav-icon-${productId}`);
-
-                    if (response.isFavorite) {
-                        icon.removeClass('bi-heart text-secondary').addClass('bi-heart-fill text-danger');
-                    } else {
-                        icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart text-secondary');
-                    }
-
-                    Toast.fire({
-                        icon: response.icon || 'success',
-                        title: response.message
-                    });
-                },
-                error: function() {
-                    Toast.fire({ icon: 'error', title: 'Failed to update favorite status.' });
-                }
-            });
-        }
-
-        function deleteProduct(id, name) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you really want to delete the product "${name}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const token = $('input[name="__RequestVerificationToken"]').val();
-
-                    $.ajax({
-                        url: `@Url.Action("DeleteConfirmed")/${id}`,
-                        type: 'POST',
-                        data: { __RequestVerificationToken: token },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: response.icon || 'success',
-                                title: 'Deleted!',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                $(`#product-card-${id}`).fadeOut(300, function() {
-                                    $(this).remove();
-                                });
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        function showFullImage(imgUrl, productName) {
-            Swal.fire({
-                title: productName || 'Product Image',
-                imageUrl: imgUrl,
-                imageAlt: productName,
-                imageWidth: 500,
-                imageHeight: 'auto',
-                showConfirmButton: false,
-                showCloseButton: true,
-                background: '#fff',
-                customClass: {
-                    image: 'img-fluid rounded shadow-sm'
-                }
-            });
-        }
+        window.ProductConfig = {
+            cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
+            favoriteUrl: '@Url.Action("Add", "Favorite")',
+            deleteUrl: '@Url.Action("DeleteConfirmed", "Products")',
+            texts: {
+                inCart: @Json.Serialize(Localizer["in cart"].Value),
+                addToCart: @Json.Serialize(Localizer["Add to Cart"].Value),
+                cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
+                itemRemoved: @Json.Serialize(Localizer["Item removed from cart"].Value),
+                cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
+                favError: @Json.Serialize(Localizer["Failed to update favorite status."].Value),
+                areYouSure: @Json.Serialize(Localizer["Are you sure?"].Value),
+                deleteConfirm: @Json.Serialize(Localizer["Do you really want to delete the product"].Value),
+                yesDelete: @Json.Serialize(Localizer["Yes, delete it!"].Value),
+                deleted: @Json.Serialize(Localizer["Deleted!"].Value)
+            }
+        };
     </script>
+    <script src="~/js/Product/Index.js"></script>
 }

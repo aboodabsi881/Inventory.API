@@ -1,0 +1,43 @@
+﻿$('#registerForm').on('submit', function (e) {
+    e.preventDefault();
+
+    if (!$(this).valid()) return;
+
+    const $form = $(this);
+    const formData = new FormData(this);
+
+    $.ajax({
+        url: $form.attr('action') || '/Accounts/Register',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            Swal.fire({
+                icon: response.icon || 'success',
+                title: '@Localizer["Success!"]',
+                text: response.message || '@Localizer["User registered successfully!"]',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = response.redirectUrl || '/Accounts/Login';
+            });
+        },
+        error: function (xhr) {
+            const err = xhr.responseJSON;
+            let errorMessage = '@Localizer["Validation failed or server error."]';
+
+            if (err && err.errors) {
+                errorMessage = Object.values(err.errors).flat().join('<br/>');
+            } else if (err && err.message) {
+                errorMessage = err.message;
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: '@Localizer["Registration Failed"]',
+                html: errorMessage
+            });
+        }
+    });
+});

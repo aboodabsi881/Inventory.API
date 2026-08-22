@@ -20,24 +20,37 @@ namespace Inventory.Data.Services
 
         public async Task<IReadOnlyList<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
         {
-            IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
-            if (include != null) query = include(query);
+            IQueryable<TEntity> query = _context.Set<TEntity>()
+                                                        .AsNoTracking();
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
             return await query.ToListAsync();
         }
 
         public async Task<TEntity?> GetByIdAsync(int id)
         {
-            return await _context.Set<TEntity>().FindAsync(id);
+            return await _context.Set<TEntity>()
+                                        .FindAsync(id);
         }
 
-        public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
+        public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null) 
         {
-            IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
-            if (include != null) query = include(query);
+            IQueryable<TEntity> query = _context.Set<TEntity>()
+                                                        .AsNoTracking();
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
             return await query.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task AddAsync(TEntity entity)
+        public async Task AddAsync(TEntity entity)  
         {
             await _context.Set<TEntity>().AddAsync(entity);
         }
@@ -57,7 +70,7 @@ namespace Inventory.Data.Services
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyList<TResponseDto>> GetAllDtoAsync<TResponseDto>(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null) where TResponseDto : class
+        public async Task<IReadOnlyList<TResponseDto>> GetAllDtoAsync<TResponseDto>(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null) where TResponseDto : class 
         {
             var entities = await GetAllAsync(include);
             return _mapper.Map<IReadOnlyList<TResponseDto>>(entities);

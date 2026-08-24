@@ -13,13 +13,12 @@
 
 <div class="container py-4">
     <!-- Category Banner Card -->
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5 bg-white">
+    <div class="card border shadow-sm rounded-4 overflow-hidden mb-5 cat-detail-card">
         <div class="card-body p-4 p-md-5">
             <div class="d-flex flex-column flex-md-row align-items-center gap-4">
 
-                <div class="category-banner-preview position-relative rounded-4 p-2 bg-light border shadow-sm flex-shrink-0"
-                     data-img="@categoryImg"
-                     data-name="@Model.Name"
+                <div class="category-banner-preview position-relative rounded-4 p-2 border shadow-sm flex-shrink-0 img-surface-wrap"
+                     onclick="showLightbox('@categoryImg', '@Model.Name')"
                      style="cursor: pointer;">
                     <img src="@categoryImg"
                          class="img-fluid rounded-3 object-fit-contain"
@@ -27,7 +26,7 @@
                          alt="@Model.Name"
                          onerror="this.onerror=null; this.src='/images/placeholder.png';"
                          title="@Localizer["Click to enlarge"]" />
-                    <span class="position-absolute bottom-0 end-0 bg-white rounded-circle p-1 m-1 shadow-sm text-muted small d-flex">
+                    <span class="position-absolute bottom-0 end-0 rounded-circle p-1 m-1 shadow-sm text-muted small d-flex fav-floating-btn">
                         <i class="bi bi-arrows-fullscreen"></i>
                     </span>
                 </div>
@@ -36,18 +35,18 @@
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-2 small fw-semibold">
                         <i class="bi bi-tag-fill me-1"></i> @Localizer["Category Overview"]
                     </span>
-                    <h2 class="fw-bolder text-dark mb-2">@Model.Name</h2>
-                    <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 text-muted small">
+                    <h2 class="fw-bolder cat-heading mb-2">@Model.Name</h2>
+                    <div class="d-inline-flex align-items-center rounded-pill px-3 py-1 small stat-pill-box">
                         <i class="bi bi-box-seam text-primary me-2"></i>
-                        <span>@Localizer["Total Products"]: <strong class="text-dark">@totalProducts</strong></span>
+                        <span>@Localizer["Total Products"]: <strong class="stat-value">@totalProducts</strong></span>
                     </div>
                 </div>
 
-                <div class="d-flex gap-2 w-100 w-md-auto justify-content-center">
+                <div class="d-flex gap-2 w-md-auto justify-content-center">
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 shadow-sm fw-semibold">
                         <i class="bi bi-pencil me-1"></i> @Localizer["Edit"]
                     </a>
-                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-action-back rounded-pill px-4 shadow-sm">
                         <i class="bi bi-arrow-left me-1"></i> @Localizer["Back"]
                     </a>
                 </div>
@@ -58,11 +57,11 @@
     <!-- Products Sub-Section Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
-            <h4 class="fw-bold text-dark mb-1 d-flex align-items-center">
+            <h4 class="fw-bold cat-heading mb-1 d-flex align-items-center">
                 <i class="bi bi-grid-3x3-gap-fill text-primary me-2 fs-5"></i>
                 @Localizer["Products in this Category"]
             </h4>
-            <p class="text-muted small mb-0">@Localizer["Browse and manage products assigned under this group."]</p>
+            <p class="cat-subtitle mb-0 small">@Localizer["Browse and manage products assigned under this group."]</p>
         </div>
     </div>
 
@@ -75,11 +74,11 @@
                 {
                     var prodImg = string.IsNullOrEmpty(product.Img) ? "/images/placeholder.png" : product.Img;
                     <div class="col" id="product-card-@product.Id">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative product-card">
+                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card cat-detail-card">
 
                             <!-- Favorite Action Button -->
                             <button type="button"
-                                    class="btn btn-white bg-white rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
+                                    class="btn rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
                                     id="fav-btn-@product.Id"
                                     onclick="toggleFavorite(@product.Id)"
                                     title="@Localizer["Toggle favorite"]"
@@ -88,11 +87,10 @@
                             </button>
 
                             <!-- Product Image -->
-                            <div class="bg-light p-3 d-flex align-items-center justify-content-center position-relative product-img-wrap" style="height: 180px;">
+                            <div class="p-3 d-flex align-items-center justify-content-center position-relative product-img-wrap img-surface-wrap" style="height: 180px;">
                                 <a href="javascript:void(0)"
-                                   class="product-image-preview w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none"
-                                   data-img="@prodImg"
-                                   data-name="@product.Name">
+                                   class="w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none"
+                                   onclick="showLightbox('@prodImg', '@product.Name')">
                                     <img src="@prodImg"
                                          class="img-fluid object-fit-contain h-100 w-100 product-img"
                                          alt="@product.Name"
@@ -103,12 +101,12 @@
 
                             <!-- Card Body -->
                             <div class="card-body d-flex flex-column p-3">
-                                <h6 class="card-title fw-bold text-dark text-truncate mb-2" title="@product.Name">
+                                <h6 class="card-title fw-bold product-name-heading text-truncate mb-2" title="@product.Name">
                                     @product.Name
                                 </h6>
 
                                 <div class="d-flex align-items-baseline gap-1 mb-3">
-                                    <span class="fs-5 fw-bolder text-primary">$@product.Price.ToString("F2")</span>
+                                    <span class="fs-5 fw-bolder text-primary" dir="ltr">$@product.Price.ToString("F2")</span>
                                 </div>
 
                                 <!-- Dynamic Cart Control Stepper -->
@@ -123,8 +121,8 @@
                                                 <i class="bi bi-dash-lg"></i>
                                             </button>
 
-                                            <span class="fw-bold px-1 fs-6 user-select-none text-truncate" id="card-qty-${product.Id}">
-                                                @product.QuantityInCart <small class="fw-normal text-white-50 ms-1 small">@Localizer["in cart"]</small>
+                                            <span class="fw-bold px-1 fs-6 user-select-none text-truncate" id="card-qty-@product.Id">
+                                                <span class="qty-num" dir="ltr">@product.QuantityInCart</span> <small class="fw-normal text-white-50 ms-1 small">@Localizer["in cart"]</small>
                                             </span>
 
                                             <button type="button"
@@ -147,8 +145,12 @@
                                 </div>
 
                                 <div class="mt-auto pt-3 border-top">
-                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-light rounded-pill btn-sm w-100 fw-semibold text-muted">
-                                        <i class="bi bi-eye me-1"></i> @Localizer["View Details"]
+                                    <a asp-controller="Products"
+                                       asp-action="Details"
+                                       asp-route-id="@product.Id"
+                                       asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)"
+                                       class="btn btn-action-view btn-view-details rounded-pill btn-sm w-100 fw-semibold">
+                                        <i class="bi bi-info-circle me-1"></i> @Localizer["Details"]
                                     </a>
                                 </div>
                             </div>
@@ -159,13 +161,13 @@
         }
         else
         {
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-3">
+            <div class="card border shadow-sm rounded-4 p-5 text-center my-3 cat-detail-card">
                 <div class="py-3">
                     <div class="bg-secondary-subtle text-secondary rounded-circle d-inline-flex p-3 mb-3">
                         <i class="bi bi-inbox fs-2"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1">@Localizer["No products in this category yet"]</h5>
-                    <p class="text-muted small mx-auto mb-0" style="max-width: 380px;">
+                    <h5 class="fw-bold cat-heading mb-1">@Localizer["No products in this category yet"]</h5>
+                    <p class="cat-subtitle small mx-auto mb-0" style="max-width: 380px;">
                         @Localizer["Assign products to this category from the product management screen."]
                     </p>
                 </div>
@@ -176,18 +178,14 @@
 
 @section Scripts {
     <script>
-        window.CategoryDetailsConfig = {
-            cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
+            window.CategoryDetailsConfig = {
+        cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
             favoriteUrl: '@Url.Action("Add", "Favorite")',
-            texts: {
-                inCart: @Json.Serialize(Localizer["in cart"].Value),
-                addToCart: @Json.Serialize(Localizer["Add to Cart"].Value),
-                cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
-                itemRemoved: @Json.Serialize(Localizer["Item removed from cart"].Value),
-                cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
-                favError: @Json.Serialize(Localizer["Failed to update favorite status."].Value)
-            }
-        };
+                labels: {
+                    inCart: @Json.Serialize(Localizer["in cart"].Value),
+                    addToCart: @Json.Serialize(Localizer["Add to Cart"].Value)
+                }
+            };
     </script>
     <script src="~/js/Category/Details.js" asp-append-version="true"></script>
 }

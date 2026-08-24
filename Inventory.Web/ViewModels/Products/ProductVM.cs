@@ -17,6 +17,8 @@ namespace Inventory.Web.ViewModels.Products
         public bool IsFavorite { get; set; }
         public int QuantityInCart { get; set; }
         public CategoryDetailsVM? Category { get; set; }
+        public string? CategoryName { get; set; }
+        public int CategoryId { get; set; }
         public string? CreatedBy { get; set; }
     }
 }

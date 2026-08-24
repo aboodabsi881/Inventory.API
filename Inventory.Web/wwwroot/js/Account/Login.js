@@ -1,4 +1,21 @@
 ﻿$(function () {
+    // Helper function to get theme-aware SweetAlert configuration
+    function getThemeSwalConfig(options) {
+        const isDark = $('html').attr('data-bs-theme') === 'dark' ||
+            $('body').attr('data-bs-theme') === 'dark' ||
+            localStorage.getItem('theme') === 'dark';
+
+        const themeDefaults = {
+            background: isDark ? '#1e293b' : '#ffffff',
+            color: isDark ? '#f8fafc' : '#0f172a',
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: isDark ? '#334155' : '#64748b'
+        };
+
+        return Object.assign({}, themeDefaults, options);
+    }
+
+    // Toggle Password Visibility
     $('#togglePassword').on('click', function () {
         const $input = $('#passwordInput');
         const $icon = $('#toggleIcon');
@@ -22,7 +39,7 @@
 
         setTimeout(() => {
             $btn.removeClass('btn-danger').addClass('btn-primary');
-            $text.text('@Localizer["Sign In"]');
+            $text.text($btn.data('default-text') || 'Sign In');
         }, 3000);
     }
 
@@ -34,32 +51,40 @@
         const $text = $('#submitText');
 
         if (!$form.valid()) {
-            setButtonError($btn, $text, $spinner, '@Localizer["Please fill all required fields"]');
+            setButtonError($btn, $text, $spinner, 'Please fill all required fields');
             return;
+        }
+
+        // Store original button text if not already cached
+        if (!$btn.data('default-text')) {
+            $btn.data('default-text', $text.text());
         }
 
         $btn.prop('disabled', true);
         $spinner.removeClass('d-none');
-        $text.text('@Localizer["Signing in..."]');
+        $text.text('Signing in...');
 
         $.ajax({
             url: $form.attr('action') || '/Accounts/Login',
             type: 'POST',
             data: $form.serialize(),
             success: function (response) {
-                Swal.fire({
+                $spinner.addClass('d-none');
+                $btn.prop('disabled', false);
+
+                Swal.fire(getThemeSwalConfig({
                     icon: response.icon || 'success',
-                    title: '@Localizer["Welcome!"]',
-                    text: response.message || '@Localizer["Login successful!"]',
+                    title: 'Welcome!',
+                    text: response.message || 'Login successful!',
                     timer: 1200,
                     showConfirmButton: false
-                }).then(() => {
+                })).then(() => {
                     window.location.href = response.redirectUrl || '/Home/Index';
                 });
             },
             error: function (xhr) {
                 const err = xhr.responseJSON;
-                let errorMessage = '@Localizer["Invalid credentials"]';
+                let errorMessage = 'Invalid credentials';
 
                 if (err && err.message) {
                     errorMessage = err.message;
@@ -69,11 +94,11 @@
 
                 setButtonError($btn, $text, $spinner, errorMessage);
 
-                Swal.fire({
+                Swal.fire(getThemeSwalConfig({
                     icon: 'error',
-                    title: '@Localizer["Login Failed"]',
-                    text: response.message || errorMessage,
-                });
+                    title: 'Login Failed',
+                    text: errorMessage
+                }));
             }
         });
     });

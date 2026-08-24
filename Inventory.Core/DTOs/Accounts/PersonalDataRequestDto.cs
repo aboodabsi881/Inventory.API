@@ -17,6 +17,6 @@ namespace Inventory.Core.DTOs
         public string? RoleName { get; set; }
 
         public string? Img { get; set; }
-        public string? Username { get; internal set; }
+        public string? Username { get; set; }
     }
 }

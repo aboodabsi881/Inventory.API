@@ -2,20 +2,30 @@
 @model IEnumerable<CartVM>
 
 @{
-    ViewData["Title"] = "Shopping Cart";
+    ViewData["Title"] = Localizer["Shopping Cart"];
     decimal grandTotal = ViewBag.GrandTotal ?? 0;
+    var isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var minusRoundedClass = isRtl ? "rounded-end-pill" : "rounded-start-pill";
+    var plusRoundedClass = isRtl ? "rounded-start-pill" : "rounded-end-pill";
 }
 
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
 
-<div class="container py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">
-            <i class="bi bi-cart3 me-2"></i>@Localizer["Shopping Cart"]
-        </h2>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary shadow-sm">
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold header-title mb-1 d-flex align-items-center">
+                <span class="p-2 rounded-circle bg-primary-subtle text-primary me-2 d-inline-flex">
+                    <i class="bi bi-cart3 fs-5"></i>
+                </span>
+                @Localizer["Shopping Cart"]
+            </h2>
+            <p class="header-subtitle mb-0 small">@Localizer["Review your items, update quantities, and proceed to checkout."]</p>
+        </div>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-action-back rounded-pill px-4 shadow-sm fw-semibold">
             <i class="bi bi-arrow-left me-1"></i> @Localizer["Continue Shopping"]
         </a>
     </div>
@@ -25,16 +35,16 @@
         <div class="row g-4">
             <!-- Cart Items Table -->
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border rounded-4 overflow-hidden">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" id="cartTable">
-                            <thead class="table-light">
+                        <table class="table table-hover table-custom align-middle mb-0" id="cartTable">
+                            <thead>
                                 <tr>
-                                    <th style="width: 40%;">@Localizer["Product"]</th>
+                                    <th style="width: 40%;" class="ps-4">@Localizer["Product"]</th>
                                     <th style="width: 15%;">@Localizer["Price"]</th>
                                     <th class="text-center" style="width: 20%;">@Localizer["Quantity"]</th>
                                     <th style="width: 15%;">@Localizer["Total"]</th>
-                                    <th class="text-end" style="width: 10%;">@Localizer["Action"]</th>
+                                    <th class="text-end pe-4" style="width: 10%;">@Localizer["Action"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,39 +54,52 @@
                                     var calculatedTotal = item.TotalPrice > 0 ? item.TotalPrice : (item.Quantity * item.ProductPrice);
 
                                     <tr id="cart-row-@item.Id">
-                                        <td style="width: 45%;">
+                                        <td class="ps-4" style="width: 45%;">
                                             <div class="d-flex align-items-center">
                                                 <a href="javascript:void(0)"
-                                                   onclick="showFullImage('@imgUrl', '@item.ProductName')">
+                                                   onclick="showFullImage('@imgUrl', '@item.ProductName')"
+                                                   class="me-3 flex-shrink-0">
                                                     <img src="@imgUrl"
-                                                         class="rounded me-3 object-fit-contain shadow-sm border bg-light"
-                                                         style="width: 85px; height: 85px; min-width: 85px; cursor: pointer;"
+                                                         class="rounded-3 object-fit-contain shadow-sm border img-surface-wrap p-1"
+                                                         style="width: 75px; height: 75px; min-width: 75px; cursor: pointer;"
                                                          alt="@item.ProductName"
                                                          title="@Localizer["Click to view full image"]" />
                                                 </a>
-                                                <div>
-                                                    <h6 class="fw-bold mb-1 text-dark text-truncate" style="max-width: 250px;">
-                                                        @(item.ProductName ?? Localizer["Unnamed Product"])
+                                                <div class="text-truncate">
+                                                    <h6 class="fw-bold mb-1 product-name-heading text-truncate" style="max-width: 230px;" title="@item.ProductName">
+                                                        @(item.ProductName ?? Localizer["Unnamed Product"].Value)
                                                     </h6>
                                                     <small class="text-muted">@Localizer["Click image to enlarge"]</small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="fw-semibold text-secondary" id="price-@item.ProductId" data-price="@item.ProductPrice">
+                                        <td class="fw-semibold text-main" id="price-@item.ProductId" data-price="@item.ProductPrice">
                                             $@item.ProductPrice.ToString("F2")
                                         </td>
                                         <td>
                                             <div class="input-group input-group-sm justify-content-center">
-                                                <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(@item.ProductId, -1)">-</button>
-                                                <span class="input-group-text bg-white px-3 fw-bold" id="qty-@item.ProductId">@item.Quantity</span>
-                                                <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(@item.ProductId, 1)">+</button>
+                                                <button type="button"
+                                                        class="btn btn-action-back @minusRoundedClass px-2.5"
+                                                        onclick="updateQuantity(@item.ProductId, -1)">
+                                                    -
+                                                </button>
+
+                                                <span class="input-group-text bg-body-secondary border text-main px-3 fw-bold user-select-none"
+                                                      id="qty-@item.ProductId"
+                                                      dir="ltr">@item.Quantity</span>
+
+                                                <button type="button"
+                                                        class="btn btn-action-back @plusRoundedClass px-2.5"
+                                                        onclick="updateQuantity(@item.ProductId, 1)">
+                                                    +
+                                                </button>
                                             </div>
                                         </td>
                                         <td class="fw-bold text-success" id="total-@item.ProductId">
                                             $@calculatedTotal.ToString("F2")
                                         </td>
-                                        <td class="text-end">
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(@item.Id, '@item.ProductName')">
+                                        <td class="text-end pe-4">
+                                            <button type="button" class="btn btn-action-delete btn-sm rounded-pill px-2.5" onclick="removeItem(@item.Id, '@item.ProductName')" title="@Localizer["Remove Item"]">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -90,22 +113,26 @@
 
             <!-- Order Summary Sidebar -->
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0 p-3">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">@Localizer["Order Summary"]</h5>
+                <div class="card shadow-sm border rounded-4 p-4">
+                    <h5 class="fw-bold header-title mb-3 border-bottom pb-2">@Localizer["Order Summary"]</h5>
+
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">@Localizer["Subtotal"]</span>
-                        <span class="fw-bold" id="summary-subtotal">$@grandTotal.ToString("F2")</span>
+                        <span class="fw-bold text-main" id="summary-subtotal">$@grandTotal.ToString("F2")</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">@Localizer["Shipping"]</span>
-                        <span class="text-success fw-bold">Free</span>
+                        <span class="text-success fw-bold">@Localizer["Free"]</span>
                     </div>
+
                     <hr />
+
                     <div class="d-flex justify-content-between mb-4 fs-5 fw-bold">
-                        <span>@Localizer["Grand Total"]</span>
+                        <span class="header-title">@Localizer["Grand Total"]</span>
                         <span class="text-primary" id="summary-grandtotal">$@grandTotal.ToString("F2")</span>
                     </div>
-                    <button type="button" class="btn btn-success w-100 btn-lg shadow-sm">
+
+                    <button type="button" class="btn btn-success w-100 rounded-pill py-2.5 shadow-sm fw-bold">
                         <i class="bi bi-credit-card me-2"></i> @Localizer["Proceed to Checkout"]
                     </button>
                 </div>
@@ -114,13 +141,19 @@
     }
     else
     {
-        <div class="alert alert-light text-center border shadow-sm p-5">
-            <i class="bi bi-cart-x text-muted display-4 d-block mb-3"></i>
-            <h4 class="fw-bold text-secondary">@Localizer["Your cart is empty"]</h4>
-            <p class="text-muted">@Localizer["Looks like you haven't added anything to your cart yet."]</p>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-2">
-                @Localizer["Browse Products"]
-            </a>
+        <div class="card border shadow-sm rounded-4 p-5 text-center my-4">
+            <div class="py-4">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-4 mb-3">
+                    <i class="bi bi-cart-x display-4"></i>
+                </div>
+                <h4 class="fw-bold header-title mb-2">@Localizer["Your cart is empty"]</h4>
+                <p class="header-subtitle mx-auto mb-4" style="max-width: 420px;">
+                    @Localizer["Looks like you haven't added anything to your cart yet."]
+                </p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                    <i class="bi bi-grid-fill me-1"></i> @Localizer["Browse Products"]
+                </a>
+            </div>
         </div>
     }
 </div>
@@ -137,8 +170,8 @@
                 removeConfirm: @Json.Serialize(Localizer["Remove from your cart?"].Value),
                 yesRemove: @Json.Serialize(Localizer["Yes, remove"].Value),
                 removeError: @Json.Serialize(Localizer["Failed to remove item"].Value)
-            }
+                    }
         };
     </script>
-    <script src="~/js/Cart/index.js"></script>
+    <script src="~/js/Cart/index.js" asp-append-version="true"></script>
 }

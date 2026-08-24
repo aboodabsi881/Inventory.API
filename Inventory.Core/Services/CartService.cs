@@ -2,6 +2,8 @@
 using Inventory.Core.Entities.Carts;
 using Inventory.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Inventory.Core.Services
 {
@@ -23,40 +25,7 @@ namespace Inventory.Core.Services
 
         public async Task<CartResponseDto?> AddOrUpdateItemAsync(int productId, int change)
         {
-            var cartItem = await _cartRepo.GetFirstOrDefaultAsync(
-                predicate: c => c.ProductId == productId,
-                include: q => q.Include(c => c.Product)
-            );
-
-            if (cartItem == null)
-            {
-                if (change <= 0) change = 1;
-
-                cartItem = new Cart
-                {
-                    ProductId = productId,
-                    Quantity = change
-                };
-
-                await _cartRepo.AddAsync(cartItem);
-            }
-            else
-            {
-                cartItem.Quantity += change;
-
-                if (cartItem.Quantity <= 0)
-                {
-                    _cartRepo.Delete(cartItem);
-                    await _cartRepo.SaveChangesAsync();
-                    return null;
-                }
-
-                _cartRepo.Update(cartItem);
-            }
-
-            await _cartRepo.SaveChangesAsync();
-
-            return await _cartRepo.GetDtoByIdAsync<CartResponseDto>(cartItem.Id);
+            return await _cartRepo.AddOrUpdateCartItemAsync(productId, change);
         }
 
         public async Task<bool> RemoveItemAsync(int cartId)
@@ -66,8 +35,7 @@ namespace Inventory.Core.Services
 
         public async Task<decimal> GetCartTotalAsync()
         {
-            var cartItems = await _cartRepo.GetAllAsync(include: q => q.Include(c => c.Product));
-            return cartItems.Sum(item => item.Quantity * (item.Product?.Price ?? 0));
+            return await _cartRepo.GetCartTotalAsync();
         }
     }
 }

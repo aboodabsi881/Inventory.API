@@ -24,12 +24,12 @@
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3 text-center p-3 bg-light rounded-3 border">
+                    <div class="mb-3 text-center p-3 img-surface-wrap rounded-3 border">
                         <label class="form-label d-block small text-muted mb-2">@Localizer["Category Image Preview"]</label>
                         <img id="imgPreview"
                              src="@(string.IsNullOrEmpty(Model.Img) ? "/images/placeholder.png" : Model.Img)"
                              alt="@Model.Name"
-                             class="img-thumbnail object-fit-cover shadow-sm"
+                             class="img-fluid rounded-3  shadow-sm p-1 img-surface-wrap object-fit-contain"
                              style="max-height: 140px;"
                              onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                     </div>

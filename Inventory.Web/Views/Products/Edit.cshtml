@@ -2,15 +2,22 @@
 @model CreateUpdateProductVM
 
 @{
-    ViewData["Title"] = "Edit Product";
+    ViewData["Title"] = Localizer["Edit Product"];
 }
 
 <div class="row justify-content-center my-4">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-warning text-dark p-3">
-                <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>@Localizer["Edit Product"]</h4>
+        <div class="card shadow-sm border rounded-4 overflow-hidden product-card">
+
+            <!-- Card Header -->
+            <div class="card-header bg-warning bg-opacity-10 border-bottom p-3 d-flex align-items-center gap-2">
+                <span class="p-2 rounded-3 bg-warning text-dark d-inline-flex align-items-center justify-content-center shadow-sm">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                </span>
+                <h5 class="mb-0 fw-bold header-title">@Localizer["Edit Product"]</h5>
             </div>
+
+            <!-- Card Body -->
             <div class="card-body p-4">
                 <form id="editProductForm" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
@@ -19,60 +26,70 @@
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="Img" />
 
+                    <!-- Product Name -->
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label fw-semibold">@Localizer["Name"]</label>
-                        <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger small"></span>
+                        <input asp-for="Name" class="form-control rounded-pill px-3 shadow-none" placeholder="@Localizer["Enter product name"]" />
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
                     </div>
 
+                    <!-- Price & Category Grid -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label asp-for="Price" class="form-label fw-semibold">@Localizer["Price"]</label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input asp-for="Price" type="number" step="0.01" class="form-control" />
+                                <span class="input-group-text bg-body-secondary border text-muted rounded-start-pill ps-3">$</span>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control rounded-end-pill px-3 shadow-none" />
                             </div>
-                            <span asp-validation-for="Price" class="text-danger small"></span>
+                            <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="col-md-6">
                             <label asp-for="CategoryId" class="form-label fw-semibold">@Localizer["Category"]</label>
-                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select rounded-pill px-3 shadow-none">
                                 <option value="">@Localizer["-- Select Category --"]</option>
                             </select>
-                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
                         </div>
                     </div>
 
+                    <!-- Power Type -->
                     <div class="mb-3">
                         <label asp-for="PowerType" class="form-label fw-semibold">@Localizer["Power Type"]</label>
                         <select asp-for="PowerType"
                                 asp-items="Html.GetEnumSelectList<Inventory.Core.Utilities.Enums.PowerType>()"
-                                class="form-select">
+                                class="form-select rounded-pill px-3 shadow-none">
                             <option value="">@Localizer["-- Select Power Type --"]</option>
                         </select>
-                        <span asp-validation-for="PowerType" class="text-danger small"></span>
+                        <span asp-validation-for="PowerType" class="text-danger small mt-1 d-block"></span>
                     </div>
 
+                    <!-- Image Preview Area -->
                     @if (!string.IsNullOrEmpty(Model.Img))
                     {
-                        <div class="mb-3 text-center p-3 bg-light rounded border">
+                        <div class="mb-3 text-center p-3 img-surface-wrap rounded-4 border">
                             <label class="form-label d-block small text-muted mb-2">@Localizer["Current Product Image"]</label>
-                            <img src="@Model.Img" alt="@Model.Name" class="img-thumbnail object-fit-cover" style="max-height: 140px;" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                            <img src="@Model.Img"
+                                 alt="@Model.Name"
+                                 class="img-fluid rounded-3  shadow-sm p-1 img-surface-wrap object-fit-contain"
+                                 style="max-height: 140px;"
+                                 onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                         </div>
                     }
 
+                    <!-- Change Image File Input -->
                     <div class="mb-4">
                         <label asp-for="ImgFile" class="form-label fw-semibold">@Localizer["Change Image (Optional)"]</label>
-                        <input asp-for="ImgFile" type="file" class="form-control" accept="image/*" />
-                        <span asp-validation-for="ImgFile" class="text-danger small"></span>
+                        <input asp-for="ImgFile" type="file" class="form-control rounded-pill px-3 shadow-none" accept="image/*" />
+                        <span asp-validation-for="ImgFile" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-3 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top gap-2">
+                        <a asp-action="Index" class="btn btn-action-back rounded-pill px-4 shadow-sm fw-semibold">
                             <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to List"]
                         </a>
-                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold">
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
                             <i class="bi bi-save me-1"></i> @Localizer["Update Product"]
                         </button>
                     </div>
@@ -84,5 +101,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/Product/Edit.js"></script>
+    <script src="~/js/Product/Edit.js" asp-append-version="true"></script>
 }

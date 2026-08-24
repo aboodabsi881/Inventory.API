@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 :root {
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 78px;
@@ -6,10 +6,75 @@
   --brand-primary-hover: #4338ca;
   --brand-subtle: #eef2ff;
   --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-secondary: #f1f5f9;
+  --bg-input: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.9);
   --text-main: #0f172a;
   --text-muted: #64748b;
+  --text-heading: #0f172a;
   --border-color: #e2e8f0;
+  --border-focus: rgba(79, 70, 229, 0.5);
   --card-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+  --hover-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+  --btn-action-bg: #f8f9fa;
+  --btn-action-color: #475569;
+  --btn-action-hover-bg: #e2e8f0;
+  --btn-action-hover-color: #0f172a;
+  --btn-edit-bg: rgba(255, 193, 7, 0.15);
+  --btn-edit-color: #b45309;
+  --btn-edit-hover-bg: rgba(255, 193, 7, 0.25);
+  --btn-edit-hover-color: #78350f;
+  --btn-delete-bg: rgba(220, 53, 69, 0.12);
+  --btn-delete-color: #dc3545;
+  --btn-delete-hover-bg: rgba(220, 53, 69, 0.22);
+  --btn-delete-hover-color: #b02a37;
+  --table-header-bg: #f8fafc;
+  --table-header-color: #64748b;
+  --table-row-hover: rgba(0, 0, 0, 0.02);
+  --table-border: #e2e8f0;
+  --swal-bg: #ffffff;
+  --swal-color: #0f172a;
+  --swal-border: #e2e8f0;
+  --swal-backdrop: rgba(15, 23, 42, 0.4);
+}
+
+[data-bs-theme=dark] {
+  --brand-primary: #6366f1;
+  --brand-primary-hover: #818cf8;
+  --brand-subtle: rgba(99, 102, 241, 0.15);
+  --bg-body: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-surface-secondary: #0f172a;
+  --bg-input: #1e293b;
+  --glass-bg: rgba(30, 41, 59, 0.85);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-heading: #ffffff;
+  --border-color: #334155;
+  --border-focus: rgba(99, 102, 241, 0.5);
+  --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  --hover-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+  --btn-action-bg: rgba(255, 255, 255, 0.08);
+  --btn-action-color: #ffffff;
+  --btn-action-hover-bg: rgba(255, 255, 255, 0.18);
+  --btn-action-hover-color: #ffffff;
+  --btn-edit-bg: rgba(255, 193, 7, 0.2);
+  --btn-edit-color: #ffda6a;
+  --btn-edit-hover-bg: rgba(255, 193, 7, 0.35);
+  --btn-edit-hover-color: #ffffff;
+  --btn-delete-bg: rgba(220, 53, 69, 0.2);
+  --btn-delete-color: #ea868f;
+  --btn-delete-hover-bg: rgba(220, 53, 69, 0.35);
+  --btn-delete-hover-color: #ffffff;
+  --table-header-bg: #0f172a;
+  --table-header-color: #94a3b8;
+  --table-row-hover: rgba(255, 255, 255, 0.04);
+  --table-border: #334155;
+  --swal-bg: #1e293b;
+  --swal-color: #f8fafc;
+  --swal-border: #334155;
+  --swal-backdrop: rgba(0, 0, 0, 0.65);
 }
 
 html {
@@ -30,92 +95,27 @@ body {
   direction: ltr;
   text-align: left;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* ==================== Interactive Resets & Focus Rings ==================== */
-/* ==================== Auth & Login Module ==================== */
-.auth-brand-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--brand-primary);
-  color: #ffffff;
-  border-radius: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.75rem;
-  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.35);
+h1, h2, h3, h4, h5, h6,
+.header-title,
+.cat-heading,
+.dashboard-heading,
+.product-name-heading,
+.card-title,
+.brand-text,
+.user-name-text,
+.footer-brand-text,
+.metric-value,
+.table-item-title {
+  color: var(--text-heading) !important;
 }
 
-.auth-card {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--card-shadow) !important;
+p, .header-subtitle, .cat-subtitle, .dashboard-subtitle, .metric-label {
+  color: var(--text-muted) !important;
 }
 
-.auth-link {
-  color: var(--brand-primary);
-  font-weight: 600;
-  transition: color 0.15s ease-in-out;
-}
-.auth-link:hover {
-  color: var(--brand-primary-hover);
-}
-
-/* Form Controls & Floating Labels (LTR) */
-.form-floating > .form-control-plaintext,
-.form-floating > .form-control {
-  text-align: left;
-}
-.form-floating > .form-control-plaintext::placeholder,
-.form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color, #94a3b8);
-  text-align: left;
-}
-.form-floating > label {
-  left: 0;
-  right: auto;
-  transform-origin: top left;
-  text-align: left;
-}
-
-.form-check {
-  padding-left: 1.75em;
-  padding-right: 0;
-}
-.form-check .form-check-input {
-  float: left;
-  margin-left: -1.75em;
-  margin-right: 0;
-}
-.form-check .form-check-input:checked {
-  background-color: var(--brand-primary);
-  border-color: var(--brand-primary);
-}
-
-/* Password Group with Eye Toggle (LTR) */
-.auth-password-group .auth-password-input {
-  padding-right: 3.25rem !important;
-}
-.auth-password-group .auth-toggle-btn {
-  position: absolute;
-  top: 50%;
-  right: 0.5rem;
-  left: auto;
-  transform: translateY(-50%);
-  padding: 0.5rem 0.75rem;
-  z-index: 5;
-  border: none;
-  background: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.auth-password-group .auth-toggle-btn:hover i {
-  color: var(--brand-primary) !important;
-}
-
-/* ==================== Sidebar Component (LTR) ==================== */
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -124,10 +124,10 @@ body {
   left: 0;
   right: auto;
   z-index: 1040;
-  background: #ffffff;
+  background: var(--bg-surface);
   border-right: 1px solid var(--border-color);
   border-left: none;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
   display: flex;
   flex-direction: column;
 }
@@ -148,15 +148,14 @@ body {
 }
 .sidebar .nav-link-item:hover {
   color: var(--brand-primary) !important;
-  background-color: #f1f5f9;
+  background-color: var(--bg-surface-secondary);
 }
 .sidebar .nav-link-item.active {
-  color: var(--brand-primary) !important;
-  background-color: var(--brand-subtle) !important;
+  color: #ffffff !important;
+  background-color: var(--brand-primary) !important;
   font-weight: 600;
 }
 
-/* Collapsed Sidebar (LTR) */
 html.sidebar-collapsed body .sidebar,
 body.sidebar-collapsed .sidebar {
   width: var(--sidebar-collapsed-width);
@@ -183,7 +182,6 @@ body.sidebar-collapsed .main-wrapper {
   margin-left: var(--sidebar-collapsed-width);
 }
 
-/* ==================== Main Content & Header ==================== */
 .main-wrapper {
   margin-left: var(--sidebar-width);
   margin-right: 0;
@@ -194,10 +192,65 @@ body.sidebar-collapsed .main-wrapper {
 }
 
 .glass-header {
-  background: rgba(255, 255, 255, 0.9) !important;
+  background: var(--glass-bg) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
+}
+
+.footer-custom {
+  background: var(--bg-surface);
+  border-color: var(--border-color) !important;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+.card,
+.product-card,
+.category-card,
+.cat-detail-card,
+.dashboard-card,
+.auth-card {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--card-shadow);
+}
+
+.product-card,
+.category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.product-card:hover,
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--hover-shadow) !important;
+}
+
+.product-img,
+.category-img {
+  transition: transform 0.25s ease;
+}
+
+.product-card:hover .product-img,
+.category-card:hover .category-img {
+  transform: scale(1.04);
+}
+
+.product-img-wrap,
+.category-img-wrap,
+.img-surface-wrap,
+.img-preview-box {
+  background-color: var(--bg-surface-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.stat-pill-box,
+.stat-pill-bg {
+  background-color: var(--bg-surface-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-muted) !important;
 }
 
 .btn-action-icon {
@@ -207,85 +260,240 @@ body.sidebar-collapsed .main-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 .btn-action-icon:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: var(--bg-surface-secondary);
 }
 
-.avatar-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--brand-subtle);
+.btn-header-action {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+}
+.btn-header-action:hover {
+  background-color: var(--bg-surface-secondary) !important;
 }
 
-.dropdown-menu-custom {
-  border: 0;
-  border-radius: 1rem;
-  box-shadow: var(--card-shadow);
-  text-align: left;
+.btn-action-view,
+.btn-product-details {
+  background-color: var(--btn-action-bg) !important;
+  color: var(--btn-action-color) !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+.btn-action-view:hover,
+.btn-product-details:hover {
+  background-color: var(--btn-action-hover-bg) !important;
+  color: var(--btn-action-hover-color) !important;
 }
 
-.dropdown-menu-end[data-bs-popper] {
-  right: 0;
-  left: auto;
+.btn-action-edit {
+  background-color: var(--btn-edit-bg) !important;
+  color: var(--btn-edit-color) !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+.btn-action-edit:hover {
+  background-color: var(--btn-edit-hover-bg) !important;
+  color: var(--btn-edit-hover-color) !important;
 }
 
-.sidebar-overlay {
-  display: none;
+.btn-action-delete,
+.btn-delete-category {
+  background-color: var(--btn-delete-bg) !important;
+  color: var(--btn-delete-color) !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+.btn-action-delete:hover,
+.btn-delete-category:hover {
+  background-color: var(--btn-delete-hover-bg) !important;
+  color: var(--btn-delete-hover-color) !important;
+}
+
+.btn-action-back {
+  background-color: var(--btn-action-bg) !important;
+  color: var(--btn-action-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+.btn-action-back:hover {
+  background-color: var(--btn-action-hover-bg) !important;
+  color: var(--btn-action-hover-color) !important;
 }
 
 .fav-floating-btn {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
-
 .fav-floating-btn:hover {
   background-color: #fee2e2 !important;
   transform: scale(1.1);
-}
-
-.product-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08) !important;
-}
-
-.product-img {
-  transition: transform 0.25s ease;
-}
-
-.product-card:hover .product-img {
-  transform: scale(1.04);
 }
 
 .stepper-btn:hover {
   background-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-.category-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.search-input-group {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  transition: all 0.25s ease;
+}
+.search-input-group input {
+  background-color: transparent !important;
+  color: var(--text-main) !important;
+}
+.search-input-group input::placeholder {
+  color: var(--text-muted);
+}
+.search-input-group .input-group-text {
+  background-color: transparent !important;
+}
+.search-input-group:focus-within {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0.25rem 0.75rem rgba(79, 70, 229, 0.15) !important;
 }
 
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08) !important;
+.clear-search-btn {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+}
+.clear-search-btn:hover {
+  color: #dc3545 !important;
 }
 
-.category-img {
-  transition: transform 0.25s ease;
+.dropdown-menu,
+.dropdown-menu-custom {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+}
+.dropdown-menu .dropdown-item,
+.dropdown-menu-custom .dropdown-item {
+  color: var(--text-main) !important;
+}
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu-custom .dropdown-item:hover {
+  background-color: var(--bg-surface-secondary) !important;
+}
+.dropdown-menu .dropdown-divider,
+.dropdown-menu-custom .dropdown-divider {
+  border-color: var(--border-color) !important;
 }
 
-.category-card:hover .category-img {
-  transform: scale(1.04);
+.custom-pagination {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+.custom-pagination .page-item {
+  margin: 0 3px;
+}
+.custom-pagination .page-link {
+  border: none;
+  border-radius: 50rem !important;
+  min-width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  font-weight: 600;
+  background-color: var(--bg-surface-secondary);
+  transition: all 0.2s ease;
+}
+.custom-pagination .page-link:hover:not(.active) {
+  background-color: var(--btn-action-hover-bg);
+  color: var(--brand-primary);
+}
+.custom-pagination .page-item.active .page-link {
+  background-color: var(--brand-primary) !important;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+  color: #ffffff !important;
+}
+.custom-pagination .page-item.disabled .page-link {
+  background-color: var(--bg-surface-secondary);
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
-/* ==================== Mobile Responsiveness (LTR) ==================== */
+.table-custom {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: var(--table-row-hover);
+  color: var(--text-main);
+}
+.table-custom thead {
+  background-color: var(--table-header-bg) !important;
+  color: var(--table-header-color) !important;
+  border-bottom: 1px solid var(--table-border);
+}
+.table-custom td, .table-custom th {
+  border-color: var(--table-border);
+}
+
+.category-badge-pill {
+  background-color: var(--bg-surface-secondary) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.swal2-popup {
+  background: var(--swal-bg) !important;
+  color: var(--swal-color) !important;
+  border: 1px solid var(--swal-border) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: var(--card-shadow) !important;
+  font-family: inherit !important;
+}
+.swal2-popup .swal2-title {
+  color: var(--text-heading) !important;
+  font-weight: 700 !important;
+}
+.swal2-popup .swal2-html-container {
+  color: var(--text-muted) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+}
+.swal2-popup .swal2-close {
+  color: var(--text-muted) !important;
+  transition: color 0.2s ease;
+}
+.swal2-popup .swal2-close:hover {
+  color: var(--text-heading) !important;
+}
+.swal2-popup .swal2-actions {
+  gap: 0.75rem !important;
+}
+.swal2-popup .swal2-actions .swal2-confirm {
+  background-color: var(--brand-primary) !important;
+  border-radius: 50rem !important;
+  padding: 0.6rem 1.75rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3) !important;
+}
+.swal2-popup .swal2-actions .swal2-confirm:focus {
+  box-shadow: 0 0 0 3px var(--border-focus) !important;
+}
+.swal2-popup .swal2-actions .swal2-cancel {
+  background-color: var(--btn-action-bg) !important;
+  color: var(--btn-action-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 50rem !important;
+  padding: 0.6rem 1.75rem !important;
+  font-weight: 600 !important;
+}
+.swal2-popup .swal2-actions .swal2-cancel:hover {
+  background-color: var(--btn-action-hover-bg) !important;
+  color: var(--btn-action-hover-color) !important;
+}
+
 @media (max-width: 991.98px) {
   .sidebar {
     margin-left: calc(-1 * var(--sidebar-width));
@@ -303,7 +511,7 @@ body.sidebar-collapsed .main-wrapper {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(4px);
     z-index: 1030;
   }

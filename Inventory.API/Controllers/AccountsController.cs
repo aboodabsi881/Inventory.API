@@ -100,19 +100,25 @@ namespace Inventory.API.Controllers
             }
         }
 
-        // POST: api/accounts/change-password/5
-        [HttpPost("change-password/{id}")]
-        public async Task<IActionResult> ChangePassword(string id, [FromBody] ChangePasswordRequestDto model)
+        [HttpPatch("change-password/{id:int}")]
+        public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordRequestDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                await _accountService.ChangePasswordAsync(id, model);
-                return Ok(new { message = "Password updated successfully." });
+                var result = await _accountService.ChangePasswordAsync(id.ToString(), model);
+                if (result)
+                    return Ok(new { message = "Password updated successfully." });
+
+                return BadRequest(new { message = "Failed to update password." });
             }
-            catch (Exception ex) when (ex is KeyNotFoundException || ex is InvalidOperationException)
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }

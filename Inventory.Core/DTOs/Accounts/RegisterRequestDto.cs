@@ -23,6 +23,6 @@ namespace Inventory.Core.DTOs
 
         [Required(ErrorMessage = "RoleName is required.")]
         public string? RoleName { get; set; }
-        public string? ImgBase64 { get; set; }
+        public string? Img { get; set; }
     }
 }

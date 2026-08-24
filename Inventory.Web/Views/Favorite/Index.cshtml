@@ -2,7 +2,7 @@
 @model IEnumerable<FavoriteVM>
 
 @{
-    ViewData["Title"] = "My Favorites";
+    ViewData["Title"] = Localizer["My Favorites"];
 }
 
 <form id="antiForgeryForm">
@@ -13,15 +13,15 @@
     <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
         <div>
-            <h2 class="fw-bold text-dark mb-1 d-flex align-items-center">
+            <h2 class="fw-bold header-title mb-1 d-flex align-items-center">
                 <span class="p-2 rounded-circle bg-danger-subtle text-danger me-2 d-inline-flex">
                     <i class="bi bi-heart-fill fs-5"></i>
                 </span>
                 @Localizer["My Favorites"]
             </h2>
-            <p class="text-muted mb-0 small">@Localizer["Items you have saved to your wishlist."]</p>
+            <p class="header-subtitle mb-0 small">@Localizer["Items you have saved to your wishlist."]</p>
         </div>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+        <a asp-controller="Products" asp-action="Index" class="btn btn-action-back rounded-pill px-4 shadow-sm fw-semibold">
             <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to Products"]
         </a>
     </div>
@@ -35,29 +35,29 @@
                 {
                     var imgSrc = string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg;
                     <div class="col" id="favorite-card-@item.Id">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative product-card">
+                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card">
 
                             <!-- Floating Heart Action -->
                             <button type="button"
-                                    class="btn btn-white bg-white text-danger rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
+                                    class="btn rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
                                     onclick="removeFavorite(@item.Id, '@item.ProductName')"
                                     title="@Localizer["Remove from favorites"]"
                                     style="width: 36px; height: 36px; z-index: 5;">
-                                <i class="bi bi-heart-fill fs-6"></i>
+                                <i class="bi bi-heart-fill text-danger fs-6"></i>
                             </button>
 
                             <!-- Image Container -->
-                            <div class="bg-light p-3 d-flex align-items-center justify-content-center" style="height: 190px;">
+                            <div class="p-3 d-flex align-items-center justify-content-center img-surface-wrap" style="height: 190px;">
                                 <img src="@imgSrc"
-                                     class="img-fluid object-fit-contain h-100 w-100"
+                                     class="img-fluid object-fit-contain h-100 w-100 product-img"
                                      alt="@item.ProductName"
                                      onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                             </div>
 
                             <!-- Body -->
                             <div class="card-body d-flex flex-column p-3">
-                                <h6 class="card-title fw-bold text-dark text-truncate mb-2" title="@item.ProductName">
-                                    @(item.ProductName ?? Localizer["Unnamed Product"])
+                                <h6 class="card-title fw-bold product-name-heading text-truncate mb-2" title="@item.ProductName">
+                                    @(item.ProductName ?? Localizer["Unnamed Product"].Value)
                                 </h6>
 
                                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -68,7 +68,11 @@
                                 </div>
 
                                 <div class="mt-auto d-flex">
-                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-info rounded-pill btn-sm flex-fill fw-semibold py-2">
+                                    <a asp-controller="Products"
+                                       asp-action="Details"
+                                       asp-route-id="@item.ProductId"
+                                       asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)"
+                                       class="btn btn-action-view rounded-pill btn-sm flex-fill fw-semibold py-2">
                                         <i class="bi bi-eye me-1"></i> @Localizer["View Product"]
                                     </a>
                                 </div>
@@ -80,13 +84,13 @@
         }
         else
         {
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+            <div class="card border shadow-sm rounded-4 p-5 text-center my-4">
                 <div class="py-4">
                     <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-4 mb-3">
                         <i class="bi bi-heartbreak display-4"></i>
                     </div>
-                    <h4 class="fw-bold text-dark mb-2">@Localizer["Your favorite list is empty"]</h4>
-                    <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                    <h4 class="fw-bold header-title mb-2">@Localizer["Your favorite list is empty"]</h4>
+                    <p class="header-subtitle mx-auto mb-4" style="max-width: 420px;">
                         @Localizer["Explore our catalog and save your preferred products here!"]
                     </p>
                     <a asp-controller="Products" asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
@@ -97,8 +101,6 @@
         }
     </div>
 </div>
-
-
 
 @section Scripts {
     <script>
@@ -112,8 +114,8 @@
                 removed: @Json.Serialize(Localizer["Removed!"].Value),
                 oops: @Json.Serialize(Localizer["Oops..."].Value),
                 errorDefault: @Json.Serialize(Localizer["Failed to remove favorite."].Value)
-            }
+                    }
         };
     </script>
-    <script src="~/js/Favorite/Index.js"></script>
+    <script src="~/js/Favorite/Index.js" asp-append-version="true"></script>
 }

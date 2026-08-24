@@ -225,42 +225,114 @@ namespace Inventory.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new
-                {
-                    errors = ModelState.ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
-                    )
-                });
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .Where(msg => !string.IsNullOrWhiteSpace(msg))
+                    .ToList();
+
+                return BadRequest(new { message = string.Join("<br/>", errors) });
             }
 
-            var payload = new { CurrentPassword = model.OldPassword, NewPassword = model.NewPassword };
-            var response = await _client.PostAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
+            var payload = new
+            {
+                CurrentPassword = model.CurrentPassword,
+                NewPassword = model.NewPassword,
+                ConfirmPassword = model.ConfirmPassword
+            };
+
+            var response = await _client.PutAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
 
             if (response.IsSuccessStatusCode)
             {
-                return Ok(new { icon = "success", message = "Password updated successfully!", redirectUrl = Url.Action("Index", "Home") });
+                return Ok(new
+                {
+                    icon = "success",
+                    message = "Password updated successfully!",
+                    redirectUrl = Url.Action("Index", "Home")
+                });
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { message = $"Password update failed: {errorContent}" });
+            string errorMessage = "Failed to update password.";
+
+            try
+            {
+                using var doc = JsonDocument.Parse(errorContent);
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("errors", out var errorsProp) && errorsProp.ValueKind == JsonValueKind.Object)
+                {
+                    var errList = new List<string>();
+                    foreach (var prop in errorsProp.EnumerateObject())
+                    {
+                        if (prop.Value.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var err in prop.Value.EnumerateArray())
+                            {
+                                errList.Add(err.GetString() ?? "");
+                            }
+                        }
+                        else if (prop.Value.ValueKind == JsonValueKind.String)
+                        {
+                            errList.Add(prop.Value.GetString() ?? "");
+                        }
+                    }
+                    if (errList.Any()) errorMessage = string.Join("<br/>", errList);
+                }
+                else if (root.TryGetProperty("message", out var msgProp))
+                {
+                    errorMessage = msgProp.GetString() ?? errorMessage;
+                }
+            }
+            catch
+            {
+                if (!string.IsNullOrWhiteSpace(errorContent))
+                {
+                    errorMessage = errorContent;
+                }
+            }
+
+            return BadRequest(new { message = errorMessage });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "SuperAdmin, Super Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
                 return BadRequest(new { message = "Invalid User ID." });
 
             var response = await _client.DeleteAsync($"Accounts/users/{id}");
+
             if (response.IsSuccessStatusCode)
             {
-                return Ok(new { icon = "success", message = "User deleted successfully." });
+                return Ok(new
+                {
+                    icon = "info",
+                    title = "Deleted!",
+                    message = "User deleted successfully."
+                });
             }
 
-            return BadRequest(new { icon = "error", message = "Failed to delete user." });
+            var errorContent = await response.Content.ReadAsStringAsync();
+            string message = "Failed to delete user.";
+
+            try
+            {
+                using var doc = JsonDocument.Parse(errorContent);
+                if (doc.RootElement.TryGetProperty("message", out var msgProp))
+                {
+                    message = msgProp.GetString() ?? message;
+                }
+            }
+            catch
+            {
+                if (!string.IsNullOrWhiteSpace(errorContent))
+                    message = errorContent;
+            }
+
+            return BadRequest(new { message });
         }
 
         #region Helpers

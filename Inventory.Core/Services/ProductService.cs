@@ -16,18 +16,17 @@ namespace Inventory.Core.Services
 
         public async Task<IReadOnlyList<ProductResponseDto>> GetAllProductsDtoAsync()
         {
-            return await _productRepo.GetAllDtoAsync<ProductResponseDto>(include: q => q.Include(p => p.Category));
+            return await _productRepo.GetAllDtoAsync<ProductResponseDto>(
+                include: q => q.Include(p => p.Category)
+            );
         }
 
         public async Task<ProductResponseDto?> GetProductDtoByIdAsync(int id)
         {
-            var product = await _productRepo.GetFirstOrDefaultAsync(
-                predicate: p => p.Id == id,
+            return await _productRepo.GetDtoByIdAsync<ProductResponseDto>(
+                id,
                 include: q => q.Include(p => p.Category)
             );
-
-            if (product == null) return null;
-            return await _productRepo.GetDtoByIdAsync<ProductResponseDto>(id);
         }
 
         public async Task<ProductResponseDto> CreateProductAsync(ProductRequestDto model)

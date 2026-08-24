@@ -2,88 +2,98 @@
 @model IEnumerable<UsersVM>
 
 @{
-    ViewData["Title"] = "Users List";
+    ViewData["Title"] = Localizer["Users List"];
     const string DefaultAvatar = "/images/Portrait_Placeholder.png";
 }
 
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
-<div class="container py-3">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-dark"><i class="bi bi-people-fill me-2 text-primary"></i>@Localizer["Users List"]</h2>
-    <a asp-action="Register" class="btn btn-primary  px-4 shadow-sm">
-        <i class="bi bi-person-plus-fill me-1"></i> @Localizer["Add New User"]
-    </a>
-</div>
 
-<div class="card border-0 shadow-sm ">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" id="usersTable">
-            <thead class="table-light">
-                <tr>
-                    <th class="ps-4" style="width: 70px;">@Localizer["Avatar"]</th>
-                    <th>@Localizer["User Info"]</th>
-                    <th>@Localizer["Email"]</th>
-                    <th>@Localizer["Role"]</th>
-                    <th class="text-end pe-4" style="width: 280px;">@Localizer["Actions"]</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var user in Model)
+<div class="container py-3">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold header-title mb-1 d-flex align-items-center">
+                <i class="bi bi-people-fill me-2 text-primary"></i>@Localizer["Users List"]
+            </h2>
+            <p class="header-subtitle mb-0 small">@Localizer["Manage system user accounts, roles, and credentials."]</p>
+        </div>
+        <a asp-action="Register" class="btn btn-primary rounded-pill px-4 shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>@Localizer["Add New User"]</span>
+        </a>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover table-custom align-middle mb-0" id="usersTable">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="width: 70px;">@Localizer["Avatar"]</th>
+                        <th>@Localizer["User Info"]</th>
+                        <th>@Localizer["Email"]</th>
+                        <th>@Localizer["Role"]</th>
+                        <th class="text-end pe-4" style="width: 220px;">@Localizer["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
                     {
-                        var avatarUrl = string.IsNullOrEmpty(user.Img) ? DefaultAvatar : user.Img;
-                        <tr id="user-row-@user.Id">
-                            <td class="ps-4">
-                                <a href="javascript:void(0)" onclick="showFullImage('@avatarUrl', '@user.UserName')">
-                                    <img src="@avatarUrl"
-                                         class="rounded-circle object-fit-cover border shadow-sm"
-                                         style="width: 44px; height: 44px; cursor: pointer;"
-                                         alt="@user.UserName" />
-                                </a>
-                            </td>
-                            <td>
-                                <div class="fw-bold text-dark">@user.UserName</div>
-                                <small class="text-muted">@user.NameEn / @user.NameAr</small>
-                            </td>
-                            <td class="text-secondary small">@user.Email</td>
-                            <td>
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fs-7 fw-semibold">
-                                    @user.RoleName
-                                </span>
-                            </td>
-                            <td class="text-end pe-4 text-nowrap">
-                                <div class="d-inline-flex gap-1">
-                                    <a asp-action="PersonalData" asp-route-id="@user.Id" class="btn btn-sm btn-outline-info text-nowrap">
-                                        <i class="bi bi-pencil"></i> 
+                        @foreach (var user in Model)
+                        {
+                            var avatarUrl = string.IsNullOrEmpty(user.Img) ? DefaultAvatar : user.Img;
+                            <tr id="user-row-@user.Id">
+                                <td class="ps-4">
+                                    <a href="javascript:void(0)" onclick="showFullImage('@avatarUrl', '@user.UserName')">
+                                        <img src="@avatarUrl"
+                                             class="rounded-circle object-fit-cover border shadow-sm"
+                                             style="width: 44px; height: 44px; cursor: pointer;"
+                                             alt="@user.UserName" />
                                     </a>
-                                    <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-sm btn-outline-warning text-nowrap mx-1">
-                                        <i class="bi bi-key"></i> 
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger text-nowrap" onclick="deleteUser(@user.Id, '@user.UserName')">
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
-                                </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold table-item-title">@user.UserName</div>
+                                    <small class="text-muted">@user.NameEn / @user.NameAr</small>
+                                </td>
+                                <td class="text-muted small">@user.Email</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1.5 small fw-semibold">
+                                        @user.RoleName
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4 text-nowrap">
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="PersonalData" asp-route-id="@user.Id" class="btn btn-action-view btn-sm rounded-pill px-2.5" title="@Localizer["Edit Profile"]">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-action-edit btn-sm rounded-pill px-2.5" title="@Localizer["Change Password"]">
+                                            <i class="bi bi-key"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-action-delete btn-sm rounded-pill px-2.5" onclick="deleteUser(@user.Id, '@user.UserName')" title="@Localizer["Delete User"]">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyRow">
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x display-6 d-block mb-2 text-secondary"></i>
+                                @Localizer["No users registered yet. Click"] <strong>@Localizer["Add New User"]</strong> @Localizer["to get started."]
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr id="emptyRow">
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="bi bi-person-x display-6 d-block mb-2 text-secondary"></i>
-                            @Localizer["No users registered yet. Click"] <strong>@Localizer["Add New User"] </strong> @Localizer["to get started."]
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-</div>
+
 @section Scripts {
-    <script src="~/js/Account/Index.js"></script>
+    <script src="~/js/Account/Index.js" ></script>
 }

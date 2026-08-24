@@ -5,6 +5,7 @@
     ViewData["Title"] = "Categories";
 }
 
+
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
 </form>
@@ -13,13 +14,13 @@
     <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
         <div>
-            <h2 class="fw-bolder text-dark mb-1 d-flex align-items-center">
+            <h2 class="fw-bolder header-title mb-1 d-flex align-items-center">
                 <span class="p-2 rounded-circle bg-primary-subtle text-primary me-2 d-inline-flex">
                     <i class="bi bi-tags-fill fs-5"></i>
                 </span>
                 @Localizer["Categories"]
             </h2>
-            <p class="text-muted mb-0 small">@Localizer["Organize, group, and manage your inventory catalog."]</p>
+            <p class="header-subtitle mb-0 small">@Localizer["Organize, group, and manage your inventory catalog."]</p>
         </div>
         <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm d-inline-flex align-items-center gap-2">
             <i class="bi bi-plus-lg"></i>
@@ -27,7 +28,7 @@
         </a>
     </div>
 
-    <!-- Categories Grid -->
+    <!-- Category Grid -->
     <div id="categories-wrapper">
         @if (Model != null && Model.Any())
         {
@@ -38,48 +39,44 @@
                     var productCount = category.Products?.Count ?? 0;
 
                     <div class="col" id="category-card-@category.Id">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative category-card">
+                        <div class="card h-100 shadow-sm rounded-4 overflow-hidden position-relative category-card">
 
                             <!-- Image Container -->
-                            <div class="bg-light p-3 d-flex align-items-center justify-content-center position-relative category-img-wrap" style="height: 190px;">
-                                <a href="javascript:void(0)"
-                                   class="category-image-preview w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none"
-                                   data-img="@imgSrc"
-                                   data-name="@category.Name">
-                                    <img src="@imgSrc"
-                                         class="img-fluid object-fit-contain h-100 w-100 category-img"
-                                         alt="@category.Name"
-                                         onerror="this.onerror=null; this.src='/images/placeholder.png';"
-                                         title="@Localizer["Click to enlarge"]" />
-                                </a>
+                            <div class="p-3 d-flex align-items-center justify-content-center position-relative category-img-wrap" style="height: 190px;">
+                                <img src="@imgSrc"
+                                     class="img-fluid object-fit-contain h-100 w-100 category-img"
+                                     alt="@category.Name"
+                                     onerror="this.onerror=null; this.src='/images/placeholder.png';"
+                                     title="@category.Name" />
                             </div>
 
                             <!-- Card Body -->
                             <div class="card-body d-flex flex-column p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="card-title fw-bold text-dark text-truncate mb-0" title="@category.Name">
+                                    <h6 class="card-title fw-bold category-title text-truncate mb-0" title="@category.Name">
                                         @category.Name
                                     </h6>
                                 </div>
 
                                 <div class="mb-3">
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small">
+                                    <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 small">
                                         <i class="bi bi-box-seam me-1"></i>@productCount @Localizer["Products"]
                                     </span>
                                 </div>
 
-                                <!-- Card Footer Actions -->
+                                <!-- Action Buttons with High-Contrast Text -->
                                 <div class="mt-auto d-flex justify-content-between gap-1 pt-3 border-top">
-                                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-light btn-sm rounded-pill flex-fill text-muted fw-semibold">
-                                        <i class="bi bi-eye"></i> @Localizer["View"]
+                                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-action-view btn-sm rounded-pill flex-fill fw-semibold">
+                                        <i class="bi bi-info-circle"></i> @Localizer["Details"]
                                     </a>
-                                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-light btn-sm rounded-pill flex-fill text-warning-emphasis fw-semibold">
+                                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-action-edit btn-sm rounded-pill flex-fill fw-semibold">
                                         <i class="bi bi-pencil"></i> @Localizer["Edit"]
                                     </a>
                                     <button type="button"
-                                            class="btn btn-light btn-sm rounded-pill px-3 text-danger btn-delete-category"
+                                            class="btn btn-action-delete btn-sm rounded-pill px-3 btn-delete-category"
                                             data-id="@category.Id"
-                                            data-name="@category.Name">
+                                            data-name="@category.Name"
+                                            title="@Localizer["Delete"]">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -91,13 +88,13 @@
         }
         else
         {
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+            <div class="card border shadow-sm rounded-4 p-5 text-center my-4 category-card">
                 <div class="py-4">
                     <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-4 mb-3">
                         <i class="bi bi-tags display-4"></i>
                     </div>
-                    <h4 class="fw-bold text-dark mb-2">@Localizer["No categories found"]</h4>
-                    <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                    <h4 class="fw-bold category-title mb-2">@Localizer["No categories found"]</h4>
+                    <p class="category-desc mx-auto mb-4" style="max-width: 420px;">
                         @Localizer["Get started by adding your first product category to organize your inventory."]
                     </p>
                     <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
@@ -109,10 +106,9 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
-            window.CategoryConfig = {
+        window.CategoryConfig = {
             deleteUrl: '@Url.Action("DeleteConfirmed", "Categories")',
             texts: {
                 areYouSure: @Json.Serialize(Localizer["Are you sure?"].Value),
@@ -121,7 +117,7 @@
                 deleted: @Json.Serialize(Localizer["Deleted!"].Value),
                 oops: @Json.Serialize(Localizer["Oops..."].Value),
                 errorDefault: @Json.Serialize(Localizer["Failed to delete category."].Value)
-            }
+                    }
         };
     </script>
     <script src="~/js/Category/Index.js"></script>

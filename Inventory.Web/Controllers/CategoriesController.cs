@@ -179,7 +179,7 @@ namespace Inventory.Web.Controllers
 
                 return Ok(new
                 {
-                    icon = "success",
+                    icon = "info",
                     message = _localizer["CategoryDeleted"].Value,
                     deletedId = id,
                     redirectUrl = Url.Action("Index")

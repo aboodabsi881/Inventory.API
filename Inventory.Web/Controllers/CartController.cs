@@ -37,15 +37,22 @@ namespace Inventory.Web.Controllers
             return View(cartItems);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrUpdate(int productId, int change = 1)
+        public async Task<IActionResult> AddOrUpdate(int productId, string? actionType, int change = 1)
         {
             if (productId <= 0)
                 return BadRequest(new { icon = "error", message = _localizer["Invalid Product ID."].Value });
 
-            string formattedChange = change.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            var response = await _client.PostAsync($"Carts/items?productId={productId}&change={formattedChange}", null);
+            int delta = 1;
+            if (actionType == "decrement" || change < 0)
+            {
+                delta = -1;
+            }
+
+            string formattedDelta = delta == -1 ? "-1" : "1";
+            var response = await _client.PostAsync($"Carts/items?productId={productId}&change={formattedDelta}", null);
 
             if (response.IsSuccessStatusCode)
             {
@@ -54,10 +61,9 @@ namespace Inventory.Web.Controllers
 
                 try
                 {
-                    updatedItem = JsonSerializer.Deserialize<CartVM>(responseContent, JsonOptions);
-                    if (updatedItem == null || updatedItem.Quantity <= 0)
+                    if (!string.IsNullOrWhiteSpace(responseContent))
                     {
-                        updatedItem = null;
+                        updatedItem = JsonSerializer.Deserialize<CartVM>(responseContent, JsonOptions);
                     }
                 }
                 catch (JsonException)
@@ -65,21 +71,25 @@ namespace Inventory.Web.Controllers
                     updatedItem = null;
                 }
 
+                bool isRemoved = updatedItem == null || updatedItem.Quantity <= 0;
                 decimal grandTotal = await GetSafeCartTotalAsync();
 
                 return Ok(new
                 {
-                    icon = "success",
-                    message = _localizer["Cart updated successfully."].Value,
-                    item = updatedItem,
+                    icon = isRemoved ? "info" : "success",
+                    message = isRemoved
+                        ? _localizer["Item removed from cart."].Value
+                        : _localizer["Cart updated successfully."].Value,
+                    item = isRemoved ? null : updatedItem,
+                    quantity = isRemoved ? 0 : updatedItem!.Quantity,
                     grandTotal,
-                    removed = updatedItem == null
+                    removed = isRemoved
                 });
             }
 
-            var errorDetails = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
+            return BadRequest(new { icon = "error", message = _localizer["Failed to update cart."].Value });
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -11,10 +11,10 @@ namespace Inventory.Web.ViewModels.Accounts
 
         public string? Token { get; set; }
 
-        [Required(ErrorMessage = "Old password is required.")]
+        [Required(ErrorMessage = "Current password is required.")]
         [DataType(DataType.Password)]
         [Display(Name = "Current Password")]
-        public string OldPassword { get; set; } = string.Empty;
+        public string CurrentPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "New password is required.")]
         [StringLength(40, MinimumLength = 6, ErrorMessage = "The new password must be between 6 and 40 characters.")]

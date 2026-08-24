@@ -32,27 +32,23 @@ namespace Inventory.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var products = await _client.GetFromJsonAsync<List<ProductVM>>("Products", JsonOptions) ?? new List<ProductVM>();
+            var productsTask = _client.GetFromJsonAsync<List<ProductVM>>("Products", JsonOptions);
+            var favoritesTask = _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions);
+            var cartsTask = _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions);
 
-            List<FavoriteVM> favorites = new();
-            List<CartVM> cartItems = new();
+            await Task.WhenAll(productsTask, favoritesTask, cartsTask);
 
-            try
-            {
-                favorites = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
-                cartItems = await _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions) ?? new List<CartVM>();
-            }
-            catch
-            {
-            }
+            var products = await productsTask ?? new List<ProductVM>();
+            var favorites = await favoritesTask ?? new List<FavoriteVM>();
+            var cartItems = await cartsTask ?? new List<CartVM>();
 
-            var favoriteProductIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
-            var cartDictionary = cartItems.ToDictionary(c => c.ProductId, c => c.Quantity);
+            var favoriteIds = favorites.Where(f => f.IsFavorite).Select(f => f.ProductId).ToHashSet();
+            var cartDict = cartItems.ToDictionary(c => c.ProductId, c => c.Quantity);
 
             foreach (var product in products)
             {
-                product.IsFavorite = favoriteProductIds.Contains(product.Id);
-                if (cartDictionary.TryGetValue(product.Id, out int qty))
+                product.IsFavorite = favoriteIds.Contains(product.Id);
+                if (cartDict.TryGetValue(product.Id, out int qty))
                 {
                     product.QuantityInCart = qty;
                 }
@@ -64,28 +60,30 @@ namespace Inventory.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var product = await _client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}", JsonOptions);
+            var productTask = _client.GetFromJsonAsync<ProductDetailsVM>($"Products/{id}", JsonOptions);
+            var favoritesTask = _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions);
+            var cartsTask = _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions);
+
+            await Task.WhenAll(productTask, favoritesTask, cartsTask);
+
+            var product = await productTask;
             if (product == null) return NotFound();
 
-            try
-            {
-                var favorites = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
-                var cartItems = await _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions) ?? new List<CartVM>();
+            var favorites = await favoritesTask ?? new List<FavoriteVM>();
+            var cartItems = await cartsTask ?? new List<CartVM>();
 
-                product.IsFavorite = favorites.Any(f => f.ProductId == id && f.IsFavorite);
+            product.IsFavorite = favorites.Any(f => f.ProductId == id && f.IsFavorite);
 
-                var cartItem = cartItems.FirstOrDefault(c => c.ProductId == id);
-                if (cartItem != null)
-                {
-                    product.QuantityInCart = cartItem.Quantity;
-                }
-            }
-            catch
+            var cartItem = cartItems.FirstOrDefault(c => c.ProductId == id);
+            if (cartItem != null)
             {
+                product.QuantityInCart = cartItem.Quantity;
             }
 
             return View(product);
         }
+    
+
 
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> Create()

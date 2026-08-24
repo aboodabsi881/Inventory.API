@@ -16,19 +16,22 @@
         ? (!string.IsNullOrWhiteSpace(nameAr) ? nameAr : (User.Identity?.Name ?? "مستخدم"))
         : (!string.IsNullOrWhiteSpace(nameEn) ? nameEn : (User.Identity?.Name ?? "User"));
 
-    // Generate initial for avatar badge
     var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Trim().Substring(0, 1).ToUpper() : "U";
 }
 
 <!DOCTYPE html>
-<html lang="@currentLang" dir="@(isRTL ? "rtl" : "ltr")">
+<html lang="@currentLang" dir="@(isRTL ? "rtl" : "ltr")" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Inventory</title>
 
+    <!-- Immediate Theme & Sidebar Execution (Prevents Flicker) -->
     <script>
             (function() {
+                const storedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-bs-theme', storedTheme);
+
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && window.innerWidth >= 992) {
                     document.documentElement.classList.add('sidebar-collapsed');
                 }
@@ -47,6 +50,58 @@
 
     <!-- Dynamic Compiled SCSS Stylesheet -->
     <link rel="stylesheet" href="@Url.Content(cssPath)" asp-append-version="true" />
+
+    <style>
+            /* High-Contrast White Text & Elevated Surfaces in Dark Mode */
+            [data-bs-theme="dark"] .brand-text,
+            [data-bs-theme="dark"] .user-name-text,
+            [data-bs-theme="dark"] .footer-brand-text {
+                color: #ffffff !important;
+            }
+
+            [data-bs-theme="dark"] .sidebar .nav-link-item {
+                color: #e2e8f0 !important;
+            }
+
+                [data-bs-theme="dark"] .sidebar .nav-link-item:hover {
+                    color: #ffffff !important;
+                    background-color: #334155 !important;
+                }
+
+                [data-bs-theme="dark"] .sidebar .nav-link-item.active {
+                    color: #ffffff !important;
+                    background-color: #4f46e5 !important;
+                }
+
+            [data-bs-theme="dark"] .btn-header-action {
+                background-color: #1e293b !important;
+                color: #ffffff !important;
+                border-color: #334155 !important;
+            }
+
+                [data-bs-theme="dark"] .btn-header-action:hover {
+                    background-color: #334155 !important;
+                    color: #ffffff !important;
+                }
+
+            [data-bs-theme="dark"] .dropdown-menu {
+                background-color: #1e293b !important;
+                border: 1px solid #334155 !important;
+            }
+
+            [data-bs-theme="dark"] .dropdown-item {
+                color: #e2e8f0 !important;
+            }
+
+                [data-bs-theme="dark"] .dropdown-item:hover {
+                    background-color: #334155 !important;
+                    color: #ffffff !important;
+                }
+
+            [data-bs-theme="dark"] .dropdown-divider {
+                border-color: #334155 !important;
+            }
+    </style>
 </head>
 <body>
 
@@ -59,7 +114,7 @@
             <span class="bg-primary text-white rounded-3 p-2 d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 40px; height: 40px;">
                 <i class="bi bi-box-seam-fill fs-5"></i>
             </span>
-            <span class="brand-text tracking-tight fw-bold fs-4 text-dark">@Localizer["Inventory"]</span>
+            <span class="brand-text tracking-tight fw-bold fs-4">@Localizer["Inventory"]</span>
         </div>
 
         <ul class="nav nav-pills flex-column gap-1 mb-auto">
@@ -107,15 +162,20 @@
                 <div class="container-fluid px-3 px-md-4">
                     <div class="d-flex align-items-center justify-content-between w-100">
 
-                        <button class="btn btn-light border-0 btn-action-icon" type="button" id="sidebarToggle" title="Toggle Sidebar">
+                        <button class="btn btn-header-action btn-light border-0 btn-action-icon" type="button" id="sidebarToggle" title="Toggle Sidebar">
                             <i class="bi bi-list fs-4"></i>
                         </button>
 
                         <div class="d-flex align-items-center gap-2">
 
+                            <!-- Dark / Light Mode Toggle Button -->
+                            <button type="button" class="btn btn-header-action btn-action-icon border" id="themeToggleBtn" title="@Localizer["Toggle Theme"]">
+                                <i class="bi bi-moon-stars-fill text-warning fs-5" id="themeIcon"></i>
+                            </button>
+
                             <!-- Language Dropdown -->
                             <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 dropdown-toggle d-flex align-items-center gap-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-sm btn-header-action rounded-pill px-3 dropdown-toggle d-flex align-items-center gap-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-globe me-1"></i>
                                     <span class="fw-semibold text-uppercase">@currentLang</span>
                                 </button>
@@ -143,20 +203,20 @@
 
                             @if (isAuthenticated)
                             {
-                                <!-- Modern User Badge Dropdown -->
+                                <!-- User Badge Dropdown -->
                                 <div class="dropdown ms-1">
-                                    <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2 px-3 py-1.5 shadow-sm dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-header-action rounded-pill d-flex align-items-center gap-2 px-3 py-1.5 shadow-sm dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
                                         <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.85rem;">
                                             <i class="bi bi-person-fill"></i>
                                         </span>
-                                        <span class="fw-semibold text-dark text-truncate" style="max-width: 140px;">
+                                        <span class="fw-semibold user-name-text text-truncate" style="max-width: 140px;">
                                             @(isRTL ? User.FindFirst("NameAr")?.Value : User.FindFirst("NameEn")?.Value)
                                         </span>
                                     </button>
 
                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom p-2 mt-2 shadow border-0" aria-labelledby="userMenu" style="min-width: 220px;">
                                         <li class="px-3 py-2 border-bottom mb-2">
-                                            <span class="d-block fw-bold text-dark text-truncate">@displayName</span>
+                                            <span class="d-block fw-bold user-name-text text-truncate">@displayName</span>
                                             <small class="text-muted d-block">@(User.FindFirst(ClaimTypes.Email)?.Value ?? "")</small>
                                         </li>
                                         <li>
@@ -195,12 +255,12 @@
             </main>
         </div>
 
-        <footer class="bg-white border-top py-4 mt-auto">
+        <footer class="footer-custom border-top py-4 mt-auto">
             <div class="container-fluid px-3 px-md-4">
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">v2.5</span>
-                        <span>&copy; 2026 <strong>@Localizer["InventoryHub Systems"]</strong>. @Localizer["All rights reserved"]</span>
+                        <span>&copy; 2026 <strong class="footer-brand-text">@Localizer["InventoryHub Systems"]</strong>. @Localizer["All rights reserved"]</span>
                     </div>
                 </div>
             </div>
@@ -214,7 +274,29 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById('themeIcon');
+                if (icon) {
+                    if (theme === 'dark') {
+                        icon.className = 'bi bi-sun-fill text-warning fs-5';
+                    } else {
+                        icon.className = 'bi bi-moon-stars-fill text-secondary fs-5';
+                    }
+                }
+            }
+
             $(document).ready(function() {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+                updateThemeIcon(currentTheme);
+
+                $('#themeToggleBtn').on('click', function() {
+                    const activeTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                    localStorage.setItem('theme', nextTheme);
+                    updateThemeIcon(nextTheme);
+                });
+
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && $(window).width() >= 992) {
                     $('body').addClass('sidebar-collapsed');
                 }

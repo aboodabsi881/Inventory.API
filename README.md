@@ -21,9 +21,9 @@ A modern, full-stack **Inventory Management Application** built using **ASP.NET 
 
 ## 📊 Dashboard & Reports
 
-[![View Dashboard PDF](docs/dashboard-preview.png)](docs/dashboard-overview.pdf)
+[![View Dashboard PDF](dashboard-overview.pdf)](dashboard-overview.pdf)
 
-> 💡 *Click the preview above to view or download the full [Dashboard Specification / Report (PDF)](docs/dashboard-overview.pdf).*
+> 💡 *Click the preview above to view or download the full [Dashboard Specification / Report (PDF)](dashboard-overview.pdf).*
 
 ---
 ## 🛠️ Tech Stack & Architecture

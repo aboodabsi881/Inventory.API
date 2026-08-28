@@ -492,6 +492,9 @@
   <data name="ItemRemovedFromCart" xml:space="preserve">
     <value>Item removed from Cart</value>
   </data>
+  <data name="Items you have saved to your wishlist." xml:space="preserve">
+    <value>Items you have saved to your wishlist.</value>
+  </data>
   <data name="JD" xml:space="preserve">
     <value>JD</value>
   </data>
@@ -528,11 +531,17 @@
   <data name="Low Stock Items" xml:space="preserve">
     <value>Low Stock Items</value>
   </data>
+  <data name="Manage inventory, update stock items, and adjust prices." xml:space="preserve">
+    <value>Manage inventory, update stock items, and adjust prices.</value>
+  </data>
   <data name="Manage personal profile details &amp; role" xml:space="preserve">
     <value>Manage personal profile details &amp; role</value>
   </data>
   <data name="Manage system roles and permissions" xml:space="preserve">
     <value>Manage system roles and permissions</value>
+  </data>
+  <data name="Manage system user accounts, roles, and credentials." xml:space="preserve">
+    <value>Manage system user accounts, roles, and credentials.</value>
   </data>
   <data name="My Favorites" xml:space="preserve">
     <value>My Favorites</value>
@@ -600,6 +609,9 @@
   <data name="Order Summary" xml:space="preserve">
     <value>Order Summary</value>
   </data>
+  <data name="Organize, group, and manage your inventory catalog." xml:space="preserve">
+    <value>Organize, group, and manage your inventory catalog.</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
@@ -647,6 +659,9 @@
   </data>
   <data name="Products" xml:space="preserve">
     <value>Products</value>
+  </data>
+  <data name="Products Catalog" xml:space="preserve">
+    <value>Products Catalog</value>
   </data>
   <data name="Products in this Category" xml:space="preserve">
     <value>Products in this Category</value>
@@ -698,6 +713,9 @@
   </data>
   <data name="Request ID:" xml:space="preserve">
     <value>Request ID:</value>
+  </data>
+  <data name="Review your items, update quantities, and proceed to checkout." xml:space="preserve">
+    <value>Review your items, update quantities, and proceed to checkout.</value>
   </data>
   <data name="Role" xml:space="preserve">
     <value>Role</value>

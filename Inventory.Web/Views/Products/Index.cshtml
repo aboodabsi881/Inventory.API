@@ -36,14 +36,39 @@
                 {
                     var imgSrc = string.IsNullOrEmpty(item.Img) ? "/images/placeholder.png" : item.Img;
                     var categoryName = string.IsNullOrEmpty(item.CategoryName) ? Localizer["Uncategorized"].Value : item.CategoryName;
+                    var isOutOfStock = item.Quantity <= 0;
+                    var isLowStock = item.Quantity > 0 && item.Quantity <= 5;
 
                     <div class="col product-item-col"
                          id="product-card-@item.Id"
                          data-name="@(item.Name?.ToLower() ?? "")"
-                         data-category="@categoryName.ToLower()">
-                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card">
+                         data-category="@categoryName.ToLower()"
+                         data-stock="@item.Quantity">
+                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card @(isOutOfStock ? "opacity-75" : "")">
 
-                            <!-- Favorite Action Button -->
+                            <!-- Stock Status Badge (Top-Left) -->
+                            <div class="position-absolute top-0 start-0 m-3" style="z-index: 5;">
+                                @if (isOutOfStock)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-slash-circle me-1"></i>@Localizer["Out of Stock"]
+                                    </span>
+                                }
+                                else if (isLowStock)
+                                {
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>@Localizer["Low Stock"]: @item.Quantity
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-check-circle me-1"></i>@Localizer["In Stock"]: @item.Quantity
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Favorite Action Button (Top-Right) -->
                             <button type="button"
                                     class="btn rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
                                     id="fav-btn-@item.Id"
@@ -84,7 +109,13 @@
 
                                 <!-- Dynamic Cart Control Stepper -->
                                 <div class="my-2" id="cart-control-container-@item.Id">
-                                    @if (item.QuantityInCart > 0)
+                                    @if (isOutOfStock)
+                                    {
+                                        <button type="button" class="btn btn-secondary w-100 rounded-pill py-2 shadow-sm fw-semibold disabled" disabled>
+                                            <i class="bi bi-slash-circle me-1"></i>@Localizer["Unavailable"]
+                                        </button>
+                                    }
+                                    else if (item.QuantityInCart > 0)
                                     {
                                         <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
                                             <button type="button"
@@ -99,8 +130,9 @@
                                             </span>
 
                                             <button type="button"
-                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn @(item.QuantityInCart >= item.Quantity ? "disabled opacity-50" : "")"
                                                     style="width: 28px; height: 28px;"
+                                                @(item.QuantityInCart >= item.Quantity ? "disabled" : "")
                                                     onclick="updateCartQuantity(@item.Id, 1)">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
@@ -175,7 +207,7 @@
             cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
             favoriteUrl: '@Url.Action("Add", "Favorite")',
             deleteUrl: '@Url.Action("DeleteConfirmed", "Products")'
-                };
+        };
     </script>
     <script src="~/js/Product/Index.js" asp-append-version="true"></script>
 }

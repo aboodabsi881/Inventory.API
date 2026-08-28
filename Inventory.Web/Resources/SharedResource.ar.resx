@@ -492,6 +492,9 @@
   <data name="ItemRemovedFromCart" xml:space="preserve">
     <value>تمت إزالة العنصر من سلة التسوق</value>
   </data>
+  <data name="Items you have saved to your wishlist." xml:space="preserve">
+    <value>العناصر التي قمت بحفظها في قائمة أمنياتك.</value>
+  </data>
   <data name="JD" xml:space="preserve">
     <value>د.أ</value>
   </data>
@@ -528,11 +531,17 @@
   <data name="Low Stock Items" xml:space="preserve">
     <value>المنتجات ذات المخزون المنخفض</value>
   </data>
+  <data name="Manage inventory, update stock items, and adjust prices." xml:space="preserve">
+    <value>إدارة المخزون، وتحديث عناصر المخزون، وتعديل الأسعار.</value>
+  </data>
   <data name="Manage personal profile details &amp; role" xml:space="preserve">
     <value>إدارة تفاصيل الملف الشخصي والدور</value>
   </data>
   <data name="Manage system roles and permissions" xml:space="preserve">
     <value>إدارة أدوار النظام وصلاحياته</value>
+  </data>
+  <data name="Manage system user accounts, roles, and credentials." xml:space="preserve">
+    <value>إدارة حسابات المستخدمين وأدوارهم وبيانات اعتمادهم في النظام.</value>
   </data>
   <data name="My Favorites" xml:space="preserve">
     <value>مفضلاتي</value>
@@ -600,6 +609,9 @@
   <data name="Order Summary" xml:space="preserve">
     <value>ملخص الطلب</value>
   </data>
+  <data name="Organize, group, and manage your inventory catalog." xml:space="preserve">
+    <value>قم بتنظيم وتجميع وإدارة كتالوج المخزون الخاص بك.</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>كلمة المرور</value>
   </data>
@@ -647,6 +659,9 @@
   </data>
   <data name="Products" xml:space="preserve">
     <value>منتجات</value>
+  </data>
+  <data name="Products Catalog" xml:space="preserve">
+    <value>كتالوج المنتجات</value>
   </data>
   <data name="Products in this Category" xml:space="preserve">
     <value>المنتجات في هذه الفئة</value>
@@ -698,6 +713,9 @@
   </data>
   <data name="Request ID:" xml:space="preserve">
     <value>معرف الطلب:</value>
+  </data>
+  <data name="Review your items, update quantities, and proceed to checkout." xml:space="preserve">
+    <value>راجع مشترياتك، وقم بتحديث الكميات، ثم انتقل إلى صفحة الدفع.</value>
   </data>
   <data name="Role" xml:space="preserve">
     <value>الدور</value>

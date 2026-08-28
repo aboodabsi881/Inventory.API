@@ -14,7 +14,8 @@ namespace Inventory.Core.AutoMapperProfiles
 
             CreateMap<Product, ProductResponseDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
-                .ForMember(dest => dest.PowerTypeName, opt => opt.MapFrom(src => src.PowerType.HasValue ? src.PowerType.Value.ToString() : null));
+                .ForMember(dest => dest.PowerTypeName, opt => opt.MapFrom(src => src.PowerType.HasValue ? src.PowerType.Value.ToString() : null))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity)); ;
         }
     }
 }

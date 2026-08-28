@@ -2,16 +2,21 @@
 using Inventory.Core.Entities.Products;
 using Inventory.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Inventory.Core.Services
 {
     public class ProductService : IProductService
     {
         private readonly IRepository<Product> _productRepo;
+        private readonly ICurrentUserService _currentUser;
 
-        public ProductService(IRepository<Product> productRepo)
+        public ProductService(IRepository<Product> productRepo, ICurrentUserService currentUser)
         {
             _productRepo = productRepo;
+            _currentUser = currentUser;
         }
 
         public async Task<IReadOnlyList<ProductResponseDto>> GetAllProductsDtoAsync()
@@ -42,6 +47,22 @@ namespace Inventory.Core.Services
         public async Task<bool> DeleteProductAsync(int id)
         {
             return await _productRepo.DeleteAndSaveAsync(id);
+        }
+
+        public async Task<bool> UpdateStockAsync(int productId, int quantityChange)
+        {
+            var product = await _productRepo.GetByIdAsync(productId);
+            if (product == null) return false;
+
+            int newQuantity = product.Quantity + quantityChange;
+            if (newQuantity < 0)
+            {
+                throw new InvalidOperationException($"Insufficient stock. Current available quantity is {product.Quantity}.");
+            }
+
+            product.Quantity = newQuantity;
+            _productRepo.Update(product);
+            return await _productRepo.SaveChangesAsync() > 0;
         }
     }
 }

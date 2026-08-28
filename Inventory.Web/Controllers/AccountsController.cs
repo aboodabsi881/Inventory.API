@@ -1,39 +1,33 @@
-﻿using Inventory.Web.ViewModels.Accounts;
-using Inventory.Web.ViewModels.Roles;
+﻿using Inventory.Web.Interfaces;
+using Inventory.Web.ViewModels.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
-using System.Text.Json;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     public class AccountsController : Controller
     {
-        private readonly HttpClient _client;
-        private readonly IWebHostEnvironment _webHostEnvironment;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private readonly IViewAccountService _accountService;
 
-        public AccountsController(IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
+        public AccountsController(IViewAccountService accountService)
         {
-            _client = httpClientFactory.CreateClient("InventoryAPI");
-            _webHostEnvironment = webHostEnvironment;
+            _accountService = accountService;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() => View();
 
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Super Admin")]
         public async Task<IActionResult> Index()
         {
-            var users = await _client.GetFromJsonAsync<List<UsersVM>>("Accounts/users", JsonOptions) ?? new List<UsersVM>();
+            var users = await _accountService.GetAllUsersAsync();
             return View(users);
         }
 
@@ -43,8 +37,13 @@ namespace Inventory.Web.Controllers
         {
             if (User.Identity?.IsAuthenticated ?? false)
             {
+                // Redirect already authenticated users based on their role
+                if (User.IsInRole("User"))
+                    return RedirectToAction("Index", "Category");
+
                 return RedirectToAction("Index", "Home");
             }
+
             return View();
         }
 
@@ -54,19 +53,13 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> Login(LoginVM model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid input details." });
+                return BadRequest(new { icon = "error", message = "Invalid input details." });
 
-            var response = await _client.PostAsJsonAsync("Accounts/login", model);
-            if (!response.IsSuccessStatusCode)
-            {
-                return BadRequest(new { message = "Invalid username or password." });
-            }
+            var result = await _accountService.LoginAsync(model);
+            if (!result.Success || result.User == null)
+                return BadRequest(new { icon = "error", message = result.Message });
 
-            var userObj = await response.Content.ReadFromJsonAsync<UsersVM>(JsonOptions);
-            if (userObj == null)
-                return BadRequest(new { message = "Invalid user response." });
-
-            var principal = CreateClaimsPrincipal(userObj);
+            var principal = _accountService.CreateClaimsPrincipal(result.User);
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = model.RememberMe,
@@ -76,11 +69,20 @@ namespace Inventory.Web.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
+            // Check if the user has the "User" role
+            bool isStandardUser = principal.IsInRole("User")
+                || string.Equals(result.User.RoleName, "User", StringComparison.OrdinalIgnoreCase);
+
+            // Direct "User" role to Category/Index, others (e.g. Admin) to Home/Index
+            string? targetUrl = isStandardUser
+                ? Url.Action("Index", "Categories")
+                : Url.Action("Index", "Home");
+
             return Ok(new
             {
                 icon = "success",
-                message = "Login successful!",
-                redirectUrl = Url.Action("Index", "Home")
+                message = result.Message,
+                redirectUrl = targetUrl
             });
         }
 
@@ -88,20 +90,12 @@ namespace Inventory.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            Response.Cookies.Delete("UserAvatar");
-            Response.Cookies.Delete("UserName");
-            Response.Cookies.Delete("UserRole");
-
             return RedirectToAction(nameof(Login));
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() => View();
 
         [HttpPost]
         [AllowAnonymous]
@@ -119,32 +113,18 @@ namespace Inventory.Web.Controllers
                 });
             }
 
-            string? imagePath = model.ImgFile is { Length: > 0 } ? await SaveUserImageAsync(model.ImgFile) : null;
-
-            var registerPayload = new
-            {
-                model.UserName,
-                model.Email,
-                model.Password,
-                model.NameEn,
-                model.NameAr,
-                Img = !string.IsNullOrEmpty(imagePath) ? imagePath : "/images/Portrait_Placeholder.png",
-                RoleName = string.IsNullOrEmpty(model.RoleName) ? "User" : model.RoleName
-            };
-
-            var response = await _client.PostAsJsonAsync("Accounts/register", registerPayload);
-            if (response.IsSuccessStatusCode)
+            var result = await _accountService.RegisterAsync(model);
+            if (result.Success)
             {
                 return Ok(new
                 {
                     icon = "success",
-                    message = "User registered successfully!",
+                    message = result.Message,
                     redirectUrl = Url.Action("Login")
                 });
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { message = $"Registration failed: {errorContent}" });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
 
         [Authorize]
@@ -153,14 +133,8 @@ namespace Inventory.Web.Controllers
         {
             if (id <= 0) return BadRequest("Invalid User ID.");
 
-            var response = await _client.GetAsync($"Accounts/personal-data/{id}");
-            if (!response.IsSuccessStatusCode) return NotFound();
-
-            var vm = await response.Content.ReadFromJsonAsync<PersonalDataVM>(JsonOptions);
+            var vm = await _accountService.GetPersonalDataAsync(id);
             if (vm == null) return NotFound();
-
-            var rolesList = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
-            vm.RoleLookup = new SelectList(rolesList.Select(r => r.Name), vm.RoleName);
 
             return View(vm);
         }
@@ -181,40 +155,25 @@ namespace Inventory.Web.Controllers
                 });
             }
 
-            if (model.ImgFile is { Length: > 0 })
-            {
-                model.Img = await SaveUserImageAsync(model.ImgFile);
-            }
-            else if (string.IsNullOrWhiteSpace(model.Img))
-            {
-                model.Img = "/images/Portrait_Placeholder.png";
-            }
-
-            using var formData = BuildPersonalDataFormData(model);
-            var response = await _client.PutAsync($"Accounts/personal-data/{model.Id}", formData);
-
-            if (response.IsSuccessStatusCode)
+            var result = await _accountService.UpdatePersonalDataAsync(model);
+            if (result.Success)
             {
                 return Ok(new
                 {
                     icon = "success",
-                    message = "Profile updated successfully!",
+                    message = result.Message,
                     redirectUrl = Url.Action("Index", "Accounts")
                 });
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { icon = "error", message = !string.IsNullOrEmpty(errorContent) ? errorContent : "Failed to update profile." });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
 
         [Authorize]
         [HttpGet]
         public IActionResult ChangePassword(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("User ID is required.");
-            }
+            if (id <= 0) return BadRequest("User ID is required.");
             return View(new ChangePasswordVM { Id = id.ToString() });
         }
 
@@ -228,200 +187,44 @@ namespace Inventory.Web.Controllers
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
-                    .Where(msg => !string.IsNullOrWhiteSpace(msg))
-                    .ToList();
+                    .Where(msg => !string.IsNullOrWhiteSpace(msg));
 
-                return BadRequest(new { message = string.Join("<br/>", errors) });
+                return BadRequest(new { icon = "error", message = string.Join("<br/>", errors) });
             }
 
-            var payload = new
-            {
-                CurrentPassword = model.CurrentPassword,
-                NewPassword = model.NewPassword,
-                ConfirmPassword = model.ConfirmPassword
-            };
-
-            var response = await _client.PutAsJsonAsync($"Accounts/change-password/{model.Id}", payload);
-
-            if (response.IsSuccessStatusCode)
+            var result = await _accountService.ChangePasswordAsync(model);
+            if (result.Success)
             {
                 return Ok(new
                 {
                     icon = "success",
-                    message = "Password updated successfully!",
+                    message = result.Message,
                     redirectUrl = Url.Action("Index", "Home")
                 });
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            string errorMessage = "Failed to update password.";
-
-            try
-            {
-                using var doc = JsonDocument.Parse(errorContent);
-                var root = doc.RootElement;
-
-                if (root.TryGetProperty("errors", out var errorsProp) && errorsProp.ValueKind == JsonValueKind.Object)
-                {
-                    var errList = new List<string>();
-                    foreach (var prop in errorsProp.EnumerateObject())
-                    {
-                        if (prop.Value.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (var err in prop.Value.EnumerateArray())
-                            {
-                                errList.Add(err.GetString() ?? "");
-                            }
-                        }
-                        else if (prop.Value.ValueKind == JsonValueKind.String)
-                        {
-                            errList.Add(prop.Value.GetString() ?? "");
-                        }
-                    }
-                    if (errList.Any()) errorMessage = string.Join("<br/>", errList);
-                }
-                else if (root.TryGetProperty("message", out var msgProp))
-                {
-                    errorMessage = msgProp.GetString() ?? errorMessage;
-                }
-            }
-            catch
-            {
-                if (!string.IsNullOrWhiteSpace(errorContent))
-                {
-                    errorMessage = errorContent;
-                }
-            }
-
-            return BadRequest(new { message = errorMessage });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Super Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id <= 0)
-                return BadRequest(new { message = "Invalid User ID." });
+            if (id <= 0) return BadRequest(new { icon = "error", message = "Invalid User ID." });
 
-            var response = await _client.DeleteAsync($"Accounts/users/{id}");
-
-            if (response.IsSuccessStatusCode)
+            var result = await _accountService.DeleteUserAsync(id);
+            if (result.Success)
             {
                 return Ok(new
                 {
                     icon = "info",
                     title = "Deleted!",
-                    message = "User deleted successfully."
+                    message = result.Message
                 });
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            string message = "Failed to delete user.";
-
-            try
-            {
-                using var doc = JsonDocument.Parse(errorContent);
-                if (doc.RootElement.TryGetProperty("message", out var msgProp))
-                {
-                    message = msgProp.GetString() ?? message;
-                }
-            }
-            catch
-            {
-                if (!string.IsNullOrWhiteSpace(errorContent))
-                    message = errorContent;
-            }
-
-            return BadRequest(new { message });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
-
-        #region Helpers
-
-        private static ClaimsPrincipal CreateClaimsPrincipal(UsersVM userObj)
-        {
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, userObj.Id.ToString()),
-                new(ClaimTypes.Name, !string.IsNullOrWhiteSpace(userObj.UserName) ? userObj.UserName : "User"),
-                new(ClaimTypes.Email, userObj.Email ?? ""),
-                new("NameAr", userObj.NameAr ?? ""),
-                new("NameEn", userObj.NameEn ?? ""),
-                new("Avatar", !string.IsNullOrWhiteSpace(userObj.Img) ? userObj.Img : "/images/Portrait_Placeholder.png")
-            };
-
-            var rolesList = new List<string>();
-
-            if (userObj.Roles != null && userObj.Roles.Any())
-            {
-                rolesList.AddRange(userObj.Roles);
-            }
-
-            if (!string.IsNullOrWhiteSpace(userObj.RoleName))
-            {
-                rolesList.Add(userObj.RoleName);
-            }
-
-            if (!rolesList.Any())
-            {
-                rolesList.Add("User");
-            }
-
-            foreach (var role in rolesList.Distinct())
-            {
-                var cleanRole = role.Trim();
-                var normalizedRole = cleanRole.Replace(" ", "");
-
-                if (normalizedRole.Equals("superadmin", StringComparison.OrdinalIgnoreCase))
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, "SuperAdmin"));
-                    claims.Add(new Claim(ClaimTypes.Role, "Super Admin"));
-                }
-                else if (normalizedRole.Equals("admin", StringComparison.OrdinalIgnoreCase))
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-                }
-                else
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, cleanRole));
-                }
-            }
-
-            return new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-        }
-
-        private static MultipartFormDataContent BuildPersonalDataFormData(PersonalDataVM model)
-        {
-            var formData = new MultipartFormDataContent
-            {
-                { new StringContent(model.Id.ToString()), nameof(model.Id) },
-                { new StringContent(model.UserName ?? string.Empty), nameof(model.UserName) },
-                { new StringContent(model.Email ?? string.Empty), nameof(model.Email) },
-                { new StringContent(model.NameEn ?? string.Empty), nameof(model.NameEn) },
-                { new StringContent(model.NameAr ?? string.Empty), nameof(model.NameAr) },
-                { new StringContent(model.Img ?? string.Empty), nameof(model.Img) }
-            };
-
-            if (!string.IsNullOrEmpty(model.RoleName))
-                formData.Add(new StringContent(model.RoleName), nameof(model.RoleName));
-
-            return formData;
-        }
-
-        private async Task<string> SaveUserImageAsync(IFormFile imgFile)
-        {
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imgFile.FileName)}";
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "users");
-
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            var fullPath = Path.Combine(uploadsFolder, fileName);
-            await using var stream = new FileStream(fullPath, FileMode.Create);
-            await imgFile.CopyToAsync(stream);
-
-            return "/images/users/" + fileName;
-        }
-
-        #endregion
     }
 }

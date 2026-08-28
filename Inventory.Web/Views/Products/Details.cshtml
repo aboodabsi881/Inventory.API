@@ -15,6 +15,9 @@
 
     var returnUrl = Context.Request.Query["returnUrl"].ToString();
     var backUrl = !string.IsNullOrEmpty(returnUrl) ? returnUrl : Url.Action("Index", "Products");
+
+    bool isOutOfStock = Model.Quantity <= 0;
+    bool isLowStock = Model.Quantity > 0 && Model.Quantity <= 5;
 }
 
 <form id="antiForgeryForm">
@@ -23,13 +26,37 @@
 
 <div class="row justify-content-center my-4">
     <div class="col-md-9 col-lg-8">
-        <div class="card shadow-sm border rounded-4 overflow-hidden product-card">
+        <div class="card shadow-sm border rounded-4 overflow-hidden product-card @(isOutOfStock ? "opacity-75" : "")">
             <div class="row g-0">
 
                 <!-- Product Image Area -->
                 <div class="col-md-5 p-4 border-end position-relative d-flex align-items-center justify-content-center img-surface-wrap">
+
+                    <!-- Stock Badge (Top-Left) -->
+                    <div class="position-absolute top-0 start-0 m-3" style="z-index: 10;">
+                        @if (isOutOfStock)
+                        {
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-semibold">
+                                <i class="bi bi-slash-circle me-1"></i>@Localizer["Out of Stock"]
+                            </span>
+                        }
+                        else if (isLowStock)
+                        {
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1 small fw-semibold">
+                                <i class="bi bi-exclamation-triangle me-1"></i>@Localizer["Low Stock"]
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-semibold">
+                                <i class="bi bi-check-circle me-1"></i>@Localizer["In Stock"]
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Favorite Button (Top-Right) -->
                     <button type="button"
-                            class="btn rounded-circle position-absolute top-0 start-0 m-3 shadow-sm fav-floating-btn"
+                            class="btn rounded-circle position-absolute top-0 end-0 m-3 shadow-sm fav-floating-btn"
                             onclick="toggleFavorite(@Model.Id)"
                             title="@Localizer["Toggle favorite"]"
                             style="width: 38px; height: 38px; z-index: 10;">
@@ -61,6 +88,19 @@
                                 <span class="fw-semibold text-main">#@Model.Id</span>
                             </li>
                             <li class="list-group-item bg-transparent px-0 d-flex justify-content-between align-items-center">
+                                <span class="text-muted"><i class="bi bi-boxes me-1"></i>@Localizer["Stock Available"]</span>
+                                @if (isOutOfStock)
+                                {
+                                    <span class="badge bg-danger text-white rounded-pill px-2">0 @Localizer["units"]</span>
+                                }
+                                else
+                                {
+                                    <span class="fw-semibold @(isLowStock ? "text-warning-emphasis" : "text-main")">
+                                        @Model.Quantity @Localizer["units"]
+                                    </span>
+                                }
+                            </li>
+                            <li class="list-group-item bg-transparent px-0 d-flex justify-content-between align-items-center">
                                 <span class="text-muted"><i class="bi bi-grid me-1"></i>@Localizer["Category"]</span>
                                 <span class="fw-semibold text-main">
                                     @(string.IsNullOrWhiteSpace(Model.CategoryName) ? Localizer["Uncategorized"].Value : Model.CategoryName)
@@ -74,7 +114,13 @@
 
                         <!-- Cart Stepper Control -->
                         <div class="my-3" id="cart-control-container-@Model.Id">
-                            @if (Model.QuantityInCart > 0)
+                            @if (isOutOfStock)
+                            {
+                                <button type="button" class="btn btn-secondary w-100 rounded-pill py-2.5 shadow-sm fw-semibold disabled" disabled>
+                                    <i class="bi bi-slash-circle me-1"></i>@Localizer["Out of Stock"]
+                                </button>
+                            }
+                            else if (Model.QuantityInCart > 0)
                             {
                                 <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-3 py-2 shadow-sm" style="min-height: 45px;">
                                     <button type="button"
@@ -89,8 +135,9 @@
                                     </span>
 
                                     <button type="button"
-                                            class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                            class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn @(Model.QuantityInCart >= Model.Quantity ? "disabled opacity-50" : "")"
                                             style="width: 32px; height: 32px;"
+                                        @(Model.QuantityInCart >= Model.Quantity ? "disabled" : "")
                                             onclick="updateCartQuantity(@Model.Id, 1)">
                                         <i class="bi bi-plus-lg fs-6"></i>
                                     </button>
@@ -115,9 +162,9 @@
                                     <i class="bi bi-pencil me-1"></i> @Localizer["Edit"]
                                 </a>
                             }
-                            <a href="@backUrl" class="btn btn-action-back rounded-pill px-4 flex-fill">
+                            <button type="button" onclick="history.back()" class="btn btn-action-back rounded-pill px-4 flex-fill">
                                 <i class="bi bi-arrow-left me-1"></i> @Localizer["Back"]
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -129,25 +176,25 @@
 
 @section Scripts {
     <script>
-                window.AppConfig = {
-                isAuthenticated: @(isAuthenticated.ToString().ToLower()),
-                loginUrl: '@Url.Action("Login", "Accounts")',
-                endpoints: {
-                    cartAddOrUpdate: '@Url.Action("AddOrUpdate", "Cart")',
-            favoriteAdd: '@Url.Action("Add", "Favorite")'
-        },
-        texts: {
-            inCart: @Json.Serialize(Localizer["in cart"].Value),
-            addToCart: @Json.Serialize(Localizer["Add to Cart"].Value),
-            signInRequired: @Json.Serialize(Localizer["Sign In Required"].Value),
-            signInPrompt: @Json.Serialize(Localizer["Please log in to manage your cart and favorites."].Value),
-            signInBtn: @Json.Serialize(Localizer["Sign In"].Value),
-            cartRemoved: @Json.Serialize(Localizer["Item removed from cart"].Value),
-            cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
-            cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
-            favError: @Json.Serialize(Localizer["Failed to update favorite status."].Value)
-                }
-            };
+        window.AppConfig = {
+            isAuthenticated: @(isAuthenticated.ToString().ToLower()),
+            loginUrl: '@Url.Action("Login", "Accounts")',
+            endpoints: {
+                cartAddOrUpdate: '@Url.Action("AddOrUpdate", "Cart")',
+                favoriteAdd: '@Url.Action("Add", "Favorite")'
+            },
+            texts: {
+                inCart: @Json.Serialize(Localizer["in cart"].Value),
+                addToCart: @Json.Serialize(Localizer["Add to Cart"].Value),
+                signInRequired: @Json.Serialize(Localizer["Sign In Required"].Value),
+                signInPrompt: @Json.Serialize(Localizer["Please log in to manage your cart and favorites."].Value),
+                signInBtn: @Json.Serialize(Localizer["Sign In"].Value),
+                cartRemoved: @Json.Serialize(Localizer["Item removed from cart"].Value),
+                cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
+                cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
+                favError: @Json.Serialize(Localizer["Failed to update favorite status."].Value)
+                    }
+        };
     </script>
     <script src="~/js/Product/Details.js" asp-append-version="true"></script>
 }

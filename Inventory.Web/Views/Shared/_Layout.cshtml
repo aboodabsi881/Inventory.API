@@ -1,22 +1,9 @@
 ﻿@using System.Globalization
-@using System.Security.Claims
 
 @{
-    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0";
-
     var currentLang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-    var isRTL = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
+    var isRTL = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
     var cssPath = isRTL ? "~/css/styleAr.css" : "~/css/style.css";
-
-    // Select Name based on active culture
-    var nameAr = User.FindFirst("NameAr")?.Value;
-    var nameEn = User.FindFirst("NameEn")?.Value;
-    var displayName = isRTL
-        ? (!string.IsNullOrWhiteSpace(nameAr) ? nameAr : (User.Identity?.Name ?? "مستخدم"))
-        : (!string.IsNullOrWhiteSpace(nameEn) ? nameEn : (User.Identity?.Name ?? "User"));
-
-    var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Trim().Substring(0, 1).ToUpper() : "U";
 }
 
 <!DOCTYPE html>
@@ -26,7 +13,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Inventory</title>
 
-    <!-- Immediate Theme & Sidebar Execution (Prevents Flicker) -->
     <script>
             (function() {
                 const storedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -38,77 +24,20 @@
             })();
     </script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap 5 & Icons -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
-    <!-- Dynamic Compiled SCSS Stylesheet -->
     <link rel="stylesheet" href="@Url.Content(cssPath)" asp-append-version="true" />
-
-    <style>
-            /* High-Contrast White Text & Elevated Surfaces in Dark Mode */
-            [data-bs-theme="dark"] .brand-text,
-            [data-bs-theme="dark"] .user-name-text,
-            [data-bs-theme="dark"] .footer-brand-text {
-                color: #ffffff !important;
-            }
-
-            [data-bs-theme="dark"] .sidebar .nav-link-item {
-                color: #e2e8f0 !important;
-            }
-
-                [data-bs-theme="dark"] .sidebar .nav-link-item:hover {
-                    color: #ffffff !important;
-                    background-color: #334155 !important;
-                }
-
-                [data-bs-theme="dark"] .sidebar .nav-link-item.active {
-                    color: #ffffff !important;
-                    background-color: #4f46e5 !important;
-                }
-
-            [data-bs-theme="dark"] .btn-header-action {
-                background-color: #1e293b !important;
-                color: #ffffff !important;
-                border-color: #334155 !important;
-            }
-
-                [data-bs-theme="dark"] .btn-header-action:hover {
-                    background-color: #334155 !important;
-                    color: #ffffff !important;
-                }
-
-            [data-bs-theme="dark"] .dropdown-menu {
-                background-color: #1e293b !important;
-                border: 1px solid #334155 !important;
-            }
-
-            [data-bs-theme="dark"] .dropdown-item {
-                color: #e2e8f0 !important;
-            }
-
-                [data-bs-theme="dark"] .dropdown-item:hover {
-                    background-color: #334155 !important;
-                    color: #ffffff !important;
-                }
-
-            [data-bs-theme="dark"] .dropdown-divider {
-                border-color: #334155 !important;
-            }
-    </style>
 </head>
 <body>
 
-    <!-- Overlay for Mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Vertical Sidebar -->
     <aside class="sidebar p-3" id="sidebar">
         <div class="sidebar-header d-flex align-items-center gap-2 pb-3 mb-3 border-bottom px-2">
             <span class="bg-primary text-white rounded-3 p-2 d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 40px; height: 40px;">
@@ -137,7 +66,7 @@
                 </a>
             </li>
 
-            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Super Admin"))
+            @if (User.IsSuperAdmin())
             {
                 <li class="nav-item">
                     <a class="nav-link nav-link-item d-flex align-items-center gap-3" asp-controller="Accounts" asp-action="Index">
@@ -201,31 +130,31 @@
                                 <i class="bi bi-bag-fill fs-5"></i>
                             </a>
 
-                            @if (isAuthenticated)
+                            @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <!-- User Badge Dropdown -->
+                                <!-- User Dropdown -->
                                 <div class="dropdown ms-1">
                                     <button class="btn btn-header-action rounded-pill d-flex align-items-center gap-2 px-3 py-1.5 shadow-sm dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
                                         <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.85rem;">
-                                            <i class="bi bi-person-fill"></i>
+                                            @User.GetUserInitial()
                                         </span>
                                         <span class="fw-semibold user-name-text text-truncate" style="max-width: 140px;">
-                                            @(isRTL ? User.FindFirst("NameAr")?.Value : User.FindFirst("NameEn")?.Value)
+                                            @User.GetDisplayName()
                                         </span>
                                     </button>
 
                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom p-2 mt-2 shadow border-0" aria-labelledby="userMenu" style="min-width: 220px;">
                                         <li class="px-3 py-2 border-bottom mb-2">
-                                            <span class="d-block fw-bold user-name-text text-truncate">@displayName</span>
-                                            <small class="text-muted d-block">@(User.FindFirst(ClaimTypes.Email)?.Value ?? "")</small>
+                                            <span class="d-block fw-bold user-name-text text-truncate">@User.GetDisplayName()</span>
+                                            <small class="text-muted d-block text-truncate">@User.GetUserEmail()</small>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="PersonalData" asp-route-id="@currentUserId">
+                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="PersonalData" asp-route-id="@User.GetUserId()">
                                                 <i class="bi bi-person me-2 text-primary"></i> @Localizer["PersonalProfile"]
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="ChangePassword" asp-route-id="@currentUserId">
+                                            <a class="dropdown-item rounded-3 py-2 text-secondary" asp-controller="Accounts" asp-action="ChangePassword" asp-route-id="@User.GetUserId()">
                                                 <i class="bi bi-key me-2 text-warning"></i> @Localizer["ChangePassword"]
                                             </a>
                                         </li>
@@ -277,11 +206,9 @@
             function updateThemeIcon(theme) {
                 const icon = document.getElementById('themeIcon');
                 if (icon) {
-                    if (theme === 'dark') {
-                        icon.className = 'bi bi-sun-fill text-warning fs-5';
-                    } else {
-                        icon.className = 'bi bi-moon-stars-fill text-secondary fs-5';
-                    }
+                    icon.className = theme === 'dark'
+                        ? 'bi bi-sun-fill text-warning fs-5'
+                        : 'bi bi-moon-stars-fill text-secondary fs-5';
                 }
             }
 

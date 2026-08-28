@@ -1,42 +1,31 @@
-﻿using Inventory.Web.ViewModels.Carts;
+﻿using Inventory.Web.Interfaces;
+using Inventory.Web.ViewModels.Carts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     [Authorize]
     public class CartController : Controller
     {
-        private readonly HttpClient _client;
+        private readonly IViewCartService _cartService;
         private readonly IStringLocalizer<SharedResource> _localizer;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-        public CartController(IHttpClientFactory httpClientFactory, IStringLocalizer<SharedResource> localizer)
+        public CartController(IViewCartService cartService, IStringLocalizer<SharedResource> localizer)
         {
-            _client = httpClientFactory.CreateClient("InventoryAPI");
+            _cartService = cartService;
             _localizer = localizer;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<CartVM> cartItems = new();
-            decimal grandTotal = 0;
-
-            try
-            {
-                cartItems = await _client.GetFromJsonAsync<List<CartVM>>("Carts", JsonOptions) ?? new List<CartVM>();
-                grandTotal = await GetSafeCartTotalAsync();
-            }
-            catch
-            {
-            }
-
-            ViewBag.GrandTotal = grandTotal;
+            var cartItems = await _cartService.GetCartItemsAsync();
+            ViewBag.GrandTotal = await _cartService.GetSafeCartTotalAsync();
             return View(cartItems);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -45,51 +34,30 @@ namespace Inventory.Web.Controllers
             if (productId <= 0)
                 return BadRequest(new { icon = "error", message = _localizer["Invalid Product ID."].Value });
 
-            int delta = 1;
-            if (actionType == "decrement" || change < 0)
+            var result = await _cartService.AddOrUpdateItemAsync(productId, actionType, change);
+            if (!result.Success)
             {
-                delta = -1;
-            }
-
-            string formattedDelta = delta == -1 ? "-1" : "1";
-            var response = await _client.PostAsync($"Carts/items?productId={productId}&change={formattedDelta}", null);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                CartVM? updatedItem = null;
-
-                try
+                return BadRequest(new
                 {
-                    if (!string.IsNullOrWhiteSpace(responseContent))
-                    {
-                        updatedItem = JsonSerializer.Deserialize<CartVM>(responseContent, JsonOptions);
-                    }
-                }
-                catch (JsonException)
-                {
-                    updatedItem = null;
-                }
-
-                bool isRemoved = updatedItem == null || updatedItem.Quantity <= 0;
-                decimal grandTotal = await GetSafeCartTotalAsync();
-
-                return Ok(new
-                {
-                    icon = isRemoved ? "info" : "success",
-                    message = isRemoved
-                        ? _localizer["Item removed from cart."].Value
-                        : _localizer["Cart updated successfully."].Value,
-                    item = isRemoved ? null : updatedItem,
-                    quantity = isRemoved ? 0 : updatedItem!.Quantity,
-                    grandTotal,
-                    removed = isRemoved
+                    icon = "error",
+                    message = !string.IsNullOrWhiteSpace(result.ErrorMessage)
+                        ? result.ErrorMessage
+                        : _localizer["Failed to update cart."].Value
                 });
             }
 
-            return BadRequest(new { icon = "error", message = _localizer["Failed to update cart."].Value });
+            return Ok(new
+            {
+                icon = result.Removed ? "info" : "success",
+                message = result.Removed
+                    ? _localizer["Item removed from cart."].Value
+                    : _localizer["Cart updated successfully."].Value,
+                item = result.Item,
+                quantity = result.Quantity,
+                grandTotal = result.GrandTotal,
+                removed = result.Removed
+            });
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -98,46 +66,25 @@ namespace Inventory.Web.Controllers
             if (id <= 0)
                 return BadRequest(new { icon = "error", message = _localizer["Invalid Cart ID."].Value });
 
-            var response = await _client.DeleteAsync($"Carts/{id}");
-            if (response.IsSuccessStatusCode)
+            var result = await _cartService.RemoveItemAsync(id);
+            if (!result.Success)
             {
-                decimal grandTotal = await GetSafeCartTotalAsync();
-
-                return Ok(new
+                return BadRequest(new
                 {
-                    icon = "info",
-                    message = _localizer["Item removed from cart."].Value,
-                    cartId = id,
-                    grandTotal
+                    icon = "error",
+                    message = !string.IsNullOrWhiteSpace(result.ErrorMessage)
+                        ? result.ErrorMessage
+                        : _localizer["Failed to remove item."].Value
                 });
             }
 
-            return BadRequest(new { icon = "error", message = _localizer["Failed to remove item."].Value });
-        }
-
-        private async Task<decimal> GetSafeCartTotalAsync()
-        {
-            try
+            return Ok(new
             {
-                var response = await _client.GetAsync("Carts/total");
-                if (!response.IsSuccessStatusCode) return 0;
-
-                var content = await response.Content.ReadAsStringAsync();
-                if (decimal.TryParse(content, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal simpleTotal))
-                    return simpleTotal;
-
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-                if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("total", out var totalProp))
-                {
-                    return totalProp.GetDecimal();
-                }
-            }
-            catch
-            {
-            }
-
-            return 0;
+                icon = "info",
+                message = _localizer["Item removed from cart."].Value,
+                cartId = id,
+                grandTotal = result.GrandTotal
+            });
         }
     }
 }

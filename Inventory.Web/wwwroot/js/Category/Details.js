@@ -1,5 +1,4 @@
-﻿// 1. Helper function to get theme-aware SweetAlert configuration
-function getThemeSwalConfig(options) {
+﻿function getThemeSwalConfig(options) {
     const isDark = $('html').attr('data-bs-theme') === 'dark' ||
         $('body').attr('data-bs-theme') === 'dark' ||
         localStorage.getItem('theme') === 'dark';
@@ -14,7 +13,6 @@ function getThemeSwalConfig(options) {
     return Object.assign({}, themeDefaults, options);
 }
 
-// 2. Dynamic Theme-Aware Toast Function
 function showThemeToast(options) {
     const isDark = $('html').attr('data-bs-theme') === 'dark' ||
         $('body').attr('data-bs-theme') === 'dark' ||
@@ -37,10 +35,9 @@ function showThemeToast(options) {
 }
 
 function getDetailsConfig() {
-    return window.CategoryDetailsConfig || { labels: {} };
+    return window.CategoryDetailsConfig || {};
 }
 
-// Global Lightbox function
 window.showLightbox = function (imgUrl, title) {
     Swal.fire(getThemeSwalConfig({
         title: title || '',
@@ -56,11 +53,8 @@ window.showLightbox = function (imgUrl, title) {
     }));
 };
 
-// Global Cart Function
 window.updateCartQuantity = function (productId, change) {
     const config = getDetailsConfig();
-    const labels = config.labels || {};
-
     const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
         || $('input[name="__RequestVerificationToken"]').val();
 
@@ -99,7 +93,6 @@ window.updateCartQuantity = function (productId, change) {
                             class="btn btn-outline-primary w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
                             onclick="updateCartQuantity(${cleanProductId}, 1)">
                         <i class="bi bi-bag-plus fs-6"></i>
-                        <span>${labels.addToCart || 'Add to Cart'}</span>
                     </button>
                 `);
             } else {
@@ -113,7 +106,7 @@ window.updateCartQuantity = function (productId, change) {
                         </button>
 
                         <span class="fw-bold px-1 fs-6 user-select-none text-truncate" id="card-qty-${cleanProductId}">
-                            <span class="qty-num" dir="ltr">${finalQty}</span> <small class="fw-normal text-white-50 ms-1 small">${labels.inCart || 'in cart'}</small>
+                            <span class="qty-num" dir="ltr">${finalQty}</span>
                         </span>
 
                         <button type="button"
@@ -144,7 +137,6 @@ window.updateCartQuantity = function (productId, change) {
     });
 };
 
-// Global Favorite Function
 window.toggleFavorite = function (productId) {
     const config = getDetailsConfig();
     const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()

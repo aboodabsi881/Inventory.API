@@ -73,10 +73,35 @@
                 @foreach (var product in Model.ProductsVM)
                 {
                     var prodImg = string.IsNullOrEmpty(product.Img) ? "/images/placeholder.png" : product.Img;
-                    <div class="col" id="product-card-@product.Id">
-                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card cat-detail-card">
+                    var isOutOfStock = product.Quantity <= 0;
+                    var isLowStock = product.Quantity > 0 && product.Quantity <= 5;
 
-                            <!-- Favorite Action Button -->
+                    <div class="col" id="product-card-@product.Id">
+                        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden position-relative product-card cat-detail-card @(isOutOfStock ? "opacity-75" : "")">
+
+                            <!-- Stock Status Badge (Top-Left) -->
+                            <div class="position-absolute top-0 start-0 m-3" style="z-index: 5;">
+                                @if (isOutOfStock)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-slash-circle me-1"></i>@Localizer["Out of Stock"]
+                                    </span>
+                                }
+                                else if (isLowStock)
+                                {
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>@Localizer["Low Stock"]: @product.Quantity
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-check-circle me-1"></i>@Localizer["In Stock"]: @product.Quantity
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Favorite Action Button (Top-Right) -->
                             <button type="button"
                                     class="btn rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center fav-floating-btn"
                                     id="fav-btn-@product.Id"
@@ -111,7 +136,13 @@
 
                                 <!-- Dynamic Cart Control Stepper -->
                                 <div class="my-2" id="cart-control-container-@product.Id">
-                                    @if (product.QuantityInCart > 0)
+                                    @if (isOutOfStock)
+                                    {
+                                        <button type="button" class="btn btn-secondary w-100 rounded-pill py-2 shadow-sm fw-semibold disabled" disabled>
+                                            <i class="bi bi-slash-circle me-1"></i>@Localizer["Unavailable"]
+                                        </button>
+                                    }
+                                    else if (product.QuantityInCart > 0)
                                     {
                                         <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
                                             <button type="button"
@@ -126,8 +157,9 @@
                                             </span>
 
                                             <button type="button"
-                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                                    class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn @(product.QuantityInCart >= product.Quantity ? "disabled opacity-50" : "")"
                                                     style="width: 28px; height: 28px;"
+                                                @(product.QuantityInCart >= product.Quantity ? "disabled" : "")
                                                     onclick="updateCartQuantity(@product.Id, 1)">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
@@ -178,14 +210,10 @@
 
 @section Scripts {
     <script>
-            window.CategoryDetailsConfig = {
-        cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
-            favoriteUrl: '@Url.Action("Add", "Favorite")',
-                labels: {
-                    inCart: @Json.Serialize(Localizer["in cart"].Value),
-                    addToCart: @Json.Serialize(Localizer["Add to Cart"].Value)
-                }
-            };
+        window.CategoryDetailsConfig = {
+            cartUrl: '@Url.Action("AddOrUpdate", "Cart")',
+            favoriteUrl: '@Url.Action("Add", "Favorite")'
+        };
     </script>
     <script src="~/js/Category/Details.js" asp-append-version="true"></script>
 }

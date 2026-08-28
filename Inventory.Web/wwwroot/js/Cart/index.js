@@ -1,4 +1,5 @@
-﻿const Toast = Swal.mixin({
+﻿// 1. Toast Notification Setup
+const Toast = Swal.mixin({
     toast: true,
     position: 'top',
     showConfirmButton: false,
@@ -7,28 +8,43 @@
 });
 
 function getCartConfig() {
-    return window.CartConfig || { texts: {} };
+    return window.CartConfig || {};
 }
 
+// 2. Update Quantity (+ / -)
 function updateQuantity(productId, change) {
     const config = getCartConfig();
-    const texts = config.texts || {};
-    const token = $('input[name="__RequestVerificationToken"]').val();
+    const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
+        || $('input[name="__RequestVerificationToken"]').val();
+
+    const cleanProductId = parseInt(productId, 10);
+    const actionType = change < 0 ? "decrement" : "increment";
 
     $.ajax({
-        url: `${config.addOrUpdateUrl}?productId=${productId}&change=${change}`,
+        url: config.addOrUpdateUrl,
         type: 'POST',
         headers: {
             "RequestVerificationToken": token
         },
+        data: {
+            productId: cleanProductId,
+            actionType: actionType,
+            change: change < 0 ? -1 : 1,
+            __RequestVerificationToken: token
+        },
         success: function (res) {
-            if (res.removed) {
+            if (res && res.removed) {
                 location.reload();
-            } else if (res) {
-                const itemObj = res.item || res.Item;
-                const qty = itemObj ? (itemObj.quantity ?? itemObj.Quantity ?? 0) : 0;
+                return;
+            }
 
-                const unitPrice = parseFloat($(`#price-${productId}`).attr('data-price')) || 0;
+            if (res) {
+                const itemObj = res.item || res.Item;
+                const qty = res.quantity !== undefined
+                    ? res.quantity
+                    : (itemObj ? (itemObj.quantity ?? itemObj.Quantity ?? 0) : 0);
+
+                const unitPrice = parseFloat($(`#price-${cleanProductId}`).attr('data-price')) || 0;
 
                 let itemTotal = itemObj ? (itemObj.totalPrice ?? itemObj.TotalPrice ?? 0) : 0;
                 if (!itemTotal || itemTotal === 0) {
@@ -37,61 +53,56 @@ function updateQuantity(productId, change) {
 
                 const grandTotal = res.grandTotal ?? res.GrandTotal ?? 0;
 
-                $(`#qty-${productId}`).text(qty);
-                $(`#total-${productId}`).text('$' + Number(itemTotal).toFixed(2));
+                $(`#qty-${cleanProductId}`).text(qty);
+                $(`#total-${cleanProductId}`).text('$' + Number(itemTotal).toFixed(2));
 
                 $('#summary-subtotal').text('$' + Number(grandTotal).toFixed(2));
                 $('#summary-grandtotal').text('$' + Number(grandTotal).toFixed(2));
 
-                Toast.fire({ icon: 'success', title: texts.cartUpdated || 'Cart updated' });
+                // Controller-driven message & icon
+                if (res.message) {
+                    Toast.fire({
+                        icon: res.icon || 'success',
+                        title: res.message
+                    });
+                }
             }
         },
         error: function (xhr) {
-            console.error("AJAX Error Details:", xhr);
-            let msg = texts.cartError || 'Failed to update cart.';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                msg = xhr.responseJSON.message;
-            }
-            Toast.fire({ icon: 'error', title: msg });
+            console.error("Cart Update AJAX Error:", xhr);
+            const err = xhr.responseJSON;
+            Toast.fire({
+                icon: (err && err.icon) ? err.icon : 'error',
+                title: (err && err.message) ? err.message : 'Error'
+            });
         }
     });
 }
 
-function showFullImage(imgUrl, productName) {
-    Swal.fire({
-        title: productName || 'Product Image',
-        imageUrl: imgUrl,
-        imageAlt: productName,
-        imageWidth: 500,
-        imageHeight: 'auto',
-        showConfirmButton: false,
-        showCloseButton: true,
-        background: '#fff',
-        customClass: {
-            image: 'img-fluid rounded shadow-sm'
-        }
-    });
-}
-
+// 3. Remove Item
 function removeItem(cartId, name) {
     const config = getCartConfig();
-    const texts = config.texts || {};
+    const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
+        || $('input[name="__RequestVerificationToken"]').val();
 
     Swal.fire({
-        title: texts.removeTitle || 'Remove Item?',
-        text: `Remove "${name}" from your cart?`,
+        text: `"${name}"`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        confirmButtonText: texts.yesRemove || 'Yes, remove'
+        cancelButtonColor: '#6c757d'
     }).then((result) => {
         if (result.isConfirmed) {
-            const token = $('input[name="__RequestVerificationToken"]').val();
-
             $.ajax({
-                url: `${config.removeUrl}/${cartId}`,
+                url: config.removeUrl,
                 type: 'POST',
-                headers: { "RequestVerificationToken": token },
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                data: {
+                    id: cartId,
+                    __RequestVerificationToken: token
+                },
                 success: function (res) {
                     $(`#cart-row-${cartId}`).fadeOut(300, function () {
                         $(this).remove();
@@ -104,11 +115,41 @@ function removeItem(cartId, name) {
                             location.reload();
                         }
                     });
+
+                    // Controller-driven message & icon
+                    if (res && res.message) {
+                        Toast.fire({
+                            icon: res.icon || 'info',
+                            title: res.message
+                        });
+                    }
                 },
-                error: function () {
-                    Toast.fire({ icon: 'error', title: texts.removeError || 'Failed to remove item' });
+                error: function (xhr) {
+                    console.error("Cart Remove AJAX Error:", xhr);
+                    const err = xhr.responseJSON;
+                    Toast.fire({
+                        icon: (err && err.icon) ? err.icon : 'error',
+                        title: (err && err.message) ? err.message : 'Error'
+                    });
                 }
             });
+        }
+    });
+}
+
+// 4. Image Preview Modal
+function showFullImage(imgUrl, productName) {
+    Swal.fire({
+        title: productName || '',
+        imageUrl: imgUrl,
+        imageAlt: productName || '',
+        imageWidth: 500,
+        imageHeight: 'auto',
+        showConfirmButton: false,
+        showCloseButton: true,
+        background: '#fff',
+        customClass: {
+            image: 'img-fluid rounded shadow-sm'
         }
     });
 }

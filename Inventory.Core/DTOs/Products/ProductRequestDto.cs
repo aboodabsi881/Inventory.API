@@ -19,5 +19,10 @@ namespace Inventory.Core.DTOs
 
         [Required(ErrorMessage = "Category ID is required.")]
         public int CategoryId { get; set; }
+
+        //Quantity
+        [Range(0, 10000, ErrorMessage = "Quantity must be 0 or greater.")]
+        public int Quantity { get; set; } = 0;
+
     }
 }

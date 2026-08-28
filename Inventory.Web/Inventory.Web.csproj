@@ -7,14 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Inventory.Core\Inventory.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="wwwroot\images\categories\" />
     <Folder Include="wwwroot\images\users\" />
     <Folder Include="wwwroot\images\Products\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Inventory.Core\Inventory.Core.csproj" />
+    <ProjectReference Include="..\Inventory.Data\Inventory.Data.csproj" />
   </ItemGroup>
 
 </Project>

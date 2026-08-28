@@ -19,5 +19,6 @@ namespace Inventory.Core.Entities.Products
         public Category Category { get; set; }
         public List<Favorite> Favorites { get; set; } = new List<Favorite>();
         public List<Cart> Cart { get; set; } = new List<Cart>();
+        public int Quantity { get; set; } = 0;
     }
 }

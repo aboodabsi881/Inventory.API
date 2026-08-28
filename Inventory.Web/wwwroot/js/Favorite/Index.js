@@ -1,72 +1,81 @@
-﻿// Helper function to get theme-aware SweetAlert configuration
-function getThemeSwalConfig(options) {
+﻿// Dynamic Theme-Aware Toast
+function showThemeToast(options) {
     const isDark = $('html').attr('data-bs-theme') === 'dark' ||
         $('body').attr('data-bs-theme') === 'dark' ||
         localStorage.getItem('theme') === 'dark';
 
-    const themeDefaults = {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
         background: isDark ? '#1e293b' : '#ffffff',
         color: isDark ? '#f8fafc' : '#0f172a',
-        confirmButtonColor: '#4f46e5',
-        cancelButtonColor: isDark ? '#334155' : '#64748b'
-    };
+        customClass: {
+            popup: 'shadow-sm border border-secondary border-opacity-25'
+        }
+    });
 
-    return Object.assign({}, themeDefaults, options);
+    return Toast.fire(options);
 }
 
-function removeFavorite(favoriteId, name) {
-    const config = window.FavoriteConfig || {};
-    const texts = config.texts || {};
+function getFavoriteConfig() {
+    return window.FavoriteConfig || {};
+}
 
-    const confirmMessage = `${texts.removeConfirm || 'Are you sure you want to remove'} "${name}" ${texts.fromFavorites || 'from your favorites?'}`;
+// Instant Toggle Action (No Confirm Dialog)
+function toggleFavoriteRemove(favoriteId) {
+    const config = getFavoriteConfig();
+    const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
+        || $('input[name="__RequestVerificationToken"]').val();
 
-    Swal.fire(getThemeSwalConfig({
-        title: texts.removeTitle || 'Remove from Favorites?',
-        text: confirmMessage,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: texts.yesRemove || 'Yes, remove it!'
-    })).then((result) => {
-        if (result.isConfirmed) {
-            const token = $('input[name="__RequestVerificationToken"]').val();
+    const cleanId = parseInt(favoriteId, 10);
+    const $icon = $(`#fav-icon-${cleanId}`);
+    const $card = $(`#favorite-card-${cleanId}`);
 
-            $.ajax({
-                url: `${config.deleteUrl}/${favoriteId}`,
-                type: 'POST',
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                data: {
-                    id: favoriteId,
-                    __RequestVerificationToken: token
-                },
-                success: function (response) {
-                    Swal.fire(getThemeSwalConfig({
-                        icon: response.icon || 'info',
-                        title: texts.removed || 'Removed!',
-                        text: response.message || 'Item removed from favorites.',
-                        timer: 1500,
-                        showConfirmButton: false
-                    })).then(() => {
-                        $(`#favorite-card-${favoriteId}`).fadeOut(300, function () {
-                            $(this).remove();
+    // Instant visual toggle
+    $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart text-secondary');
 
-                            if ($('#favorites-container .col, #favorites-container [class*="col-"]').length === 0) {
-                                location.reload();
-                            }
-                        });
-                    });
-                },
-                error: function (xhr) {
-                    const err = xhr.responseJSON;
-                    Swal.fire(getThemeSwalConfig({
-                        icon: 'error',
-                        title: texts.oops || 'Oops...',
-                        text: err ? err.message : (texts.errorDefault || 'Failed to remove favorite.')
-                    }));
+    $.ajax({
+        url: `${config.deleteUrl}/${cleanId}`,
+        type: 'POST',
+        headers: {
+            "RequestVerificationToken": token
+        },
+        data: {
+            id: cleanId,
+            __RequestVerificationToken: token
+        },
+        success: function (response) {
+            // Show localized controller message via Toast
+            if (response && response.message) {
+                showThemeToast({
+                    icon: response.icon || 'info',
+                    title: response.message
+                });
+            }
+
+            // Smooth fade out and remove
+            $card.fadeOut(300, function () {
+                $(this).remove();
+
+                // If no cards left, reload to show the empty state design
+                if ($('#favorites-container .col').length === 0) {
+                    location.reload();
                 }
+            });
+        },
+        error: function (xhr) {
+            console.error("Favorite Delete AJAX Error:", xhr);
+
+            // Revert heart state on error
+            $icon.removeClass('bi-heart text-secondary').addClass('bi-heart-fill text-danger');
+
+            const err = xhr.responseJSON;
+            showThemeToast({
+                icon: (err && err.icon) ? err.icon : 'error',
+                title: (err && err.message) ? err.message : 'Error'
             });
         }
     });

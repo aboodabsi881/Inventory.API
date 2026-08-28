@@ -20,5 +20,6 @@ namespace Inventory.Web.ViewModels.Products
         public string? CategoryName { get; set; }
         public int CategoryId { get; set; }
         public string? CreatedBy { get; set; }
+        public int Quantity { get; set; }
     }
 }

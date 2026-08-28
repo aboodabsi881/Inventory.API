@@ -2,35 +2,51 @@
 @model CreateUpdateProductVM
 
 @{
-    ViewData["Title"] = "Create Product";
+    ViewData["Title"] = Localizer["Create Product"];
 }
 
 <div class="row justify-content-center my-4">
     <div class="col-md-8 col-lg-6">
         <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
             <div class="card-header bg-primary text-white p-3">
-                <h4 class="mb-0 fw-bold"><i class="bi bi-plus-square me-2"></i>@Localizer["Create New Product"]</h4>
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-plus-square me-2"></i>@Localizer["Create New Product"]
+                </h4>
             </div>
             <div class="card-body p-4">
                 <form id="createProductForm" asp-action="Create" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
+                    <!-- Product Name -->
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label fw-semibold">@Localizer["Product Name"]</label>
                         <input asp-for="Name" class="form-control" placeholder="@Localizer["Enter product name"]" />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
+                    <!-- Price & Stock Quantity -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label asp-for="Price" class="form-label fw-semibold">@Localizer["Price"]</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                <input asp-for="Price" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" />
                             </div>
                             <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
 
+                        <div class="col-md-6">
+                            <label asp-for="Quantity" class="form-label fw-semibold">@Localizer["Stock Quantity"]</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-boxes"></i></span>
+                                <input asp-for="Quantity" type="number" min="0" step="1" class="form-control" placeholder="0" />
+                            </div>
+                            <span asp-validation-for="Quantity" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Category & Power Type -->
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label asp-for="CategoryId" class="form-label fw-semibold">@Localizer["Category"]</label>
                             <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
@@ -38,16 +54,16 @@
                             </select>
                             <span asp-validation-for="CategoryId" class="text-danger small"></span>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label asp-for="PowerType" class="form-label fw-semibold">@Localizer["Power Type"]</label>
-                        <select asp-for="PowerType"
-                                asp-items="Html.GetEnumSelectList<Inventory.Core.Utilities.Enums.PowerType>()"
-                                class="form-select">
-                            <option value="">@Localizer["-- Select Power Type --"]</option>
-                        </select>
-                        <span asp-validation-for="PowerType" class="text-danger small"></span>
+                        <div class="col-md-6">
+                            <label asp-for="PowerType" class="form-label fw-semibold">@Localizer["Power Type"]</label>
+                            <select asp-for="PowerType"
+                                    asp-items="Html.GetEnumSelectList<Inventory.Core.Utilities.Enums.PowerType>()"
+                                    class="form-select">
+                                <option value="">@Localizer["-- Select Power Type --"]</option>
+                            </select>
+                            <span asp-validation-for="PowerType" class="text-danger small"></span>
+                        </div>
                     </div>
 
                     <!-- Image Preview Container -->
@@ -56,20 +72,21 @@
                         <img id="imgPreview" src="#" alt="Selected Image" class="img-thumbnail object-fit-cover shadow-sm" style="max-height: 150px;" />
                     </div>
 
+                    <!-- Image Upload -->
                     <div class="mb-4">
                         <label asp-for="ImgFile" class="form-label fw-semibold">@Localizer["Product Image"]</label>
                         <input asp-for="ImgFile" id="imgInput" type="file" class="form-control" accept="image/*" />
                         <span asp-validation-for="ImgFile" class="text-danger small"></span>
                     </div>
 
+                    <!-- Actions -->
                     <div class="d-flex justify-content-between pt-3 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-                            <i class="bi bi-arrow-left me-1"></i> @Localizer["Back to List"]
+                        <a  onclick="history.back()" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="bi bi-arrow-left me-1"></i> @Localizer["Back"]
                         </a>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
                             <i class="bi bi-check-lg me-1"></i> @Localizer["Save Product"]
                         </button>
-
                     </div>
                 </form>
             </div>
@@ -79,5 +96,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/Product/Create.js"></script>
+    <script src="~/js/Product/Create.js" asp-append-version="true"></script>
 }

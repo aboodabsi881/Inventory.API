@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Data.Services
+namespace Inventory.Data.Common
 {
     public class SeedService
     {

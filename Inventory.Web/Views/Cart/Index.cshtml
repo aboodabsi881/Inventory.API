@@ -52,9 +52,11 @@
                                 {
                                     var imgUrl = string.IsNullOrEmpty(item.ProductImg) ? "/images/placeholder.png" : item.ProductImg;
                                     var calculatedTotal = item.TotalPrice > 0 ? item.TotalPrice : (item.Quantity * item.ProductPrice);
+                                    var isMaxStockReached = item.AvailableStock > 0 && item.Quantity >= item.AvailableStock;
+                                    var isOutOfStock = item.AvailableStock <= 0 && item.Quantity > 0;
 
-                                    <tr id="cart-row-@item.Id">
-                                        <td class="ps-4" style="width: 45%;">
+                                    <tr id="cart-row-@item.Id" data-stock="@item.AvailableStock">
+                                        <td class="ps-4" style="width: 40%;">
                                             <div class="d-flex align-items-center">
                                                 <a href="javascript:void(0)"
                                                    onclick="showFullImage('@imgUrl', '@item.ProductName')"
@@ -66,10 +68,25 @@
                                                          title="@Localizer["Click to view full image"]" />
                                                 </a>
                                                 <div class="text-truncate">
-                                                    <h6 class="fw-bold mb-1 product-name-heading text-truncate" style="max-width: 230px;" title="@item.ProductName">
+                                                    <h6 class="fw-bold mb-1 product-name-heading text-truncate" style="max-width: 220px;" title="@item.ProductName">
                                                         @(item.ProductName ?? Localizer["Unnamed Product"].Value)
                                                     </h6>
-                                                    <small class="text-muted">@Localizer["Click image to enlarge"]</small>
+                                                    @if (isOutOfStock)
+                                                    {
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 small">
+                                                            @Localizer["Out of Stock"]
+                                                        </span>
+                                                    }
+                                                    else if (item.AvailableStock <= 5)
+                                                    {
+                                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5 small">
+                                                            @Localizer["Only"] @item.AvailableStock @Localizer["left in stock"]
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <small class="text-muted d-block">@Localizer["In Stock"]: @item.AvailableStock</small>
+                                                    }
                                                 </div>
                                             </div>
                                         </td>
@@ -89,7 +106,9 @@
                                                       dir="ltr">@item.Quantity</span>
 
                                                 <button type="button"
-                                                        class="btn btn-action-back @plusRoundedClass px-2.5"
+                                                        class="btn btn-action-back @plusRoundedClass px-2.5 @(isMaxStockReached ? "disabled opacity-50" : "")"
+                                                        id="plus-btn-@item.ProductId"
+                                                    @(isMaxStockReached ? "disabled" : "")
                                                         onclick="updateQuantity(@item.ProductId, 1)">
                                                     +
                                                 </button>
@@ -164,12 +183,8 @@
             addOrUpdateUrl: '@Url.Action("AddOrUpdate", "Cart")',
             removeUrl: '@Url.Action("Remove", "Cart")',
             texts: {
-                cartUpdated: @Json.Serialize(Localizer["Cart updated"].Value),
-                cartError: @Json.Serialize(Localizer["Failed to update cart."].Value),
-                removeTitle: @Json.Serialize(Localizer["Remove Item?"].Value),
-                removeConfirm: @Json.Serialize(Localizer["Remove from your cart?"].Value),
-                yesRemove: @Json.Serialize(Localizer["Yes, remove"].Value),
-                removeError: @Json.Serialize(Localizer["Failed to remove item"].Value)
+                stockLimitReached: @Json.Serialize(Localizer["You have reached the maximum available stock for this item."].Value),
+                removeConfirm: @Json.Serialize(Localizer["Are you sure you want to remove this item?"].Value)
                     }
         };
     </script>

@@ -2,9 +2,8 @@
 @model IEnumerable<CategoryVM>
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = Localizer["Categories"];
 }
-
 
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
@@ -42,12 +41,14 @@
                         <div class="card h-100 shadow-sm rounded-4 overflow-hidden position-relative category-card">
 
                             <!-- Image Container -->
-                            <div class="p-3 d-flex align-items-center justify-content-center position-relative category-img-wrap" style="height: 190px;">
+                            <div class="p-3 d-flex align-items-center justify-content-center position-relative category-img-wrap"
+                                 style="height: 190px; cursor: pointer;"
+                                 onclick="showCategoryImage('@imgSrc', '@category.Name')">
                                 <img src="@imgSrc"
                                      class="img-fluid object-fit-contain h-100 w-100 category-img"
                                      alt="@category.Name"
                                      onerror="this.onerror=null; this.src='/images/placeholder.png';"
-                                     title="@category.Name" />
+                                     title="@Localizer["Click to enlarge"]" />
                             </div>
 
                             <!-- Card Body -->
@@ -64,7 +65,7 @@
                                     </span>
                                 </div>
 
-                                <!-- Action Buttons with High-Contrast Text -->
+                                <!-- Action Buttons -->
                                 <div class="mt-auto d-flex justify-content-between gap-1 pt-3 border-top">
                                     <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-action-view btn-sm rounded-pill flex-fill fw-semibold">
                                         <i class="bi bi-info-circle"></i> @Localizer["Details"]
@@ -73,9 +74,8 @@
                                         <i class="bi bi-pencil"></i> @Localizer["Edit"]
                                     </a>
                                     <button type="button"
-                                            class="btn btn-action-delete btn-sm rounded-pill px-3 btn-delete-category"
-                                            data-id="@category.Id"
-                                            data-name="@category.Name"
+                                            class="btn btn-action-delete btn-sm rounded-pill px-3"
+                                            onclick="deleteCategory(@category.Id, '@category.Name')"
                                             title="@Localizer["Delete"]">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -109,16 +109,8 @@
 @section Scripts {
     <script>
         window.CategoryConfig = {
-            deleteUrl: '@Url.Action("DeleteConfirmed", "Categories")',
-            texts: {
-                areYouSure: @Json.Serialize(Localizer["Are you sure?"].Value),
-                deleteConfirm: @Json.Serialize(Localizer["Do you really want to delete the category"].Value),
-                yesDelete: @Json.Serialize(Localizer["Yes, delete it!"].Value),
-                deleted: @Json.Serialize(Localizer["Deleted!"].Value),
-                oops: @Json.Serialize(Localizer["Oops..."].Value),
-                errorDefault: @Json.Serialize(Localizer["Failed to delete category."].Value)
-                    }
+            deleteUrl: '@Url.Action("DeleteConfirmed", "Categories")'
         };
     </script>
-    <script src="~/js/Category/Index.js"></script>
+    <script src="~/js/Category/Index.js" asp-append-version="true"></script>
 }

@@ -24,7 +24,7 @@ function showThemeToast(options) {
         toast: true,
         position: 'top',
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
         timerProgressBar: true,
         background: isDark ? '#1e293b' : '#ffffff',
         color: isDark ? '#f8fafc' : '#0f172a',
@@ -43,22 +43,42 @@ function getProductConfig() {
 // 3. Cart Stepper / Add to Cart
 function updateCartQuantity(productId, change) {
     const config = getProductConfig();
+    const cleanProductId = parseInt(productId, 10);
+    const productCard = $(`#product-card-${cleanProductId}`);
+
+    // Read available stock from card data attribute
+    const maxStock = parseInt(productCard.attr('data-stock'), 10) || 0;
+    const currentQty = parseInt($(`#card-qty-${cleanProductId} .qty-num`).text(), 10) || 0;
+
+    // Client-side guard: out of stock
+    if (change > 0 && maxStock <= 0) {
+        showThemeToast({
+            icon: 'warning',
+            title: 'This product is currently out of stock.'
+        });
+        return;
+    }
+
+    // Client-side guard: max stock reached
+    if (change > 0 && currentQty >= maxStock) {
+        showThemeToast({
+            icon: 'warning',
+            title: `Maximum available stock reached (${maxStock} units).`
+        });
+        return;
+    }
 
     const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
         || $('input[name="__RequestVerificationToken"]').val();
 
-    const cleanProductId = parseInt(productId, 10);
-    const actionType = change < 0 ? "decrement" : "increment";
-
     $.ajax({
-        url: config.cartUrl,
+        url: config.cartUrl || '/Cart/AddOrUpdate',
         type: 'POST',
         headers: {
             "RequestVerificationToken": token
         },
         data: {
             productId: cleanProductId,
-            actionType: actionType,
             change: change < 0 ? -1 : 1,
             __RequestVerificationToken: token
         },
@@ -82,9 +102,12 @@ function updateCartQuantity(productId, change) {
                             class="btn btn-outline-primary w-100 rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-semibold"
                             onclick="updateCartQuantity(${cleanProductId}, 1)">
                         <i class="bi bi-bag-plus fs-6"></i>
+                        <span>Add to Cart</span>
                     </button>
                 `);
             } else {
+                const isMaxReached = maxStock > 0 && finalQty >= maxStock;
+
                 container.html(`
                     <div class="d-flex align-items-center justify-content-between bg-primary text-white rounded-pill px-2 py-1 shadow-sm" style="min-height: 38px;">
                         <button type="button"
@@ -99,8 +122,9 @@ function updateCartQuantity(productId, change) {
                         </span>
 
                         <button type="button"
-                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn"
+                                class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0 bg-white bg-opacity-25 stepper-btn ${isMaxReached ? 'disabled opacity-50' : ''}"
                                 style="width: 28px; height: 28px;"
+                                ${isMaxReached ? 'disabled' : ''}
                                 onclick="updateCartQuantity(${cleanProductId}, 1)">
                             <i class="bi bi-plus-lg"></i>
                         </button>
@@ -108,7 +132,6 @@ function updateCartQuantity(productId, change) {
                 `);
             }
 
-            // Message and icon delivered directly from controller
             if (response && response.message) {
                 showThemeToast({
                     icon: response.icon || (isRemoved ? 'info' : 'success'),
@@ -118,10 +141,22 @@ function updateCartQuantity(productId, change) {
         },
         error: function (xhr) {
             console.error("Cart AJAX error:", xhr);
-            const err = xhr.responseJSON;
+            let errorMessage = 'Failed to update cart.';
+
+            if (xhr.responseJSON) {
+                errorMessage = xhr.responseJSON.message || xhr.responseJSON.title || errorMessage;
+            } else if (xhr.responseText) {
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    errorMessage = parsed.message || parsed.title || errorMessage;
+                } catch (e) {
+                    // Fallback to default
+                }
+            }
+
             showThemeToast({
-                icon: (err && err.icon) ? err.icon : 'error',
-                title: (err && err.message) ? err.message : 'Error'
+                icon: 'error',
+                title: errorMessage
             });
         }
     });
@@ -136,7 +171,7 @@ function toggleFavorite(productId) {
     const cleanProductId = parseInt(productId, 10);
 
     $.ajax({
-        url: config.favoriteUrl,
+        url: config.favoriteUrl || '/Favorite/Add',
         type: 'POST',
         headers: {
             "RequestVerificationToken": token
@@ -154,7 +189,6 @@ function toggleFavorite(productId) {
                 icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart text-secondary');
             }
 
-            // Message and icon delivered directly from controller
             if (response.message) {
                 showThemeToast({
                     icon: response.icon || 'success',
@@ -167,7 +201,7 @@ function toggleFavorite(productId) {
             const err = xhr.responseJSON;
             showThemeToast({
                 icon: (err && err.icon) ? err.icon : 'error',
-                title: (err && err.message) ? err.message : 'Error'
+                title: (err && err.message) ? err.message : 'Failed to update favorites.'
             });
         }
     });
@@ -215,7 +249,7 @@ function deleteProduct(id, name) {
                 },
                 error: function (xhr) {
                     const err = xhr.responseJSON;
-                    Swal.fire(getThemeSwalConfig({
+                    Swal.fire(getThemeSwalConfig({  
                         icon: (err && err.icon) ? err.icon : 'error',
                         text: (err && err.message) ? err.message : 'Failed to delete product.'
                     }));

@@ -1,33 +1,34 @@
-﻿using Inventory.Web;
+﻿using Inventory.Web.Interfaces;
 using Inventory.Web.ViewModels.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     [Authorize(Roles = "SuperAdmin, Super Admin")]
     public class RolesController : Controller
     {
-        private readonly HttpClient _client;
+        private readonly IViewRoleService _roleService;
         private readonly IStringLocalizer<SharedResource> _localizer;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public RolesController(
-            IHttpClientFactory httpClientFactory,
+            IViewRoleService roleService,
             IStringLocalizer<SharedResource> localizer)
         {
-            _client = httpClientFactory.CreateClient("InventoryAPI");
+            _roleService = roleService;
             _localizer = localizer;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var roles = await _client.GetFromJsonAsync<List<RoleVM>>("Roles", JsonOptions) ?? new List<RoleVM>();
+            var roles = await _roleService.GetAllRolesAsync();
             return View(roles);
         }
 
+        [HttpGet]
         public IActionResult Create() => View();
 
         [HttpPost]
@@ -37,8 +38,8 @@ namespace Inventory.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { icon = "warning", message = _localizer["ValidationFailed"].Value });
 
-            var response = await _client.PostAsJsonAsync("Roles", new { Name = roleVM.Name });
-            if (response.IsSuccessStatusCode)
+            var result = await _roleService.CreateRoleAsync(roleVM);
+            if (result.Success)
             {
                 return Ok(new
                 {
@@ -48,13 +49,15 @@ namespace Inventory.Web.Controllers
                 });
             }
 
-            var errorDetails = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
 
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var role = await _client.GetFromJsonAsync<RoleVM>($"Roles/{id}", JsonOptions);
+            if (id <= 0) return BadRequest("Invalid Role ID.");
+
+            var role = await _roleService.GetRoleByIdAsync(id);
             if (role == null) return NotFound();
 
             return View(role);
@@ -70,8 +73,8 @@ namespace Inventory.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { icon = "warning", message = _localizer["ValidationFailed"].Value });
 
-            var response = await _client.PutAsync($"Roles/{id}", JsonContent.Create(new { Id = roleVM.Id, Name = roleVM.Name }));
-            if (response.IsSuccessStatusCode)
+            var result = await _roleService.UpdateRoleAsync(id, roleVM);
+            if (result.Success)
             {
                 return Ok(new
                 {
@@ -81,22 +84,22 @@ namespace Inventory.Web.Controllers
                 });
             }
 
-            var errorDetails = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
+            return BadRequest(new { icon = "error", message = result.Message });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var role = await _client.GetFromJsonAsync<RoleVM>($"Roles/{id}", JsonOptions);
-            if (role != null && (role.Name.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) || role.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase)))
+            if (id <= 0) return BadRequest(new { icon = "error", message = _localizer["NotFoundRole"].Value });
+
+            var result = await _roleService.DeleteRoleAsync(id);
+            if (result.IsProtected)
             {
-                return BadRequest(new { icon = "error", message = "System Role 'SuperAdmin' cannot be deleted!" });
+                return BadRequest(new { icon = "error", message = result.Message });
             }
 
-            var response = await _client.DeleteAsync($"Roles/{id}");
-            if (response.IsSuccessStatusCode)
+            if (result.Success)
             {
                 return Ok(new
                 {

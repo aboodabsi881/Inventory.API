@@ -19,5 +19,6 @@ namespace Inventory.Web.ViewModels.Products
         // 💡 Store interaction properties needed by the view:
         public int QuantityInCart { get; set; } = 0;
         public bool IsFavorite { get; set; } = false;
+        public int Quantity { get; set; }
     }
 }

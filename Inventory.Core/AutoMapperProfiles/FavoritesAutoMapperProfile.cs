@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Inventory.Core.DTOs;
 using Inventory.Core.Entities.Favorites;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inventory.Core.AutoMapperProfiles
 {
@@ -11,12 +8,17 @@ namespace Inventory.Core.AutoMapperProfiles
     {
         public FavoritesAutoMapperProfile()
         {
-            CreateMap<FavoriteRequestDto, Favorite>();
+            CreateMap<FavoriteRequestDto, Favorite>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Product, opt => opt.Ignore());
 
             CreateMap<Favorite, FavoriteResponseDto>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
-                .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.Product.Price))
-                .ForMember(dest => dest.ProductImg, opt => opt.MapFrom(src => src.Product.Img));
+                .ForMember(dest => dest.ProductName,
+                    opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : string.Empty))
+                .ForMember(dest => dest.ProductPrice,
+                    opt => opt.MapFrom(src => src.Product != null ? src.Product.Price : 0m))
+                .ForMember(dest => dest.ProductImg,
+                    opt => opt.MapFrom(src => src.Product != null ? src.Product.Img : "/images/placeholder.png"));
         }
     }
 }

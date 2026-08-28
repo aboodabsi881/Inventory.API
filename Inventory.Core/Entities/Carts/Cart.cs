@@ -11,6 +11,7 @@ namespace Inventory.Core.Entities.Carts
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public int Quantity { get; set; }
-        public decimal TotalPrice { get; set; } 
+        public decimal TotalPrice { get; set; }
+        public int UserId { get; set; }
     }
 }

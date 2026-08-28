@@ -8,5 +8,6 @@
         public decimal ProductPrice { get; set; }
         public string ProductImg { get; set; } = string.Empty;
         public bool IsFavorite { get; set; }
+        public int UserId { get; set; }
     }
 }

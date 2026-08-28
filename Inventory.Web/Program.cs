@@ -1,16 +1,17 @@
 using Inventory.Web;
+using Inventory.Web.Handlers;
+using Inventory.Web.Interfaces;
+using Inventory.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
 namespace Inventory.Web
 {
-    public class Progeam
+    public class Program
     {
         public static void Main(string[] args)
         {
-
-
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -23,11 +24,24 @@ namespace Inventory.Web
                         factory.Create(typeof(SharedResource));
                 });
 
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddTransient<UserAuthHeaderHandler>();
+
+            var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7182/api/";
             builder.Services.AddHttpClient("InventoryAPI", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7182/api/");
+                client.BaseAddress = new Uri(apiBaseUrl);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
+            })
+            .AddHttpMessageHandler<UserAuthHeaderHandler>(); 
+
+            builder.Services.AddScoped<IViewAccountService, ViewAccountService>();
+            builder.Services.AddScoped<IViewCartService, ViewCartService>();
+            builder.Services.AddScoped<IViewCategoryService, ViewCategoryService>();
+            builder.Services.AddScoped<IViewFavoriteService, ViewFavoriteService>();
+            builder.Services.AddScoped<IViewHomeService, ViewHomeService>();
+            builder.Services.AddScoped<IViewProductService, ViewProductService>();
+            builder.Services.AddScoped<IViewRoleService, ViewRoleService>();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -36,6 +50,8 @@ namespace Inventory.Web
                     options.AccessDeniedPath = "/Accounts/AccessDenied";
                     options.ExpireTimeSpan = TimeSpan.FromDays(7);
                     options.SlidingExpiration = true;
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                 });
 
             var supportedCultures = new[]
@@ -71,6 +87,7 @@ namespace Inventory.Web
             app.UseRequestLocalization();
 
             app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -80,6 +97,5 @@ namespace Inventory.Web
 
             app.Run();
         }
-    
     }
 }

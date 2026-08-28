@@ -6,7 +6,6 @@ namespace Inventory.Core.DTOs
     {
         [Required(ErrorMessage = "Product ID is required.")]
         public int ProductId { get; set; }
-
         public bool IsFavorite { get; set; } = true;
     }
 }

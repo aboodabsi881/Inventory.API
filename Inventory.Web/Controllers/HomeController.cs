@@ -1,58 +1,34 @@
 using Inventory.ViewModels;
-using Inventory.Web.ViewModels.Home;
+using Inventory.Web.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Diagnostics;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly HttpClient _client;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private readonly IViewHomeService _homeService;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IViewHomeService homeService)
         {
-            _client = httpClientFactory.CreateClient("InventoryAPI");
+            _homeService = homeService;
         }
 
         [HttpGet]
-        [Authorize(Roles = "SuperAdmin, Admin , Super Admin")]
+        [Authorize(Roles = "SuperAdmin, Admin, Super Admin")]
         public async Task<IActionResult> Index()
         {
-            var vm = new DashboardVM();
-
-            try
-            {
-                var productsTask = _client.GetFromJsonAsync<List<RecentProductVM>>("Products", JsonOptions);
-                var categoriesTask = _client.GetFromJsonAsync<List<object>>("Categories", JsonOptions);
-                var usersTask = _client.GetFromJsonAsync<List<object>>("Accounts/users", JsonOptions);
-
-                await Task.WhenAll(productsTask, categoriesTask, usersTask);
-
-                var products = await productsTask ?? new();
-                var categories = await categoriesTask ?? new();
-                var users = await usersTask ?? new();
-
-                vm.TotalProducts = products.Count;
-                vm.LowStockCount = products.Count(p => p.StockQuantity <= 5);
-                vm.TotalCategories = categories.Count;
-                vm.TotalUsers = users.Count;
-                vm.RecentProducts = products.OrderByDescending(p => p.Id).Take(5).ToList();
-            }
-            catch
-            {
-            }
-
+            var vm = await _homeService.GetDashboardMetricsAsync();
             return View(vm);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        [HttpGet]
+        public IActionResult Privacy() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -68,7 +44,7 @@ namespace Inventory.Web.Controllers
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(lang)),
                 new CookieOptions
                 {
-                    Path = "/", // Ensures cookie is sent for all routes
+                    Path = "/",
                     Expires = DateTimeOffset.UtcNow.AddYears(1),
                     IsEssential = true,
                     SameSite = SameSiteMode.Lax

@@ -13,5 +13,7 @@ namespace Inventory.Core.DTOs
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string? CreatedBy { get; set; }
+        public int Quantity { get; set; }
+        public bool InStock => Quantity > 0;
     }
 }

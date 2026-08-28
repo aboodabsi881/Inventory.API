@@ -1,4 +1,4 @@
-﻿// 1. Helper function to get theme-aware SweetAlert configuration
+﻿// 1. Theme-Aware SweetAlert Configuration Helper
 function getThemeSwalConfig(options) {
     const isDark = $('html').attr('data-bs-theme') === 'dark' ||
         $('body').attr('data-bs-theme') === 'dark' ||
@@ -14,80 +14,76 @@ function getThemeSwalConfig(options) {
     return Object.assign({}, themeDefaults, options);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const config = window.CategoryConfig || {};
-    const texts = config.texts || {};
+function getCategoryConfig() {
+    return window.CategoryConfig || {};
+}
 
-    // 2. Category Image Lightbox Preview
-    $(document).on('click', '.category-image-preview', function (e) {
-        e.preventDefault();
-        const imgUrl = $(this).data('img');
-        const categoryName = $(this).data('name') || 'Category Image';
+// 2. Lightbox Preview
+function showCategoryImage(imgUrl, categoryName) {
+    Swal.fire(getThemeSwalConfig({
+        title: categoryName || '',
+        imageUrl: imgUrl,
+        imageAlt: categoryName || 'Category Image',
+        imageWidth: 500,
+        imageHeight: 'auto',
+        showConfirmButton: false,
+        showCloseButton: true,
+        customClass: {
+            image: 'img-fluid rounded shadow-sm'
+        }
+    }));
+}
 
-        Swal.fire(getThemeSwalConfig({
-            title: categoryName,
-            imageUrl: imgUrl,
-            imageAlt: categoryName,
-            imageWidth: 500,
-            imageHeight: 'auto',
-            showConfirmButton: false,
-            showCloseButton: true,
-            customClass: {
-                image: 'img-fluid rounded shadow-sm'
-            }
-        }));
-    });
+// 3. Category Delete Action (Controller Driven)
+function deleteCategory(id, name) {
+    const config = getCategoryConfig();
+    const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val()
+        || $('input[name="__RequestVerificationToken"]').val();
 
-    // 3. Category Delete Action
-    $(document).on('click', '.btn-delete-category', function () {
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-
-        Swal.fire(getThemeSwalConfig({
-            title: texts.areYouSure || 'Are you sure?',
-            text: `${texts.deleteConfirm || 'Delete'} "${name}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: texts.yesDelete || 'Yes, delete it!'
-        })).then((result) => {
-            if (result.isConfirmed) {
-                const token = $('input[name="__RequestVerificationToken"]').val();
-
-                $.ajax({
-                    url: `${config.deleteUrl}/${id}`,
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        __RequestVerificationToken: token
-                    },
-                    headers: {
-                        "RequestVerificationToken": token
-                    },
-                    success: function (response) {
-                        Swal.fire(getThemeSwalConfig({
-                            icon: response.icon || 'success',
-                            title: texts.deleted || 'Deleted!',
-                            text: response.message || 'Category deleted successfully.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        })).then(() => {
-                            $(`#category-card-${id}`).fadeOut(300, function () {
-                                $(this).remove();
-                            });
+    Swal.fire(getThemeSwalConfig({
+        text: `"${name}"`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#64748b'
+    })).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `${config.deleteUrl}/${id}`,
+                type: 'POST',
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                data: {
+                    id: id,
+                    __RequestVerificationToken: token
+                },
+                success: function (response) {
+                    Swal.fire(getThemeSwalConfig({
+                        icon: response.icon || 'success',
+                        title: response.title || '',
+                        text: response.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    })).then(() => {
+                        $(`#category-card-${id}`).fadeOut(300, function () {
+                            $(this).remove();
+                            if ($('#categories-container .col').length === 0) {
+                                location.reload();
+                            }
                         });
-                    },
-                    error: function (xhr) {
-                        const err = xhr.responseJSON;
-                        Swal.fire(getThemeSwalConfig({
-                            icon: 'error',
-                            title: texts.oops || 'Error',
-                            text: err?.message || texts.errorDefault || 'Failed to delete category.'
-                        }));
-                    }
-                });
-            }
-        });
+                    });
+                },
+                error: function (xhr) {
+                    console.error("Category Delete AJAX Error:", xhr);
+                    const err = xhr.responseJSON;
+                    Swal.fire(getThemeSwalConfig({
+                        icon: (err && err.icon) ? err.icon : 'error',
+                        title: (err && err.title) ? err.title : 'Error',
+                        text: (err && err.message) ? err.message : 'Failed to delete category.'
+                    }));
+                }
+            });
+        }
     });
-});
+}

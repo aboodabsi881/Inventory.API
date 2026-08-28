@@ -3,11 +3,10 @@ using Inventory.Core.Entities.Users.ApplicationRoles;
 using Inventory.Core.Entities.Users.ApplicationUsers;
 using Inventory.Core.Interfaces;
 using Inventory.Core.Services;
+using Inventory.Data.Common;
 using Inventory.Data.Data;
-using Inventory.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-
 
 namespace Inventory.API
 {
@@ -15,7 +14,6 @@ namespace Inventory.API
     {
         public static async Task Main(string[] args) // Entry point of the application
         {
-
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -23,6 +21,9 @@ namespace Inventory.API
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>() // Add Identity services for user and role management
                 .AddEntityFrameworkStores<AppDbContext>();  // Add Entity Framework stores for Identity
+
+            builder.Services.AddHttpContextAccessor(); // Allows reading HTTP Headers/Claims
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>(); // Resolves the dependency for CartService/FavoriteService
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); //AddScoped : Registers a service with a scoped lifetime, meaning a new instance is created for each HTTP request.
             builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -37,7 +38,7 @@ namespace Inventory.API
             builder.Services.AddEndpointsApiExplorer(); // Add API explorer for endpoint discovery
             builder.Services.AddSwaggerGen(); // Add Swagger generator for API documentation
 
-            builder.Services.AddControllers() 
+            builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Add JSON string enum converter
@@ -47,7 +48,7 @@ namespace Inventory.API
             var app = builder.Build();
 
             // Configure Pipeline
-            if (app.Environment.IsDevelopment()) 
+            if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger(); // Enable Swagger middleware for API documentation
                 app.UseSwaggerUI();
@@ -63,13 +64,13 @@ namespace Inventory.API
 
             app.MapControllers(); // Map controller routes
 
-            using (var scope = app.Services.CreateScope()) 
+            using (var scope = app.Services.CreateScope())
             {
-                var services = scope.ServiceProvider; 
-                await SeedService.SeedDatabaseAsync(services); 
+                var services = scope.ServiceProvider;
+                await SeedService.SeedDatabaseAsync(services);
             }
 
-            app.Run(); 
+            app.Run();
         }
     }
 }

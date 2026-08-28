@@ -1,39 +1,29 @@
-﻿using Inventory.Web;
-using Inventory.Web.ViewModels.Favorites;
+﻿using Inventory.Web.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Inventory.Web.Controllers
 {
     [Authorize]
     public class FavoriteController : Controller
     {
-        private readonly HttpClient _client;
+        private readonly IViewFavoriteService _favoriteService;
         private readonly IStringLocalizer<SharedResource> _localizer;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public FavoriteController(
-            IHttpClientFactory httpClientFactory,
+            IViewFavoriteService favoriteService,
             IStringLocalizer<SharedResource> localizer)
         {
-            _client = httpClientFactory.CreateClient("InventoryAPI");
+            _favoriteService = favoriteService;
             _localizer = localizer;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<FavoriteVM> favorites = new();
-            try
-            {
-                var response = await _client.GetFromJsonAsync<List<FavoriteVM>>("Favorites", JsonOptions) ?? new List<FavoriteVM>();
-                favorites = response.Where(f => f.IsFavorite).ToList();
-            }
-            catch
-            {
-            }
-
+            var favorites = await _favoriteService.GetUserFavoritesAsync();
             return View(favorites);
         }
 
@@ -44,23 +34,21 @@ namespace Inventory.Web.Controllers
             if (productId <= 0)
                 return BadRequest(new { icon = "error", message = _localizer["ProductNotFound"].Value });
 
-            var response = await _client.PostAsync($"Favorites/toggle/{productId}", null);
-            if (response.IsSuccessStatusCode)
+            var result = await _favoriteService.ToggleFavoriteAsync(productId);
+            if (result.Success)
             {
-                var result = await response.Content.ReadFromJsonAsync<FavoriteVM>(JsonOptions);
                 return Ok(new
                 {
                     icon = "success",
-                    message = result?.IsFavorite == true
+                    message = result.IsFavorite
                         ? _localizer["AddedToFavorite"].Value
                         : _localizer["RemovedFromFavorite"].Value,
-                    isFavorite = result?.IsFavorite ?? false,
+                    isFavorite = result.IsFavorite,
                     productId
                 });
             }
 
-            var errorDetails = await response.Content.ReadAsStringAsync();
-            return BadRequest(new { icon = "error", message = $"API Error: {errorDetails}" });
+            return BadRequest(new { icon = "error", message = $"API Error: {result.Message}" });
         }
 
         [HttpPost]
@@ -70,8 +58,8 @@ namespace Inventory.Web.Controllers
             if (id <= 0)
                 return BadRequest(new { icon = "error", message = _localizer["ProductNotFound"].Value });
 
-            var response = await _client.DeleteAsync($"Favorites/{id}");
-            if (response.IsSuccessStatusCode)
+            var result = await _favoriteService.DeleteFavoriteAsync(id);
+            if (result.Success)
             {
                 return Ok(new
                 {

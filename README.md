@@ -21,9 +21,9 @@ A modern, full-stack **Inventory Management Application** built using **ASP.NET 
 
 ## 📊 Dashboard Preview
 
-[![Inventory Dashboard](dashboard_img.png)](dashboard_img.png)
+[![Inventory Dashboard](dashboard_img.png)](dashboard-overview.pdf)
 
-> 💡 *Click the preview image to open the full [Dashboard PDF](dashboard_img.png).*
+> 💡 *Click the preview image above to view the full [Dashboard PDF](dashboard-overview.pdf).*
 
 ---
 
@@ -47,7 +47,7 @@ A modern, full-stack **Inventory Management Application** built using **ASP.NET 
 ```text
 InventoryApp/
 ├── dashboard-overview.pdf       # Full dashboard PDF
-├── dashboard-preview.png        # Rendered image preview for README
+├── dashboard_img.png            # Rendered preview image for README
 ├── Inventory.API/               # RESTful Web API project
 │   └── Controllers/             # CartsController, ProductsController, etc.
 │
